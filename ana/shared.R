@@ -25,13 +25,10 @@ getGroupParticipants <- function(group) {
   
 }
 
-getParticipantTaskData <- function(group, id, taskno, task) {
+getParticipantTaskData <- function(id, taskno, task) {
   
-  if (id < 10){
-    filepath <- sprintf('data/pilot/SELECTED/%s/p00%d/p00%d-%d-%s_selected.txt', group, id, id, taskno,task) #creates the file path relative to current directory
-  } else{
-    filepath <- sprintf('data/pilot/SELECTED/%s/p0%d/p0%d-%d-%s_selected.txt', group, id, id, taskno,task) #creates the file path relative to current directory
-  }
+  filepath <- sprintf('data/behavior/p%03d/p%03d-%d-%s_selected.txt', id, id, taskno,task) #creates the file path relative to current directory
+
   
   df <- read.table(file = filepath) #these files need headers to be added
   # count the number of columns
@@ -40,9 +37,9 @@ getParticipantTaskData <- function(group, id, taskno, task) {
   
   # 19 columns, use these as headers
   if (CountCol == 19) {
-    colnames(df) <- c("cursorx_cm", "cursory_cm", "homex_cm", "homey_cm", "mousex_cm", "mousey_cm",
-                      "participant", "rotation", "step", "targetangle_deg", "targetx_cm", "targety_cm",
-                      "time_ms", "trial", "trialselected_bool", "sampleselected_bool", "sampleinterpolated_bool",
+    colnames(df) <- c("step", "time_ms", "mousex_cm", "mousey_cm", "cursorx_cm", "cursory_cm",
+                      "homex_cm", "homey_cm", "rotation", "participant", "targetangle_deg", "targetx_cm",
+                      "targety_cm", "trial", "trialselected_bool", "sampleselected_bool", "sampleinterpolated_bool",
                       "maxvelocity_idx", "unsure")
   }
   return(df)
@@ -205,6 +202,30 @@ getColourScheme <- function(groups = c('noninstructed','instructed')){
     
     #colourscheme[['ALIGNED']] <-   list('S'='#A9A9A9ff', #dark grey
     #                               'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
+getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm')){
+  #create a list containing the colourscheme per group
+  for (group in groups){
+    colourscheme <- list()
+    
+    colourscheme[['smlrot']] <- list('S'='#ff8200ff', # pure orange
+                                    'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['lrgrot']] <- list('S'='#e51636ff', #vivid/york red
+                                            'T'='#e516362f')
+    
+    colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
+                                    'T'='#c400c42f')
+    
+    colourscheme[['aln']] <-   list('S'='#005de4ff', #pure blue
+                                           'T'='#005de42f')
+    
+    colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
+                                        'T'='#A9A9A92f')
     
   }
   return(colourscheme)

@@ -4,11 +4,8 @@ getStepReach <- function(id, task, taskno){
   #specify pp id, the task type, and task number
   #note that task type and taskno have to match, depending on present csv files
   #Note to change filepath once data folder is arranged
-  if (id < 10){
-    dat <- read.csv(file = sprintf('data/pilot/RAW/p00%d/p00%d-%d-%s.csv', id, id, taskno,task))
-  } else{
-    dat <- read.csv(file = sprintf('data/pilot/RAW/p0%d/p0%d-%d-%s.csv', id, id, taskno,task))
-  }
+  dat <- read.csv(file = sprintf('data/behavior/p%03d/p%03d-%d-%s.csv', id, id, taskno,task))
+
   
   #use line below to only include particular steps
   #as of now raw files will have all steps
@@ -16,13 +13,9 @@ getStepReach <- function(id, task, taskno){
   #ndat <- dat[dat$step == 3 | dat$step == 4 | dat$step == 5, ]
   ndat <- subset(dat, select = - trial_correct) #remove last column (trial_correct)
   #want it as txt file so that it can work with selection GUI
-  if (id < 10){
-    write.table(ndat, file = sprintf("data/pilot/RAW/p00%d/p00%d-%d-%s.txt", id, id, taskno,task), sep = "\t",
-                row.names = FALSE)
-  } else{
-    write.table(ndat, file = sprintf("data/pilot/RAW/p0%d/p0%d-%d-%s.txt", id, id, taskno,task), sep = "\t",
-                row.names = FALSE)
-  }
+  write.table(ndat, file = sprintf('data/behavior/p%03d/p%03d-%d-%s.txt', id, id, taskno,task), sep = "\t",
+              row.names = FALSE)
+
 }
 
 getAllStepReach <- function(id){
@@ -46,6 +39,17 @@ getAllStepReach <- function(id){
     getStepReach(id = id, task = 'random1', taskno = 9)
     getStepReach(id = id, task = 'mirror', taskno = 11)
     getStepReach(id = id, task = 'washout1', taskno = 13)
+  }
+  
+}
+
+getDataForSelection <- function(maxppid = 31){
+  
+  
+  ids <- c(0:maxppid)
+  
+  for(idno in ids){
+    getAllStepReach(id = idno)
   }
   
 }
