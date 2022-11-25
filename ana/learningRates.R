@@ -344,7 +344,7 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
        main = "ERP time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
-  axis(2, at = c(-15, -10, -5, 0, 5)) #tick marks for y axis
+  axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
   
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
@@ -406,6 +406,125 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   
 }
 
+getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), type = 'b'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s.csv', group))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/DiffWaves_CI_%s.csv', group), row.names = F) 
+      
+    }
+  }
+}
+
+plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig2_DiffWaves.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s.csv', group))
+    timepts <- data$time
+  }
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+       xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+  axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+  
+  for(group in groups){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    groupconfidence <- read.csv(file=sprintf('data/DiffWaves_CI_%s.csv', group))
+    
+    colourscheme <- getERPColourScheme(groups = group)
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[group]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+  }
+  
+  
+  for (group in groups) {
+    # plot mean reaches for each group
+    col <- colourscheme[[group]][['S']]
+    #lines(x = timepts, y = mid, col=col)
+    lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+  }
+  
+  #add movement onset 
+  #mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+  mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+  mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+  
+  # col <- colourscheme[['aln']][['T']]
+  # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+  # col <- colourscheme[['aln']][['S']]
+  # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+  
+  col <- colourscheme[['lrgrot']][['T']]
+  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.6, 4.6), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['lrgrot']][['S']]
+  points(x = mo_rot[,2], y = 4.6, pch = 20, cex = 1.5, col=col)
+  
+  col <- colourscheme[['lrgrdm']][['T']]
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.3, 4.3), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['lrgrdm']][['S']]
+  points(x = mo_rdm[,2], y = 4.3, pch = 20, cex = 1.5, col=col)
+  
+  #add legend
+  legend(0.8,-10,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned'),
+         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
 #Aligned----
 getALNParticipantLearningCurve <- function(id, location) {
   
@@ -447,8 +566,43 @@ getALNGroupLearningCurves <- function(maxppid, location) {
     }
     
   }
-  #return(dataoutput)
-  write.csv(dataoutput, file='data/ALIGNED_learningcurve_degrees.csv', row.names = F) 
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/ALIGNED_learningcurve_degrees.csv', row.names = F) 
+}
+
+getALNGroupConfidenceInterval <- function(maxppid, location, type){
+  #for (group in groups){
+  # get the confidence intervals for each trial of each group
+  data <- getALNGroupLearningCurves(maxppid = maxppid, location = location)
+  #data <- data[,-6] #remove faulty particiapnt (pp004) so the 6th column REMOVE ONCE RESOLVED
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data1 <- as.matrix(data[,2:dim(data)[2]])
+  
+  confidence <- data.frame()
+  
+  
+  for (trial in trialno){
+    cireaches <- data1[which(data$trial == trial), ]
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+    
+    write.csv(confidence, file='data/ALN_CI_learningcurve.csv', row.names = F) 
+    
+    
+  }
+  #}
 }
 
 getsmallALNErrors <- function(maxppid = 31, location = 'feedback', cutoff = 5){
@@ -741,8 +895,8 @@ getROTGroupLearningCurves <- function(maxppid, location) {
     }
     
   }
-  #return(dataoutput)
-  write.csv(dataoutput, file='data/ROT_learningcurve_degrees.csv', row.names = F) 
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/ROT_learningcurve_degrees.csv', row.names = F) 
 }
 
 getROTGroupConfidenceInterval <- function(maxppid, location, type){
@@ -834,6 +988,92 @@ plotROTLearningCurves <- function(target='inline') {
   # legend(70,-100,legend=c('Non-Instructed','Instructed'),
   #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
   #        lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+#plot aligned and learning curves for rot and random----
+plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig3_ROTRDM_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,139), ylim = c(-10,35), 
+       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reach learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(0, 30), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(side=1, at=c(1,25,48), labels=c('1','25',''))
+  axis(side=1, at=c(49,96,138), labels=c('49','96','138'))
+  axis(2, at = c(0, 15, 25, 30), las = 2) #tick marks for y axis
+  
+  
+  #read in files created by getGroupConfidenceInterval in filehandling.R
+  for(task in tasks){
+    if(task == 'rot'){
+      groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
+    } else if(task == 'rdm'){
+      groupconfidence <- read.csv(file='data/RDMROT_CI_learningcurve.csv')
+    } else if(task == 'aln'){
+      groupconfidence <- read.csv(file='data/ALN_CI_learningcurve.csv')
+    }
+    
+    
+    colourscheme <- getPtypeColourScheme(tasks=task)
+    
+    #colourscheme <- getColourScheme(groups = group)
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[task]][['T']]
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    if(task == 'rot'){
+      polygon(x = c(c(49:138), rev(c(49:138))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(49:138), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'rdm'){
+      polygon(x = c(c(49:96), rev(c(49:96))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(49:96), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'aln'){
+      polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(1:48), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    }
+    
+    
+    
+
+  }
+  
+  
+  
+  #add legend
+  legend(110,0,legend=c('ALIGNED', 'ROT','RDM'),
+         col=c(colourscheme[['aln']][['S']],colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
   if (target=='svg') {

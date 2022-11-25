@@ -231,21 +231,21 @@ getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'l
   return(colourscheme)
 }
 
-getPtypeColourScheme <- function(perturb = c('ROT','MIR')){
+getPtypeColourScheme <- function(tasks = c('aln', 'rot','rdm')){
   #create a list containing the colourscheme per group
-  for (ptype in perturb){
+  for (task in tasks){
     colourscheme <- list()
     
     #colourscheme[['WASH0']] <- list('S'='#ff8200ff', # pure orange
     #                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
     
-    colourscheme[['ROT']] <- list('S'='#e51636ff', #vivid/york red
+    colourscheme[['rot']] <- list('S'='#e51636ff', #vivid/york red
                                   'T'='#e516362f')
     
-    #colourscheme[['WASH1']] <- list('S'='#c400c4ff', #strong magenta
-    #                                     'T'='#c400c42f')
+    colourscheme[['rdm']] <- list('S'='#c400c4ff', #strong magenta
+                                    'T'='#c400c42f')
     
-    colourscheme[['MIR']] <-   list('S'='#005de4ff', #pure blue
+    colourscheme[['aln']] <-   list('S'='#005de4ff', #pure blue
                                     'T'='#005de42f')
     
     #colourscheme[['ALIGNED']] <-   list('S'='#A9A9A9ff', #dark grey
