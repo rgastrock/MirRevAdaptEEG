@@ -1010,13 +1010,14 @@ plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inl
   
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(0,139), ylim = c(-10,35), 
+  plot(NA, NA, xlim = c(0,187), ylim = c(-10,35), 
        xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
        main = "Reach learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(0, 30), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  axis(side=1, at=c(1,25,48), labels=c('1','25',''))
-  axis(side=1, at=c(49,96,138), labels=c('49','96','138'))
-  axis(2, at = c(0, 15, 25, 30), las = 2) #tick marks for y axis
+  axis(side=1, at=c(1,48), labels=c('1','48'))
+  axis(side=1, at=c(49,96), labels=c('1','48'))
+  axis(side=1, at=c(97,186), labels=c('1','90'))
+  axis(2, at = c(0, 5, 10, 15, 20, 25, 30), las = 2) #tick marks for y axis
   
   
   #read in files created by getGroupConfidenceInterval in filehandling.R
@@ -1044,11 +1045,11 @@ plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inl
     #polygon creates it from low left to low right, then up right to up left -> use rev
     #x is just trial nnumber, y depends on values of bounds
     if(task == 'rot'){
-      polygon(x = c(c(49:138), rev(c(49:138))), y = c(lower, rev(upper)), border=NA, col=col)
+      polygon(x = c(c(97:186), rev(c(97:186))), y = c(lower, rev(upper)), border=NA, col=col)
       meanGroupReaches <- mid #use mean to fill in empty list for each group
       # plot mean reaches for each group
       col <- colourscheme[[task]][['S']]
-      lines(x = c(49:138), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+      lines(x = c(97:186), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
     } else if (task == 'rdm'){
       polygon(x = c(c(49:96), rev(c(49:96))), y = c(lower, rev(upper)), border=NA, col=col)
       meanGroupReaches <- mid #use mean to fill in empty list for each group
@@ -1089,8 +1090,8 @@ getDists <- function(maxppid = 31, location = 'feedback'){
   par(mfrow = c(4,4))
   
   for(participant in participants){
-    data <- getALNParticipantLearningCurve(id = participant, location = location)
-    hist(data$reachdev, xlim = c(-30,30), ylim = c(0,15), breaks = 48,
+    data <- getROTParticipantLearningCurve(id = participant, location = location)
+    hist(data$reachdev, xlim = c(-30,30), ylim = c(0,15), breaks = 90,
          main = sprintf('Participant %s', participant), xlab = 'Degrees')
   }
 }
