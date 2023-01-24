@@ -605,13 +605,13 @@ getALNGroupConfidenceInterval <- function(maxppid, location, type){
   #}
 }
 
-getsmallALNErrors <- function(maxppid = 31, location = 'feedback', cutoff = 5){
+getsmallALNErrors <- function(maxppid = 31, location = 'feedback'){#, cutoff = 5){
  
   data <- getALNGroupLearningCurves(maxppid = maxppid, location = location)
   trial <- data[,1]
   data <- data[,2:ncol(data)]
-  data[data >= cutoff] <- NA
-  data[data <= cutoff*-1] <- NA
+  #data[data >= cutoff] <- NA
+  #data[data <= cutoff*-1] <- NA
   ndat <- data.frame(trial, data)
   
   write.csv(ndat, file='data/ALIGNED_learningcurve_degrees.csv', row.names = F) 
@@ -660,6 +660,8 @@ getRDMParticipantLearningCurve <- function(id, location) {
     RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
   }
   
+  
+  
   negvals <- c(-15, -25, -35)
   posvals <- c(15, 25, 35)
   
@@ -671,6 +673,9 @@ getRDMParticipantLearningCurve <- function(id, location) {
       RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)]))
     }
   }
+  
+  
+  
   
   return(RT)
 }
@@ -810,63 +815,58 @@ getROTParticipantLearningCurve <- function(id, location) {
   #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
   #measure where hand should be minus where it is: if this is spot on then percentage is 0%
   
-    alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  if (id%%2 == 1){
+    #mirror then rotation if odd id
+    rotatedTraining <- getParticipantTaskData(id, taskno = 11, task = 'rotation')
+  } else if (id%%2 == 0){
+    #if pp id is even
+    #rotation first then mirror
+    rotatedTraining <- getParticipantTaskData(id, taskno = 5, task = 'rotation')
+  }
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=89, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
     
-    if (id%%2 == 1){
-      #mirror then rotation if odd id
-      rotatedTraining <- getParticipantTaskData(id, taskno = 11, task = 'rotation')
-    } else if (id%%2 == 0){
-      #if pp id is even
-      #rotation first then mirror
-      rotatedTraining <- getParticipantTaskData(id, taskno = 5, task = 'rotation')
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  #rotation was not counterbalanced for this experiment, therefore we multiply everything by -1
+  #since rotation was always CCW
+  
+  alltargetsbef <- c(67.5, 75, 82.5,
+                     157.5, 165, 172.5,
+                     247.5, 255, 262.5,
+                     337.5, 345, 352.5) #should compensate for 30 degrees
+  alltargetsaft <- c(7.5, 15, 22.5,
+                     97.5, 105, 112.5,
+                     187.5, 195, 202.5,
+                     277.5, 285, 292.5) #compensate 30 degrees
+  
+  angles <- unique(RT$targetangle)
+  #RT['compensate'] <- NA
+  
+  for (target in angles){
+    if (target %in% alltargetsbef){
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])*-1)#/30)*100
+      #RT$compensate[which(RT$targetangle == target)] <- 30
+    } else if (target %in% alltargetsaft){
+      #multiply by negative 1 bec targets after axis will have negative values
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])*-1)#/30)*100
+      #RT$compensate[which(RT$targetangle == target)] <- 30
     }
-    
-    biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
-    #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
-    RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=89, location = location) #rotated is 90 trials; appended to end of aligned
-    
-    for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
-      
-      target<- biases[biasno, 'targetangle'] #get corresponding target angle
-      bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
-      
-      #subtract bias from reach deviation for rotated session only
-      RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
-    }
-    
-    #then for this study we want a measure of percentage of compensation, not angular hand deviation
-    #perturbation is constant here (always 30deg), so the (reachdev/30)*100
-    #note that rotation direction is counterbalanced (CCW and CW)
-    alltargetsbef <- c(67.5, 75, 82.5,
-                       157.5, 165, 172.5,
-                       247.5, 255, 262.5,
-                       337.5, 345, 352.5) #should compensate for 30 degrees
-    alltargetsaft <- c(7.5, 15, 22.5,
-                       97.5, 105, 112.5,
-                       187.5, 195, 202.5,
-                       277.5, 285, 292.5) #compensate 30 degrees
-    
-    angles <- unique(RT$targetangle)
-    #RT['compensate'] <- NA
-
-    for (target in angles){
-      if (target %in% alltargetsbef){
-        RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])*-1)#/30)*100
-        #RT$compensate[which(RT$targetangle == target)] <- 30
-      } else if (target %in% alltargetsaft){
-        #multiply by negative 1 bec targets after axis will have negative values
-        RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])*-1)#/30)*100
-        #RT$compensate[which(RT$targetangle == target)] <- 30
-      }
-    }
-
-    #RT$reachdev <- ((RT$reachdev * -1)/30)*100
-    
-    #use below for absolute errors:
-    #so we subtract rotation size (30deg) from all reach deviations
-    #RT$reachdev <- (RT$reachdev * -1) - 30 #if we want negative values
-    #RT$reachdev <- RT$reachdev - 30 #if we want positive values
-    return(RT)
+  }
+  
+  
+  return(RT)
 }
 
 getROTGroupLearningCurves <- function(maxppid, location) {
