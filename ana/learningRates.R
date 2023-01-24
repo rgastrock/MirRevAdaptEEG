@@ -147,7 +147,7 @@ plotLearningCurves <- function(target='inline'){
   }
 }
 
-#identify movement onset times----
+#identify movement onset times aligned to feedback----
 getMovementOnset <- function(id, taskno, task){
   dat <- getParticipantTaskData(id = id, taskno = taskno, task = task)
 
@@ -171,7 +171,7 @@ getMovementOnset <- function(id, taskno, task){
       trial <- trialno
       comment <- 'unselected'
     } else{
-      firststep4 <- subndat[1,]
+      firststep4 <- subndat[1,] #need the first sample of step 4 - just after reach onset trigger is sent
       firststep5 <- subndat[subndat$step == 5,][1,]
       
       step4start <- firststep4$time_ms
@@ -244,8 +244,8 @@ getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
       }
       
     }
-    #return(dataoutput)
-    write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s.csv', group), row.names = F)
+    return(dataoutput)
+    #write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s.csv', group), row.names = F)
   }
    
 }
@@ -286,9 +286,9 @@ getMovementOnsetConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm'), 
 
 #Plotting EEG Data----
 
-getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm'), type = 'b'){
+getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm'), type = 'b', erps = 'frn'){
   for (group in groups){
-    data <- read.csv(file=sprintf('data/Evoked_DF_%s.csv', group))
+    data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
     data <- data[,2:length(data)]
     
     data <- as.data.frame(data)
@@ -314,14 +314,14 @@ getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
         confidence <- rbind(confidence, citrial)
       }
       
-      write.csv(confidence, file=sprintf('data/ERP_CI_%s.csv', group), row.names = F) 
+      write.csv(confidence, file=sprintf('data/ERP_CI_%s_%s.csv', group, erps), row.names = F) 
       
     }
   }
 }
 
 
-plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inline') {
+plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -333,7 +333,7 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   meanGroupReaches <- list() #empty list so that it plots the means last
   
   for (group in groups){
-    data <- read.csv(file=sprintf('data/Evoked_DF_%s.csv', group))
+    data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
     timepts <- data$time
   }
   
@@ -348,7 +348,7 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
-    groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s.csv', group))
+    groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s.csv', group, erps))
     
     colourscheme <- getERPColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -406,9 +406,9 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   
 }
 
-getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), type = 'b'){
+getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), type = 'b', erps = 'frn'){
   for (group in groups){
-    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s.csv', group))
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
     data <- data[,2:length(data)]
     
     data <- as.data.frame(data)
@@ -434,13 +434,13 @@ getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrd
         confidence <- rbind(confidence, citrial)
       }
       
-      write.csv(confidence, file=sprintf('data/DiffWaves_CI_%s.csv', group), row.names = F) 
+      write.csv(confidence, file=sprintf('data/DiffWaves_CI_%s_%s.csv', group, erps), row.names = F) 
       
     }
   }
 }
 
-plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inline') {
+plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -452,7 +452,7 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inli
   meanGroupReaches <- list() #empty list so that it plots the means last
   
   for (group in groups){
-    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s.csv', group))
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
     timepts <- data$time
   }
   
@@ -467,7 +467,7 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inli
   
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
-    groupconfidence <- read.csv(file=sprintf('data/DiffWaves_CI_%s.csv', group))
+    groupconfidence <- read.csv(file=sprintf('data/DiffWaves_CI_%s_%s.csv', group, erps))
     
     colourscheme <- getERPColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -517,6 +517,257 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inli
   legend(0.8,-10,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned'),
          col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+#identify movement onset times aligned to go target onset----
+getMovementOnsetLRP <- function(id, taskno, task){
+  dat <- getParticipantTaskData(id = id, taskno = taskno, task = task)
+  
+  
+  trials <- unique(dat$trial) 
+  proportion <- data.frame()
+  
+  for (trialno in trials){
+    
+    subndat <- dat[dat$trial == trialno,]
+    subndat <- subndat[subndat$step == c(3,4),]
+    subndatsamp <- subndat[1,]
+    
+    if (nrow(subndat)==0){
+      movementtime <- NA #will assign NA if step 3 does not occur
+      trial <- trialno
+      comment <- 'nostep' #this will help to keep track of how many trials did not have a step later on
+      
+    } else if(subndatsamp$trialselected_bool == 0){#we only want data that has been selected
+      movementtime <- NA
+      trial <- trialno
+      comment <- 'unselected'
+    } else{
+      firststep3 <- subndat[1,] #need the first sample of step 3 - just after go target onset trigger is sent
+      firststep4 <- subndat[subndat$step == 4,][1,]
+      
+      step3start <- firststep3$time_ms
+      step4start <- firststep4$time_ms
+      
+      movementtime <- (step4start - step3start)/1000
+      
+      trial <- trialno
+      comment <- 'selected'
+      
+    }
+    feedback <- c(trial, movementtime, task, comment)
+    
+    
+    if (prod(dim(proportion)) == 0){
+      proportion <- feedback
+    } else {
+      proportion <- rbind(proportion, feedback)
+    }
+  }
+  proportion <- data.frame(proportion, row.names = NULL, stringsAsFactors = F)
+  colnames(proportion) <- c('trial', 'movement_onset', 'task', 'comment')
+  proportion$participant <- id
+  return(proportion)
+}
+
+getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
+  #behavioral data aren't really split into small or large errors, just the task type
+  #so we only plot movement onsets for aligned, rotation, random
+  for (group in groups){
+    #a consequence of adding the groups late led me to fix it in the manner below
+    participants <- seq(0,maxppid,1)
+    
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      if (group == 'aln'){
+        mo <- getMovementOnsetLRP(id = participant, taskno = 1, task = 'aligned')
+      } else if (group == 'rot'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          mo <- getMovementOnsetLRP(id = participant, taskno = 11, task = 'rotation')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          mo <- getMovementOnsetLRP(id = participant, taskno = 5, task = 'rotation')
+        }
+      } else if (group == 'rdm'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          mo <- getMovementOnsetLRP(id = participant, taskno = 9, task = 'random1')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          mo <- getMovementOnsetLRP(id = participant, taskno = 3, task = 'random0')
+        }
+      }
+      
+      
+      reaches <- mo$movement_onset#get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      #rdat <- dat$reaches
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+      
+    }
+    return(dataoutput)
+    #write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s_lrp.csv', group), row.names = F)
+  }
+  
+}
+
+getMovementOnsetConfidenceIntervalLRP <- function(groups = c('aln', 'rot', 'rdm'), type = 'b'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Movement_Onset_%s_lrp.csv', group))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    
+    data <- apply(data, 2, median) #take median movement onset for each participant
+    
+    #then take confidence interval for "group"
+    confidence <- data.frame()
+    cireaches <- data
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    citrial <- as.data.frame(t(citrial))
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+    
+    write.csv(confidence, file=sprintf('data/MovementOnset_CI_%s_lrp.csv', group), row.names = F) 
+    
+    
+  }
+}
+
+#Plotting LRPs----
+getLRPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm'), type = 'b', erps = 'lrp', channel = 'C4'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s.csv', group, erps, channel))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/ERP_CI_%s_%s_%s.csv', group, erps, channel), row.names = F) 
+      
+    }
+  }
+}
+
+
+plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig2_LRP.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  par(mfrow = c(2,2))
+  
+  for (group in groups){
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("ERP time-locked to go signal onset, %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    for (channel in channels){
+      data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s.csv', group, erps, channel))
+      timepts <- data$time
+      
+      #read in files created by getGroupConfidenceInterval in filehandling.R
+      groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s_%s.csv', group, erps, channel))
+      
+      colourscheme <- getLRPColourScheme(channels = channel)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[channel]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[channel]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+
+    }
+    
+    #add legend
+    legend(0.2,-10,legend=c('C3','C4'),
+           col=c(colourscheme[['C3']][['S']],colourscheme[['C4']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    #add movement onset
+    if(group == 'aln'){
+      mo <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+    } else if (group == 'smlrot'){
+      mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+    } else if (group == 'lrgrot'){
+      mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+    } else if (group == 'lrgrdm'){
+      mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+    }
+    colourscheme <- getERPColourScheme(groups = group)
+    col <- colourscheme[[group]][['T']]
+    lines(x = c(mo[,1], mo[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[[group]][['S']]
+    points(x = mo[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    
+
+  }
   
   #close everything if you saved plot as svg
   if (target=='svg') {

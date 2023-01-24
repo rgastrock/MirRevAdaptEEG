@@ -231,6 +231,30 @@ getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'l
   return(colourscheme)
 }
 
+getLRPColourScheme <- function(channels = c('C3','C4')){
+  #create a list containing the colourscheme per group
+  for (channel in channels){
+    colourscheme <- list()
+    
+    # colourscheme[['smlrot']] <- list('S'='#ff8200ff', # pure orange
+    #                                  'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['C3']] <- list('S'='#e51636ff', #vivid/york red
+                                     'T'='#e516362f')
+    
+    # colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
+    #                                  'T'='#c400c42f')
+    
+    colourscheme[['C4']] <-   list('S'='#005de4ff', #pure blue
+                                    'T'='#005de42f')
+    
+    # colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
+    #                                    'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
 getPtypeColourScheme <- function(tasks = c('aln', 'rot','rdm')){
   #create a list containing the colourscheme per group
   for (task in tasks){
