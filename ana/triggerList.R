@@ -43,7 +43,7 @@ getMissingTriggers <- function(pp, startmark, endmark = 16156, trigger){
 }
 
 #single participant, all tasks
-getAllTriggers <- function(maxppid = 31, trigger = 16142, endmark = 16156, tasks = c(16149, 16150, 16151, 16152, 16153, 16154, 16155)){
+getAllTriggers <- function(maxppid = 31, trigger = 16140, endmark = 16156){
   
   participants <- seq(0,maxppid,1)
 
@@ -51,6 +51,16 @@ getAllTriggers <- function(maxppid = 31, trigger = 16142, endmark = 16156, tasks
     trigidx <- c()
     trialno <- c()
     tasktrig<- c()
+    
+    if (participant %%2 == 1){
+      #mirror then rotation if odd id
+      tasks = c(16149, 16150, 16154, 16152, 16153, 16151, 16155)
+    } else if (participant %%2 == 0){
+      #if pp id is even
+      #rotation first then mirror
+      tasks = c(16149, 16150, 16151, 16152, 16153, 16154, 16155)
+    }
+    
     for (task in tasks){
       trigs <- getMissingTriggers(pp = participant, startmark = task, endmark = endmark, trigger = trigger)
       trials <- c(1:length(trigs)-1)
@@ -62,6 +72,9 @@ getAllTriggers <- function(maxppid = 31, trigger = 16142, endmark = 16156, tasks
     }
 
     alldat <- data.frame(trialno, trigidx, tasktrig)
+    #get cumulative trial count
+    ctrial <- c(1:length(alldat$trialno)-1)
+    alldat <- data.frame(ctrial, trialno, trigidx, tasktrig)
     if (trigger == 16142){
       write.csv(alldat, file=sprintf('data/eeg/p%03d/frn/mra_p%03d_tasktrigindex.csv', participant, participant), row.names = F) 
     } else if (trigger == 16140){
