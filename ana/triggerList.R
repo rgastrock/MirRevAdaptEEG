@@ -26,6 +26,7 @@ getMissingTriggers <- function(pp, startmark, endmark = 16156, trigger){
   #every marker shows up after 7 other markers
   #this may be distorted a bit, since we have other missing markers,
   #but if we get an idx close to 2x this number (14) then it is obvious the specific marker was skipped for one trial
+  #need a number less than 14, since different triggers can be missing at once
   trigpres <- 1
   trigabs <- 0
   ntrials <- c()
@@ -33,7 +34,7 @@ getMissingTriggers <- function(pp, startmark, endmark = 16156, trigger){
     ntrials <- c(ntrials, trigpres)
     nxtidx <- diff + 1
     if(nxtidx <= length(ttidx)){
-      if(ttidx[nxtidx] - ttidx[diff] >= 14){
+      if(ttidx[nxtidx] - ttidx[diff] >= 12){
         ntrials <- c(ntrials, trigabs)
       }
     }
