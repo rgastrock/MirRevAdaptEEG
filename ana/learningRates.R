@@ -877,13 +877,6 @@ plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='i
       lines(x = c(mo[,1], mo[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
       col <- colourscheme[[group]][['S']]
       points(x = mo[,2], y = 5, pch = 20, cex = 1.5, col=col)
-    } else if (group == 'smlrot'){
-      mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
-      colourscheme <- getERPColourScheme(groups = group)
-      col <- colourscheme[[group]][['T']]
-      lines(x = c(mo[,1], mo[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[[group]][['S']]
-      points(x = mo[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
     } else if (group == 'lrgrot'){
       mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
       colourscheme <- getERPColourScheme(groups = group)
@@ -953,7 +946,7 @@ getAllLRPConfidenceInterval <- function(type = 'b', erps = 'lrp', channels = c('
 }
 
 
-plotAllLRPs <- function(groups = c('aln', 'smlrot', 'lrgrot', 'lrgrdm'),target='inline', erps = 'lrp', channels = c('C3','C4')) {
+plotAllLRPs <- function(groups = c('aln', 'lrgrot', 'lrgrdm'),target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
@@ -1006,13 +999,11 @@ plotAllLRPs <- function(groups = c('aln', 'smlrot', 'lrgrot', 'lrgrdm'),target='
          col=c(colourscheme[['C3']][['S']],colourscheme[['C4']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
-  ctr = 3.5
+  ctr = 4.5
   for(group in groups){
     #add movement onset
     if(group == 'aln'){
       mo <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
-    } else if (group == 'smlrot'){
-      mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
     } else if (group == 'lrgrot'){
       mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
     } else if (group == 'lrgrdm'){
@@ -1023,7 +1014,7 @@ plotAllLRPs <- function(groups = c('aln', 'smlrot', 'lrgrot', 'lrgrdm'),target='
     lines(x = c(mo[,1], mo[,3]), y = c(ctr, ctr), col = col, lty = 1, lwd = 8)
     col <- colourscheme[[group]][['S']]
     points(x = mo[,2], y = ctr, pch = 20, cex = 1.5, col=col)
-    ctr = ctr + 0.5
+    ctr = ctr - 0.5
   }
 
   
