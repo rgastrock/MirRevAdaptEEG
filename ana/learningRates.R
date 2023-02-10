@@ -198,7 +198,7 @@ getMovementOnset <- function(id, taskno, task){
   return(proportion)
 }
 
-getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
+getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'mir')) {
   #behavioral data aren't really split into small or large errors, just the task type
   #so we only plot movement onsets for aligned, rotation, random
   for (group in groups){
@@ -229,6 +229,15 @@ getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
           #rotation first then mirror
           mo <- getMovementOnset(id = participant, taskno = 3, task = 'random0')
         }
+      } else if (group == 'mir'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          mo <- getMovementOnset(id = participant, taskno = 5, task = 'mirror')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          mo <- getMovementOnset(id = participant, taskno = 11, task = 'mirror')
+        }
       }
       
       
@@ -244,8 +253,8 @@ getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
       }
       
     }
-    return(dataoutput)
-    #write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s.csv', group), row.names = F)
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s.csv', group), row.names = F)
   }
    
 }
@@ -1588,8 +1597,8 @@ plotROTLearningCurves <- function(target='inline') {
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
        xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
-       main = "Reach Learning over Time: ROT", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
-  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+       main = "Reach Learning over Time: MIR", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(0, 15, 30, 45), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
   axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
   
@@ -1726,11 +1735,12 @@ plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inl
 getDists <- function(maxppid = 31, location = 'feedback'){
   
   participants <- seq(0,maxppid,1)
-  par(mfrow = c(4,4))
+  par(mfrow = c(3,3))
   
   for(participant in participants){
-    data <- getROTParticipantLearningCurve(id = participant, location = location)
-    hist(data$reachdev, xlim = c(-30,30), ylim = c(0,15), breaks = 90,
+    #specify function for perturbation
+    data <- getMIRParticipantLearningCurve(id = participant, location = location)
+    hist(data$reachdev, xlim = c(-180, 180), ylim = c(0,15), breaks = 90,
          main = sprintf('Participant %s', participant), xlab = 'Degrees')
   }
 }
@@ -1738,17 +1748,17 @@ getDists <- function(maxppid = 31, location = 'feedback'){
 
 
 # Learning Curves MIRROR----
-getMIRParticipantLearningCurve <- function(group, id, location){
-  #same as rotation, we look into percentage of compensation, but note that magnitude to compensate differs per target
-  alignedTraining <- getParticipantTaskData(group, id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+getMIRParticipantLearningCurve <- function(id, location){
+  #same as rotation, for now we keep measures to degrees for eeg matching
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
   
   if (id%%2 == 1){
     #mirror then rotation if odd id
-    rotatedTraining <- getParticipantTaskData(group, id, taskno = 5, task = 'mirror')
+    rotatedTraining <- getParticipantTaskData(id, taskno = 5, task = 'mirror')
   } else if (id%%2 == 0){
     #if pp id is even
     #rotation first then mirror
-    rotatedTraining <- getParticipantTaskData(group, id, taskno = 11, task = 'mirror')
+    rotatedTraining <- getParticipantTaskData(id, taskno = 11, task = 'mirror')
   }
   
   biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
@@ -1778,27 +1788,27 @@ getMIRParticipantLearningCurve <- function(group, id, location){
   angles <- unique(RT$targetangle)
   RT['compensate'] <- NA
   
-  #we want percentage of compensation
+  #we want degrees for now, not percentages
   #we multily by -1 so that getting positive values mean that the hand went to the correct direction
-  #above 100 values would mean an overcompensation, 0 is going directly to target, negative values are undercompensation
+  #percentage: above 100 values would mean an overcompensation, 0 is going directly to target, negative values are undercompensation
   for (target in angles){
     if (target %in% alltargets15bef){
-      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])/15)*100
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)]))#/15)*100
       RT$compensate[which(RT$targetangle == target)] <- 15
     } else if (target %in% alltargets15aft){
-      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/15)*100
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1))#/15)*100
       RT$compensate[which(RT$targetangle == target)] <- 15
     } else if (target %in% alltargets30bef){
-      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])/30)*100
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)]))#/30)*100
       RT$compensate[which(RT$targetangle == target)] <- 30
     } else if (target %in% alltargets30aft){
-      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/30)*100
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1))#/30)*100
       RT$compensate[which(RT$targetangle == target)] <- 30
     } else if (target %in% alltargets45bef){
-      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])/45)*100
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)]))#/45)*100
       RT$compensate[which(RT$targetangle == target)] <- 45
     } else if (target %in% alltargets45aft){
-      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/45)*100
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1))#/45)*100
       RT$compensate[which(RT$targetangle == target)] <- 45
     }
   }
@@ -1806,121 +1816,128 @@ getMIRParticipantLearningCurve <- function(group, id, location){
   return(RT)  
 }
 
-
-getMIRGroupLearningCurves <- function(group, maxppid, location) { # add angle?
+#grab reachdevs across all targets for EEG data
+getMIRGroupLCALL <- function(maxppid=31, location='feedback') { # add angle?
   #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
   
-  #a consequence of adding the groups late led me to fix it in the manner below
-  if (group == 'noninstructed'){
-    participants <- seq(0,maxppid,1)
-  } else if (group == 'instructed'){
-    participants <- seq(16,maxppid,1)
-  }
+  participants <- seq(0,maxppid,1)
   
   dataoutput<- data.frame() #create place holder
   #go through each participant in this group
   for (participant in participants) {
-    ppangles <- getMIRParticipantLearningCurve(group = group, id=participant, location = location) #for every participant, get learning curve data
+    ppangles <- getMIRParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
     
     reaches <- ppangles$reachdev #get reach deviations column from learning curve data
     trial <- c(1:length(reaches)) #sets up trial column
     dat <- cbind(trial, reaches)
-    #rdat <- dat$reaches
+    
     
     if (prod(dim(dataoutput)) == 0){
       dataoutput <- dat
     } else {
       dataoutput <- cbind(dataoutput, reaches)
     }
-    
-    # if (angle == 15){
-    #   ppangles <- subset(ppangles, compensate == 15)
-    #   reaches <- ppangles$reachdev #get reach deviations column from learning curve data
-    #   trial <- c(1:length(reaches)) #sets up trial column
-    #   dat <- cbind(trial, reaches)
-    #   #rdat <- dat$reaches
-    #   
-    #   if (prod(dim(dataoutput)) == 0){
-    #     dataoutput <- dat
-    #   } else {
-    #     dataoutput <- cbind(dataoutput, reaches)
-    #   }
-    # } else if (angle == 30){
-    #   ppangles <- subset(ppangles, compensate == 30)
-    #   reaches <- ppangles$reachdev #get reach deviations column from learning curve data
-    #   trial <- c(1:length(reaches)) #sets up trial column
-    #   dat <- cbind(trial, reaches)
-    #   #rdat <- dat$reaches
-    #   
-    #   if (prod(dim(dataoutput)) == 0){
-    #     dataoutput <- dat
-    #   } else {
-    #     dataoutput <- cbind(dataoutput, reaches)
-    #   }
-    # } else if (angle == 45){
-    #   ppangles <- subset(ppangles, compensate == 45)
-    #   reaches <- ppangles$reachdev #get reach deviations column from learning curve data
-    #   trial <- c(1:length(reaches)) #sets up trial column
-    #   dat <- cbind(trial, reaches)
-    #   #rdat <- dat$reaches
-    #   
-    #   if (prod(dim(dataoutput)) == 0){
-    #     dataoutput <- dat
-    #   } else {
-    #     dataoutput <- cbind(dataoutput, reaches)
-    #   }
-    # }
-    
-    
-    
   }
-  return(dataoutput)
+  write.csv(dataoutput, file='data/MIR_learningcurve_degrees_ALL.csv', row.names = F) 
+  #return(dataoutput)
+  
 }
 
-getMIRGroupConfidenceInterval <- function(group, maxppid, location, type){
+getMIRGroupLearningCurves <- function(maxppid, location, angles = c(15, 30, 45)) { # add angle?
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  participants <- seq(0,maxppid,1)
+
+  
+  #get csv for each angle, combining all into one plot will produce great variabilities
+  
+  for(angle in angles){
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      ppangles <- getMIRParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+      
+      # reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+      # trial <- c(1:length(reaches)) #sets up trial column
+      # dat <- cbind(trial, reaches)
+      #rdat <- dat$reaches
+      
+      # if (prod(dim(dataoutput)) == 0){
+      #   dataoutput <- dat
+      # } else {
+      #   dataoutput <- cbind(dataoutput, reaches)
+      # }
+      
+      for (irow in c(1:nrow(ppangles))){
+        subdat <- ppangles[irow,]
+        if (subdat$compensate != angle){
+          subdat$reachdev <- NA
+          ppangles[irow,] <- subdat
+        }
+      }
+      
+      reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+        
+        
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+    }
+    write.csv(dataoutput, file=sprintf('data/MIR_learningcurve_degrees_%02d.csv', angle), row.names = F) 
+  }
+  #return(dataoutput)
+  
+}
+
+getMIRGroupConfidenceInterval <- function(angles = c(15,30,45), type = 'b'){
   #for (group in groups){
   # get the confidence intervals for each trial of each group
   #compangle <- c(15,30,45)
   #for (comp in compangle){
-  data <- getMIRGroupLearningCurves(group = group, maxppid = maxppid, location = location) #angle = comp
+  #data <- getMIRGroupLearningCurves(group = group, maxppid = maxppid, location = location) #angle = comp
   #data <- data[,-6] #remove faulty particiapnt (pp004) so the 6th column REMOVE ONCE RESOLVED
-  data <- as.data.frame(data)
-  trialno <- data$trial
-  data1 <- as.matrix(data[,2:dim(data)[2]])
-  
-  confidence <- data.frame()
-  
-  
-  for (trial in trialno){
-    cireaches <- data1[which(data$trial == trial), ]
+  for(angle in angles){
+    data <- read.csv(file=sprintf('data/MIR_learningcurve_degrees_%02d.csv', angle))
     
-    if (type == "t"){
-      cireaches <- cireaches[!is.na(cireaches)]
-      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
-    } else if(type == "b"){
-      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
-    }
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data1 <- as.matrix(data[,2:dim(data)[2]])
     
-    if (prod(dim(confidence)) == 0){
-      confidence <- citrial
-    } else {
-      confidence <- rbind(confidence, citrial)
-    }
-    if (group == 'noninstructed'){
-      write.csv(confidence, file='data/MIR_noninstructed_CI_learningcurve.csv', row.names = F) 
-    } else if (group == 'instructed'){
-      write.csv(confidence, file='data/MIR_instructed_CI_learningcurve.csv', row.names = F)
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[which(data$trial == trial), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/MIR_CI_learningcurve_%02d.csv', angle), row.names = F) 
+      
     }
   }
-  #}
 }
 
-plotMIRLearningCurves <- function(groups = c('noninstructed'), target='inline') {
+plotMIRLearningCurves <- function(angles = c(15,30,45), target='inline') {
   
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig3_MIR_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig7_MIR_learningcurve_degrees.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -1928,44 +1945,44 @@ plotMIRLearningCurves <- function(groups = c('noninstructed'), target='inline') 
   
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
+  plot(NA, NA, xlim = c(0,91), ylim = c(-20, 60), 
        xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
        main = "Reach Learning over Time: MIR", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
-  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  abline(h = c(0, 15, 30, 45), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
-  axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+  axis(2, at = c(-15, -5, 0, 5, 15, 30, 45,60)) #tick marks for y axis
   
-  for(group in groups){
+  for(angle in angles){
     #read in files created by getGroupConfidenceInterval in filehandling.R
-    groupconfidence <- read.csv(file=sprintf('data/MIR_%s_CI_learningcurve.csv', group))
+    groupconfidence <- read.csv(file=sprintf('data/MIR_CI_learningcurve_%02d.csv', angle))
     
-    colourscheme <- getColourScheme(groups = group)
+    colourscheme <- getColourScheme(angles = angle)
     #take only first, last and middle columns of file
     lower <- groupconfidence[,1]
     upper <- groupconfidence[,3]
     mid <- groupconfidence[,2]
     
-    col <- colourscheme[[group]][['T']] #use colour scheme according to group
+    col <- colourscheme[[angle]][['T']] #use colour scheme according to group
     
     #upper and lower bounds create a polygon
     #polygon creates it from low left to low right, then up right to up left -> use rev
     #x is just trial nnumber, y depends on values of bounds
     polygon(x = c(c(1:90), rev(c(1:90))), y = c(lower, rev(upper)), border=NA, col=col)
     
-    meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+    meanGroupReaches[[angle]] <- mid #use mean to fill in empty list for each group
   }
   
   
-  for (group in groups) {
+  for (angle in angles) {
     # plot mean reaches for each group
-    col <- colourscheme[[group]][['S']]
-    lines(meanGroupReaches[[group]],col=col,lty=1)
+    col <- colourscheme[[angle]][['S']]
+    lines(meanGroupReaches[[angle]],col=col,lty=1, lwd=2)
   }
   
   #add legend
-  # legend(70,-100,legend=c('Non-Instructed','Instructed'),
-  #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
-  #        lty=1,bty='n',cex=1,lwd=2)
+  legend(70,0,legend=c('15°','30°','45°'),
+         col=c(colourscheme[[15]][['S']],colourscheme[[30]][['S']],colourscheme[[45]][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
   if (target=='svg') {

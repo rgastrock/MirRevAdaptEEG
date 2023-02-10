@@ -183,21 +183,21 @@ getCircularConfidenceInterval <- function(data, variance = var(data), conf.level
   
 }
 
-getColourScheme <- function(groups = c('noninstructed','instructed')){
+getColourScheme <- function(angles = c(15,30,45)){
   #create a list containing the colourscheme per group
-  for (group in groups){
+  for (angle in angles){
     colourscheme <- list()
     
-    #colourscheme[['WASH0']] <- list('S'='#ff8200ff', # pure orange
-    #                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
+    colourscheme[[15]] <- list('S'='#ff8200ff', # pure orange
+                                         'T'='#ff82002f')    #2f gives a lighter shade of the color
     
-    colourscheme[['noninstructed']] <- list('S'='#e51636ff', #vivid/york red
+    colourscheme[[30]] <- list('S'='#e51636ff', #vivid/york red
                                             'T'='#e516362f')
     
     #colourscheme[['WASH1']] <- list('S'='#c400c4ff', #strong magenta
     #                                     'T'='#c400c42f')
     
-    colourscheme[['instructed']] <-   list('S'='#005de4ff', #pure blue
+    colourscheme[[45]] <-   list('S'='#005de4ff', #pure blue
                                            'T'='#005de42f')
     
     #colourscheme[['ALIGNED']] <-   list('S'='#A9A9A9ff', #dark grey
