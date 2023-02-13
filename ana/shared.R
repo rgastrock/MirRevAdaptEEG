@@ -207,7 +207,7 @@ getColourScheme <- function(angles = c(15,30,45)){
   return(colourscheme)
 }
 
-getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm')){
+getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlmir', 'lrgmir', 'lrgrdm')){
   #create a list containing the colourscheme per group
   for (group in groups){
     colourscheme <- list()
@@ -218,13 +218,16 @@ getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'l
     colourscheme[['lrgrot']] <- list('S'='#e51636ff', #vivid/york red
                                             'T'='#e516362f')
     
-    colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
+    colourscheme[['lrgmir']] <- list('S'='#c400c4ff', #strong magenta
                                     'T'='#c400c42f')
     
-    colourscheme[['aln']] <-   list('S'='#005de4ff', #pure blue
+    colourscheme[['smlmir']] <-   list('S'='#005de4ff', #pure blue
                                            'T'='#005de42f')
     
-    colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
+    colourscheme[['lrgrdm']] <-   list('S'='#00FFFFff', #cyan
+                                       'T'='#00FFFF2f')
+    
+    colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #dark grey
                                         'T'='#A9A9A92f')
     
   }

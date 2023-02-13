@@ -259,7 +259,7 @@ getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'mir'
    
 }
 
-getMovementOnsetConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm'), type = 'b'){
+getMovementOnsetConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm', 'mir'), type = 'b'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/Movement_Onset_%s.csv', group))
     data <- data[,2:length(data)]
@@ -295,7 +295,7 @@ getMovementOnsetConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm'), 
 
 #Plotting EEG Data----
 
-getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm'), type = 'b', erps = 'frn'){
+getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'frn'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
     data <- data[,2:length(data)]
@@ -330,7 +330,7 @@ getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
 }
 
 
-plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'frn') {
+plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -387,6 +387,7 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+  mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
   
   col <- colourscheme[['aln']][['T']]
   lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
@@ -394,18 +395,23 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['lrgrot']][['T']]
-  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.6, 4.6), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['lrgrot']][['S']]
-  points(x = mo_rot[,2], y = 4.6, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['lrgrdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.3, 4.3), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['lrgrdm']][['S']]
-  points(x = mo_rdm[,2], y = 4.3, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rdm[,2], y = 4, pch = 20, cex = 1.5, col=col)
+  
+  col <- colourscheme[['lrgmir']][['T']]
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(3.5, 3.5), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['lrgmir']][['S']]
+  points(x = mo_mir[,2], y = 3.5, pch = 20, cex = 1.5, col=col)
   
   #add legend
-  legend(0.8,-10,legend=c('Aligned','Small ROT', 'Large ROT', 'Large RDM'),
-         col=c(colourscheme[['aln']][['S']],colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']]),
+  legend(0.8,-5,legend=c('Aligned','Small ROT', 'Large ROT', 'Large RDM', 'Small MIR', 'Large MIR'),
+         col=c(colourscheme[['aln']][['S']],colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -415,7 +421,7 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
   
 }
 
-getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), type = 'b', erps = 'frn'){
+getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'frn'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
     data <- data[,2:length(data)]
@@ -449,7 +455,7 @@ getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrd
   }
 }
 
-plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'frn') {
+plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -506,6 +512,7 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inli
   #mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+  mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
   
   # col <- colourscheme[['aln']][['T']]
   # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
@@ -513,18 +520,23 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inli
   # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['lrgrot']][['T']]
-  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.6, 4.6), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['lrgrot']][['S']]
-  points(x = mo_rot[,2], y = 4.6, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['lrgrdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.3, 4.3), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['lrgrdm']][['S']]
-  points(x = mo_rdm[,2], y = 4.3, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+  
+  col <- colourscheme[['lrgmir']][['T']]
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['lrgmir']][['S']]
+  points(x = mo_mir[,2], y = 4, pch = 20, cex = 1.5, col=col)
   
   #add legend
-  legend(0.8,-10,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned'),
-         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']]),
+  legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
+         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -585,7 +597,7 @@ getMovementOnsetLRP <- function(id, taskno, task){
   return(proportion)
 }
 
-getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
+getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'mir')) {
   #behavioral data aren't really split into small or large errors, just the task type
   #so we only plot movement onsets for aligned, rotation, random
   for (group in groups){
@@ -616,6 +628,15 @@ getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
           #rotation first then mirror
           mo <- getMovementOnsetLRP(id = participant, taskno = 3, task = 'random0')
         }
+      } else if (group == 'mir'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          mo <- getMovementOnsetLRP(id = participant, taskno = 5, task = 'mirror')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          mo <- getMovementOnsetLRP(id = participant, taskno = 11, task = 'mirror')
+        }
       }
       
       
@@ -637,7 +658,7 @@ getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
   
 }
 
-getMovementOnsetConfidenceIntervalLRP <- function(groups = c('aln', 'rot', 'rdm'), type = 'b'){
+getMovementOnsetConfidenceIntervalLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), type = 'b'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/Movement_Onset_%s_lrp.csv', group))
     data <- data[,2:length(data)]
@@ -672,7 +693,7 @@ getMovementOnsetConfidenceIntervalLRP <- function(groups = c('aln', 'rot', 'rdm'
 }
 
 #Plotting LRPs----
-getLRPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
+getLRPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
   for(channel in channels){
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s.csv', group, erps, channel))
@@ -709,15 +730,15 @@ getLRPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
 }
 
 
-plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig4_LRP.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig4_LRP.svg', width=16, height=10, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
-  par(mfrow = c(2,2))
+  par(mfrow = c(3,2))
   
   for (group in groups){
     #NA to create empty plot
@@ -772,6 +793,10 @@ plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
       mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
     } else if (group == 'lrgrdm'){
       mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+    } else if (group == 'smlmir'){
+      mo <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+    } else if (group == 'lrgmir'){
+      mo <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
     }
     colourscheme <- getERPColourScheme(groups = group)
     col <- colourscheme[[group]][['T']]
@@ -790,7 +815,7 @@ plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm'), target='inl
 }
 
 #C3 only (finding out which is more negative)
-getLRPDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), type = 'b', erps = 'lrp'){
+getLRPDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'lrp'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s_C3.csv', group, erps))
     data <- data[,2:length(data)]
@@ -824,7 +849,7 @@ getLRPDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lr
   }
 }
 
-plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='inline', erps = 'lrp') {
+plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'lrp') {
   
   
   #but we can save plot as svg file
@@ -900,13 +925,20 @@ plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm'), target='i
       lines(x = c(mo[,1], mo[,3]), y = c(3.5, 3.5), col = col, lty = 1, lwd = 8)
       col <- colourscheme[[group]][['S']]
       points(x = mo[,2], y = 3.5, pch = 20, cex = 1.5, col=col)
+    } else if (group == 'lrgmir'){
+      mo <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+      colourscheme <- getERPColourScheme(groups = group)
+      col <- colourscheme[[group]][['T']]
+      lines(x = c(mo[,1], mo[,3]), y = c(3, 3), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[[group]][['S']]
+      points(x = mo[,2], y = 3, pch = 20, cex = 1.5, col=col)
     }
   }
   
   
   #add legend
-  legend(0.8,-10,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned'),
-         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']]),
+  legend(0.8,-10,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
+         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -955,7 +987,7 @@ getAllLRPConfidenceInterval <- function(type = 'b', erps = 'lrp', channels = c('
 }
 
 
-plotAllLRPs <- function(groups = c('aln', 'lrgrot', 'lrgrdm'),target='inline', erps = 'lrp', channels = c('C3','C4')) {
+plotAllLRPs <- function(groups = c('aln', 'lrgrot', 'lrgrdm', 'lrgmir'),target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
@@ -1008,7 +1040,7 @@ plotAllLRPs <- function(groups = c('aln', 'lrgrot', 'lrgrdm'),target='inline', e
          col=c(colourscheme[['C3']][['S']],colourscheme[['C4']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
-  ctr = 4.5
+  ctr = 5
   for(group in groups){
     #add movement onset
     if(group == 'aln'){
@@ -1017,6 +1049,8 @@ plotAllLRPs <- function(groups = c('aln', 'lrgrot', 'lrgrdm'),target='inline', e
       mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
     } else if (group == 'lrgrdm'){
       mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+    } else if (group == 'lrgmir'){
+      mo <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
     }
     colourscheme <- getERPColourScheme(groups = group)
     col <- colourscheme[[group]][['T']]
@@ -1087,7 +1121,7 @@ getStimulusOnsetLRP <- function(id, taskno, task){
   return(proportion)
 }
 
-getStimulusOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
+getStimulusOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'mir')) {
   #behavioral data aren't really split into small or large errors, just the task type
   #so we only plot movement onsets for aligned, rotation, random
   for (group in groups){
@@ -1118,6 +1152,15 @@ getStimulusOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
           #rotation first then mirror
           mo <- getStimulusOnsetLRP(id = participant, taskno = 3, task = 'random0')
         }
+      } else if (group == 'mir'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          mo <- getStimulusOnsetLRP(id = participant, taskno = 5, task = 'mirror')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          mo <- getStimulusOnsetLRP(id = participant, taskno = 11, task = 'mirror')
+        }
       }
       
       
@@ -1139,7 +1182,7 @@ getStimulusOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm')) {
   
 }
 
-getStimulusOnsetConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm'), type = 'b'){
+getStimulusOnsetConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm', 'mir'), type = 'b'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/Stimulus_Onset_%s_lrp.csv', group))
     data <- data[,2:length(data)]
