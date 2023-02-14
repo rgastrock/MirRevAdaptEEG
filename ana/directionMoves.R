@@ -6,151 +6,300 @@ source('ana/learningRates.R')
 getAnglesWorkspace <- function(id, taskno, task, location){
   
   data <- getParticipantTaskData(id = id, taskno = taskno, task = task)
-  AT<- getReachAngles(data, starttrial=0, endtrial=47, location = location)
+  
+  if(task == 'aligned' | task == 'random0' | task == 'random1'){
+    AT<- getReachAngles(data, starttrial=0, endtrial=47, location = location)
+  } else if (task == 'rotation' | task == 'mirror'){
+    AT<- getReachAngles(data, starttrial=0, endtrial=89, location = location)
+  }
+  
+  
   
   trials <- c(1:length(AT$trial))-1
+  AT$direction <- NA
   
   for(trialno in trials){
     subdat <- AT[which(AT$trial == trialno),]
     target <- subdat$targetangle
     
     #ensure that reachdev is either in the left or right side of the workspace, relative to vertical midline
-    if(target == 7.5 | target == 187.5){
+    #right targets
+    if(target == 7.5){
       x <- subdat$reachdev
-      if (x < -97.5 | x > 82.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -97.5 | x > 82.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 15 | target == 195){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 15){
       x <- subdat$reachdev
-      if (x < -105 | x > 75){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -105 | x > 75){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 22.5 | target == 202.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 22.5){
       x <- subdat$reachdev
-      if (x < -112.5 | x > 67.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -112.5 | x > 67.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 67.5 | target == 247.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 67.5){
       x <- subdat$reachdev
-      if (x < -157.5 | x > 22.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -157.5 | x > 22.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 75 | target == 255){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 75){
       x <- subdat$reachdev
-      if (x < -165 | x > 15){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -165 | x > 15){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 82.5 | target == 262.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 82.5){
       x <- subdat$reachdev
-      if (x < -172.5 | x > 7.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -172.5 | x > 7.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 97.5 | target == 277.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 277.5){
       x <- subdat$reachdev
-      if (x < -7.5 | x > 172.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -7.5 | x > 172.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 105 | target == 285){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 285){
       x <- subdat$reachdev
-      if (x < -15 | x > 165){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -15 | x > 165){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 112.5 | target == 292.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 292.5){
       x <- subdat$reachdev
-      if (x < -22.5 | x > 157.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -22.5 | x > 157.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 157.5 | target == 337.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 337.5){
       x <- subdat$reachdev
-      if (x < -67.5 | x > 112.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -67.5 | x > 112.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 165 | target == 345){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 345){
       x <- subdat$reachdev
-      if (x < -75 | x > 105){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -75 | x > 105){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    } else if (target == 172.5 | target == 352.5){
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 352.5){
       x <- subdat$reachdev
-      if (x < -82.5 | x > 97.5){
-        subdat$reachdev <- NA
-        AT[which(AT$trial == trialno),] <- subdat
+      if(x < -82.5 | x > 97.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
       }
-    }
-    
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 97.5){#left targets
+      x <- subdat$reachdev
+      if(x < -7.5 | x > 172.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 105){
+      x <- subdat$reachdev
+      if(x < -15 | x > 165){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 112.5){
+      x <- subdat$reachdev
+      if(x < -22.5 | x > 157.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 157.5){
+      x <- subdat$reachdev
+      if(x < -67.5 | x > 112.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 165){
+      x <- subdat$reachdev
+      if(x < -75 | x > 105){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 172.5){
+      x <- subdat$reachdev
+      if(x < -82.5 | x > 97.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 187.5){
+      x <- subdat$reachdev
+      if(x < -97.5 | x > 82.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 195){
+      x <- subdat$reachdev
+      if(x < -105 | x > 75){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 202.5){
+      x <- subdat$reachdev
+      if(x < -112.5 | x > 67.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 247.5){
+      x <- subdat$reachdev
+      if(x < -157.5 | x > 22.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 255){
+      x <- subdat$reachdev
+      if(x < -165 | x > 15){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 262.5){
+      x <- subdat$reachdev
+      if(x < -172.5 | x > 7.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } 
   }
   
   return(AT)
 }
 
-getMovementWorkspaceDirection <- function(id, taskno=1, task='aligned', location='feedback'){
-  
-  data <- getAnglesWorkspace(id=id, taskno=taskno, task=task, location=location)
-  trials <- c(1:length(data$trial))-1
-  
-  righttargs <- c(7.5, 15, 22.5, 67.5, 75, 82.5,
-                  277.5, 285, 292.5, 337.5, 345, 352.5)
-  
-  lefttargs <- c(97.5, 105, 112.5, 157.5, 165, 172.5,
-                  187.5, 195, 202.5, 247.5, 255, 262.5)
-  
-  movdir <- c()
-  for(trialno in trials){
-    subdat <- data[which(data$trial == trialno),]
-    if(subdat$targetangle %in% righttargs & !is.na(subdat$reachdev)){
-      md <- 'r'
-    } else if (subdat$targetangle %in% lefttargs & !is.na(subdat$reachdev)){
-      md <- 'l'
-    } else {
-      md <- NA
-    }
-    
-    movdir <- c(movdir, md)
-    
-  }
-  data$movdir <- movdir
-  return(data)
-}
-
-getGroupMovementWorkspaceDirection <- function(maxppid = 31, taskno = 1, task = 'aligned', location = 'feedback') {
+getGroupMovementWorkspaceDirection <- function(maxppid = 31, groups = c('aln', 'rot', 'rdm', 'mir'), location = 'feedback') {
   #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
   
-  #a consequence of adding the groups late led me to fix it in the manner below
-  participants <- seq(0,maxppid,1)
-  
-  
-  
-  dataoutput<- data.frame() #create place holder
-  #go through each participant in this group
-  for (participant in participants) {
-    #print(participant)
-    ppangles <- getMovementWorkspaceDirection(id=participant, taskno = taskno, task = task, location = location) #for every participant, get learning curve data
-    
-    reaches <- ppangles$movdir #get reach deviations column from learning curve data
-    trial <- c(1:length(reaches)) #sets up trial column
-    dat <- cbind(trial, reaches)
-    #rdat <- dat$reaches
-    
-    if (prod(dim(dataoutput)) == 0){
-      dataoutput <- dat
-    } else {
-      dataoutput <- cbind(dataoutput, reaches)
+  for(group in groups){
+    participants <- seq(0,maxppid,1)
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      if (group == 'aln'){
+        ppangles <- getAnglesWorkspace(id=participant, taskno = 1, task = 'aligned', location = location)
+      } else if (group == 'rot'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesWorkspace(id = participant, taskno = 11, task = 'rotation', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesWorkspace(id = participant, taskno = 5, task = 'rotation', location = location)
+        }
+      } else if (group == 'rdm'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesWorkspace(id = participant, taskno = 9, task = 'random1', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesWorkspace(id = participant, taskno = 3, task = 'random0', location = location)
+        }
+      } else if (group == 'mir'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesWorkspace(id = participant, taskno = 5, task = 'mirror', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesWorkspace(id = participant, taskno = 11, task = 'mirror', location = location)
+        }
+      }
+      reaches <- ppangles$direction #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      #rdat <- dat$reaches
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
     }
-    
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/%s_MovementWorkspace_direction.csv', group), row.names = F) 
   }
-  #return(dataoutput)
-  write.csv(dataoutput, file='data/ALIGNED_MovementWorkspace_direction.csv', row.names = F) 
+  
 }
 
 
