@@ -305,7 +305,7 @@ getGroupMovementWorkspaceDirection <- function(maxppid = 31, groups = c('aln', '
 
 
 # plot LRP differences for right and left moves ----
-getWorkspaceLRPConfidenceInterval <- function(groups = c('right', 'left'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
+getWorkspaceLRPConfidenceInterval <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
   for(channel in channels){
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s.csv', group, erps, channel))
@@ -342,15 +342,15 @@ getWorkspaceLRPConfidenceInterval <- function(groups = c('right', 'left'), type 
 }
 
 
-plotWorkspaceLRPs <- function(groups = c('right','left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+plotWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig6_Workspace_LRP.svg', width=20, height=6, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig6_Workspace_LRP.svg', width=16, height=24, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
-  par(mfrow = c(1,2))
+  par(mfrow = c(4,2))
   
   for (group in groups){
     #NA to create empty plot
@@ -397,13 +397,13 @@ plotWorkspaceLRPs <- function(groups = c('right','left'), target='inline', erps 
            lty=1,bty='n',cex=1,lwd=2)
     
     #add movement onset
-    mo <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
-
-    colourscheme <- getERPColourScheme(group = 'smlrdm') #just so we could get grey
-    col <- colourscheme[['smlrdm']][['T']]
-    lines(x = c(mo[,1], mo[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['smlrdm']][['S']]
-    points(x = mo[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    # mo <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+    # 
+    # colourscheme <- getERPColourScheme(group = 'smlrdm') #just so we could get grey
+    # col <- colourscheme[['smlrdm']][['T']]
+    # lines(x = c(mo[,1], mo[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    # col <- colourscheme[['smlrdm']][['S']]
+    # points(x = mo[,2], y = 5, pch = 20, cex = 1.5, col=col)
     
     
   }
