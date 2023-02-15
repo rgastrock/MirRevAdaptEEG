@@ -330,7 +330,7 @@ getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
 }
 
 
-plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
+plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -410,8 +410,8 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'l
   points(x = mo_mir[,2], y = 3.5, pch = 20, cex = 1.5, col=col)
   
   #add legend
-  legend(0.8,-5,legend=c('Aligned','Small ROT', 'Large ROT', 'Large RDM', 'Small MIR', 'Large MIR'),
-         col=c(colourscheme[['aln']][['S']],colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
+  legend(0.8,-5,legend=c('Aligned','Small ROT', 'Large ROT', 'Small RDM', 'Large RDM', 'Small MIR', 'Large MIR'),
+         col=c(colourscheme[['aln']][['S']],colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['smlrdm']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -421,7 +421,7 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'l
   
 }
 
-getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'frn'){
+getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'frn'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
     data <- data[,2:length(data)]
@@ -455,7 +455,7 @@ getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrd
   }
 }
 
-plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
+plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -535,8 +535,8 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lr
   points(x = mo_mir[,2], y = 4, pch = 20, cex = 1.5, col=col)
   
   #add legend
-  legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
-         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
+  legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Small RDM - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
+         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['smlrdm']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -730,15 +730,15 @@ getLRPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
 }
 
 
-plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig4_LRP.svg', width=16, height=10, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig4_LRP.svg', width=16, height=24, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
-  par(mfrow = c(3,2))
+  par(mfrow = c(4,2))
   
   for (group in groups){
     #NA to create empty plot
@@ -791,6 +791,8 @@ plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'l
       mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
     } else if (group == 'lrgrot'){
       mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+    } else if (group == 'smlrdm'){
+      mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
     } else if (group == 'lrgrdm'){
       mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
     } else if (group == 'smlmir'){
@@ -815,7 +817,7 @@ plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'l
 }
 
 #C3 only (finding out which is more negative)
-getLRPDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'lrp'){
+getLRPDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), type = 'b', erps = 'lrp'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s_C3.csv', group, erps))
     data <- data[,2:length(data)]
@@ -849,7 +851,7 @@ getLRPDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'lr
   }
 }
 
-plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'lrp') {
+plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'lrp') {
   
   
   #but we can save plot as svg file
@@ -937,8 +939,8 @@ plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'lrgrdm', 'smlmir', 
   
   
   #add legend
-  legend(0.8,-10,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
-         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
+  legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Small RDM - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
+         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['smlrdm']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -1371,7 +1373,7 @@ getRDMParticipantLearningCurve <- function(id, location) {
   return(RT)
 }
 
-getRDMGroupLearningCurves <- function(maxppid, location) {
+getRDMGroupLCALL <- function(maxppid, location) {
   #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
   
   #a consequence of adding the groups late led me to fix it in the manner below
@@ -1398,13 +1400,52 @@ getRDMGroupLearningCurves <- function(maxppid, location) {
     
   }
   return(dataoutput)
-  #write.csv(dataoutput, file='data/RDMROT_learningcurve_degrees.csv', row.names = F) 
+  #write.csv(dataoutput, file='data/ROT_learningcurve_degrees.csv', row.names = F) 
+}
+
+getRDMGroupLearningCurves <- function(maxppid, location, angles = c(15, 25, 35)) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  for (angle in angles){
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      ppangles <- getRDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+      ppangles$rotation <- abs(ppangles$rotation)
+      for (irow in c(1:nrow(ppangles))){
+        subdat <- ppangles[irow,]
+        if (subdat$rotation != angle){
+          subdat$reachdev <- NA
+          ppangles[irow,] <- subdat
+        }
+      }
+      
+      reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+      
+    }
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/RDMROT_learningcurve_degrees_%02d.csv', angle), row.names = F) 
+  }
 }
 
 getRDMGroupConfidenceInterval <- function(maxppid, location, type){
   #for (group in groups){
   # get the confidence intervals for each trial of each group
-  data <- getRDMGroupLearningCurves(maxppid = maxppid, location = location)
+  data <- getRDMGroupLCALL(maxppid = maxppid, location = location)
   #data <- data[,-6] #remove faulty particiapnt (pp004) so the 6th column REMOVE ONCE RESOLVED
   data <- as.data.frame(data)
   trialno <- data$trial

@@ -207,7 +207,7 @@ getColourScheme <- function(angles = c(15,30,45)){
   return(colourscheme)
 }
 
-getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlmir', 'lrgmir', 'lrgrdm')){
+getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlmir', 'lrgmir', 'smlrdm', 'lrgrdm')){
   #create a list containing the colourscheme per group
   for (group in groups){
     colourscheme <- list()
@@ -224,11 +224,38 @@ getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlmir', 'l
     colourscheme[['smlmir']] <-   list('S'='#005de4ff', #pure blue
                                            'T'='#005de42f')
     
-    colourscheme[['lrgrdm']] <-   list('S'='#00FFFFff', #cyan
-                                       'T'='#00FFFF2f')
+    colourscheme[['smlrdm']] <-   list('S'='#fff44fff', #lemon yellow
+                                       'T'='#fff44f2f')
+    
+    colourscheme[['lrgrdm']] <-   list('S'='#00FA9Aff', #spring green
+                                       'T'='#00FA9A2f')
     
     colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #dark grey
                                         'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
+getTrainingColourScheme <- function(training = c('early','late')){
+  #create a list containing the colourscheme per group
+  for (t in training){
+    colourscheme <- list()
+    
+    # colourscheme[['smlrot']] <- list('S'='#ff8200ff', # pure orange
+    #                                  'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['early']] <- list('S'='#e51636ff', #vivid/york red
+                                 'T'='#e516362f')
+    
+    # colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
+    #                                  'T'='#c400c42f')
+    
+    colourscheme[['late']] <-   list('S'='#005de4ff', #pure blue
+                                   'T'='#005de42f')
+    
+    # colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
+    #                                    'T'='#A9A9A92f')
     
   }
   return(colourscheme)
@@ -253,6 +280,30 @@ getLRPColourScheme <- function(channels = c('C3','C4')){
     
     # colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
     #                                    'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
+getSubtractedLRPColourScheme <- function(groups = c('aln', 'rot', 'rdm', 'mir')){
+  #create a list containing the colourscheme per group
+  for (group in groups){
+    colourscheme <- list()
+    
+    #colourscheme[['WASH0']] <- list('S'='#ff8200ff', # pure orange
+    #                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['rot']] <- list('S'='#e51636ff', #vivid/york red
+                                  'T'='#e516362f')
+    
+    colourscheme[['rdm']] <- list('S'='#c400c4ff', #strong magenta
+                                  'T'='#c400c42f')
+    
+    colourscheme[['mir']] <-   list('S'='#005de4ff', #pure blue
+                                    'T'='#005de42f')
+    
+    colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #dark grey
+                                        'T'='#A9A9A92f')
     
   }
   return(colourscheme)
