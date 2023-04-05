@@ -334,8 +334,10 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
   
   
   #but we can save plot as svg file
-  if (target=='svg') {
+  if (target=='svg' & erps=='frn') {
     svglite(file='doc/fig/Fig1_FRN.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & erps=='ern') {
+    svglite(file='doc/fig/Fig10_ERN.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -348,9 +350,16 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
   
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
-       xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-       main = "ERP time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  if (erps == 'frn'){
+    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = "ERP time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  } else if (erps == 'ern'){
+    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = "ERP time-locked to movement onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  }
+  
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
   axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
@@ -384,30 +393,33 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
   }
   
   #add movement onset 
-  mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
-  mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
-  mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
-  mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+  if (erps == 'frn'){
+    mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+    mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+    mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+    mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+    
+    col <- colourscheme[['aln']][['T']]
+    lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['aln']][['S']]
+    points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['lrgrot']][['T']]
+    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['lrgrot']][['S']]
+    points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['lrgrdm']][['T']]
+    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['lrgrdm']][['S']]
+    points(x = mo_rdm[,2], y = 4, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['lrgmir']][['T']]
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(3.5, 3.5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['lrgmir']][['S']]
+    points(x = mo_mir[,2], y = 3.5, pch = 20, cex = 1.5, col=col)
+  }
   
-  col <- colourscheme[['aln']][['T']]
-  lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['aln']][['S']]
-  points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
-  
-  col <- colourscheme[['lrgrot']][['T']]
-  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['lrgrot']][['S']]
-  points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
-  
-  col <- colourscheme[['lrgrdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['lrgrdm']][['S']]
-  points(x = mo_rdm[,2], y = 4, pch = 20, cex = 1.5, col=col)
-  
-  col <- colourscheme[['lrgmir']][['T']]
-  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(3.5, 3.5), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['lrgmir']][['S']]
-  points(x = mo_mir[,2], y = 3.5, pch = 20, cex = 1.5, col=col)
   
   #add legend
   legend(0.8,-5,legend=c('Aligned','Small ROT', 'Large ROT', 'Small RDM', 'Large RDM', 'Small MIR', 'Large MIR'),
@@ -459,8 +471,10 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
   
   
   #but we can save plot as svg file
-  if (target=='svg') {
-    svglite(file='doc/fig/Fig2_DiffWaves.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  if (target=='svg' & erps == 'frn') {
+    svglite(file='doc/fig/Fig2_FRN_DiffWaves.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & erps == 'ern') {
+    svglite(file='doc/fig/Fig11_ERN_DiffWaves.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -473,9 +487,16 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
   
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
-       xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-       main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  if(erps == 'frn'){
+    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  } else if (erps == 'ern'){
+    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = "Difference Waves time-locked to movement onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  }
+  
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
   axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
@@ -509,30 +530,33 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
   }
   
   #add movement onset 
-  #mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
-  mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
-  mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
-  mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
-  
-  # col <- colourscheme[['aln']][['T']]
-  # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-  # col <- colourscheme[['aln']][['S']]
-  # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
-  
-  col <- colourscheme[['lrgrot']][['T']]
-  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['lrgrot']][['S']]
-  points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
-  
-  col <- colourscheme[['lrgrdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['lrgrdm']][['S']]
-  points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
-  
-  col <- colourscheme[['lrgmir']][['T']]
-  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
-  col <- colourscheme[['lrgmir']][['S']]
-  points(x = mo_mir[,2], y = 4, pch = 20, cex = 1.5, col=col)
+  if(erps=='frn'){
+    #mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+    mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+    mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+    mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+    
+    # col <- colourscheme[['aln']][['T']]
+    # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    # col <- colourscheme[['aln']][['S']]
+    # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['lrgrot']][['T']]
+    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['lrgrot']][['S']]
+    points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['lrgrdm']][['T']]
+    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['lrgrdm']][['S']]
+    points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['lrgmir']][['T']]
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['lrgmir']][['S']]
+    points(x = mo_mir[,2], y = 4, pch = 20, cex = 1.5, col=col)
+    
+  }
   
   #add legend
   legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Small RDM - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),

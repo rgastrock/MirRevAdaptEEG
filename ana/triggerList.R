@@ -44,7 +44,7 @@ getMissingTriggers <- function(pp, startmark, endmark = 16156, trigger){
 }
 
 #single participant, all tasks
-getAllTriggers <- function(maxppid = 31, trigger = 16140, endmark = 16156){
+getAllTriggers <- function(maxppid = 31, trigger = 16141, endmark = 16156){
   
   participants <- seq(0,maxppid,1)
 
@@ -80,6 +80,8 @@ getAllTriggers <- function(maxppid = 31, trigger = 16140, endmark = 16156){
       write.csv(alldat, file=sprintf('data/eeg/p%03d/frn/mra_p%03d_tasktrigindex.csv', participant, participant), row.names = F) 
     } else if (trigger == 16140){
       write.csv(alldat, file=sprintf('data/eeg/p%03d/lrp/mra_p%03d_tasktrigindex.csv', participant, participant), row.names = F) 
+    } else if (trigger == 16141){
+      write.csv(alldat, file=sprintf('data/eeg/p%03d/ern/mra_p%03d_tasktrigindex.csv', participant, participant), row.names = F) 
     }
     
    
