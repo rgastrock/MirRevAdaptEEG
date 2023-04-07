@@ -10,6 +10,7 @@ library(phia) #used for interactionMeans
 library(emmeans)
 library(afex) #used for aov_ez
 library(lsr) #for cohensD
+library(BayesFactor)
 
 #Generic Functions----
 
@@ -309,7 +310,7 @@ getSubtractedLRPColourScheme <- function(groups = c('aln', 'rot', 'rdm', 'mir'))
   return(colourscheme)
 }
 
-getPtypeColourScheme <- function(tasks = c('aln', 'rot','rdm')){
+getPtypeColourScheme <- function(tasks = c('aln', 'rdmrot','rot', 'rdmmir', 'mir15', 'mir30', 'mir45')){
   #create a list containing the colourscheme per group
   for (task in tasks){
     colourscheme <- list()
@@ -317,17 +318,26 @@ getPtypeColourScheme <- function(tasks = c('aln', 'rot','rdm')){
     #colourscheme[['WASH0']] <- list('S'='#ff8200ff', # pure orange
     #                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
     
-    colourscheme[['rot']] <- list('S'='#e51636ff', #vivid/york red
-                                  'T'='#e516362f')
+    colourscheme[['rot']] <- list('S'='#005de4ff', #blue
+                                  'T'='#005de42f')
     
-    colourscheme[['rdm']] <- list('S'='#c400c4ff', #strong magenta
+    colourscheme[['rdmrot']] <- list('S'='#c400c4ff', #strong magenta
                                     'T'='#c400c42f')
     
-    colourscheme[['aln']] <-   list('S'='#005de4ff', #pure blue
-                                    'T'='#005de42f')
+    colourscheme[['rdmmir']] <- list('S'='#c400c4ff', #strong magenta
+                                     'T'='#c400c42f')
     
-    #colourscheme[['ALIGNED']] <-   list('S'='#A9A9A9ff', #dark grey
-    #                               'T'='#A9A9A92f')
+    colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #grey
+                                    'T'='#A9A9A92f')
+    
+    colourscheme[['mir45']] <-   list('S'='#e51636ff', #york red
+                                    'T'='#e516362f')
+    
+    colourscheme[['mir15']] <-   list('S'='#ff8200ff', #orange
+                                      'T'='#ff82002f')
+    
+    colourscheme[['mir30']] <-   list('S'='#A38A00', #gold
+                                      'T'='#A38A002f')
     
   }
   return(colourscheme)

@@ -1042,7 +1042,26 @@ plotBlockedLRPs <- function(groups = c('aln', 'rot', 'rdm', 'mir'), target='inli
   
 }
 
-
+getAverageBlockedLRPComparisons <- function(){
+  
+  aln <- getAverageBLockedLRP(group='aln')
+  rdm <- getAverageBLockedLRP(group='rdm')
+  rot <- getAverageBLockedLRP(group='rot')
+  mir <- getAverageBLockedLRP(group='mir')
+  
+  cat('t-test (Aligned vs. Random): \n')
+  t.test(aln, rdm)
+  
+  cat('t-test (Aligned vs. Rotation Block 1): \n')
+  t.test(aln, rot[1,])
+  
+  cat('t-test (Aligned vs. Mirror Block 1): \n')
+  t.test(aln, mir[1,])
+  
+  cat('t-test (Rotation Block 1 vs. Mirror Block 1): \n')
+  t.test(rot[1,], mir[1,])
+  
+}
 
 
 

@@ -1336,7 +1336,7 @@ getsmallALNErrors <- function(maxppid = 31, location = 'feedback'){#, cutoff = 5
   
 }
 
-# Learning curves RANDOM----
+# Learning curves RANDOM ROTATION----
 getRDMParticipantLearningCurve <- function(id, location) {
   
   #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
@@ -1506,7 +1506,7 @@ plotRDMLearningCurves <- function(target='inline') {
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig3_ROT_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/FigX_ROT_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -1524,6 +1524,233 @@ plotRDMLearningCurves <- function(target='inline') {
   
   #read in files created by getGroupConfidenceInterval in filehandling.R
   groupconfidence <- read.csv(file='data/RDMROT_CI_learningcurve.csv')
+  
+  colourscheme <- list('S'='#e51636ff', #vivid/york red
+                       'T'='#e516362f')
+  
+  #colourscheme <- getColourScheme(groups = group)
+  #take only first, last and middle columns of file
+  lower <- groupconfidence[,1]
+  upper <- groupconfidence[,3]
+  mid <- groupconfidence[,2]
+  
+  col <- colourscheme[['T']] #use colour scheme according to group
+  
+  #upper and lower bounds create a polygon
+  #polygon creates it from low left to low right, then up right to up left -> use rev
+  #x is just trial nnumber, y depends on values of bounds
+  polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+  
+  meanGroupReaches <- mid #use mean to fill in empty list for each group
+  
+  
+  
+  
+  # plot mean reaches for each group
+  col <- colourscheme[['S']]
+  lines(meanGroupReaches,col=col,lty=1)
+  
+  
+  #add legend
+  # legend(70,-100,legend=c('Non-Instructed','Instructed'),
+  #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+# Learning curves RANDOM MIRROR----
+getRDMMIRParticipantLearningCurve <- function(id, location) {
+  
+  #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
+  #rotation should show percentage of compensation (not angular deviation of hand)
+  #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
+  #measure where hand should be minus where it is: if this is spot on then percentage is 0%
+  
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  if (id%%2 == 1){
+    #mirror then rotation if odd id
+    rotatedTraining <- getParticipantTaskData(id, taskno = 3, task = 'random0')
+  } else if (id%%2 == 0){
+    #if pp id is even
+    #rotation first then mirror
+    rotatedTraining <- getParticipantTaskData(id, taskno = 9, task = 'random1')
+  }
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=47, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  #include rotation values, because they differ
+  rotation <- c()
+  for (trialno in c(0: dim(RT)[1] - 1)){
+    rotsize <- unique(rotatedTraining$rotation[which(rotatedTraining$trial == trialno)])
+    rotation <- c(rotation, rotsize)
+  }
+  
+  RT$rotation <- rotation
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  
+  
+  negvals <- c(-15, -25, -35)
+  posvals <- c(15, 25, 35)
+  
+  for (t in RT$trial){
+    rot <- RT$rotation[which(RT$trial == t)]
+    if (rot %in% posvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)])*-1)
+    } else if (rot %in% negvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)]))
+    }
+  }
+  
+  
+  
+  
+  return(RT)
+}
+
+getRDMMIRGroupLCALL <- function(maxppid, location) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    #print(participant)
+    ppangles <- getRDMMIRParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    #rdat <- dat$reaches
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+    
+  }
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/RDMMIR_learningcurve_degrees.csv', row.names = F) 
+}
+
+getRDMMIRGroupLearningCurves <- function(maxppid, location, angles = c(15, 25, 35)) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  for (angle in angles){
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      ppangles <- getRDMMIRParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+      ppangles$rotation <- abs(ppangles$rotation)
+      for (irow in c(1:nrow(ppangles))){
+        subdat <- ppangles[irow,]
+        if (subdat$rotation != angle){
+          subdat$reachdev <- NA
+          ppangles[irow,] <- subdat
+        }
+      }
+      
+      reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+      
+    }
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/RDMMIR_learningcurve_degrees_%02d.csv', angle), row.names = F) 
+  }
+}
+
+getRDMMIRGroupConfidenceInterval <- function(maxppid, location, type){
+  #for (group in groups){
+  # get the confidence intervals for each trial of each group
+  data <- getRDMMIRGroupLCALL(maxppid = maxppid, location = location)
+  #data <- data[,-6] #remove faulty particiapnt (pp004) so the 6th column REMOVE ONCE RESOLVED
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data1 <- as.matrix(data[,2:dim(data)[2]])
+  
+  confidence <- data.frame()
+  
+  
+  for (trial in trialno){
+    cireaches <- data1[which(data$trial == trial), ]
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+    
+    write.csv(confidence, file='data/RDMMIR_CI_learningcurve.csv', row.names = F) 
+    
+    
+  }
+  #}
+}
+
+plotRDMMIRLearningCurves <- function(target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/FigX_ROTMIR_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,48), ylim = c(-10,36), 
+       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reach Learning over Time: RDM", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 10, 20, 30, 40, 48)) #tick marks for x axis
+  axis(2, at = c(-10, 0, 10, 20, 30, 35)) #tick marks for y axis
+  
+  
+  #read in files created by getGroupConfidenceInterval in filehandling.R
+  groupconfidence <- read.csv(file='data/RDMMIR_CI_learningcurve.csv')
   
   colourscheme <- list('S'='#e51636ff', #vivid/york red
                        'T'='#e516362f')
@@ -1690,170 +1917,67 @@ getROTGroupConfidenceInterval <- function(maxppid, location, type){
   #}
 }
 
-plotROTLearningCurves <- function(target='inline') {
-  
-  
-  #but we can save plot as svg file
-  if (target=='svg') {
-    svglite(file='doc/fig/Fig3_ROT_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
-  }
-  
-  # create plot
-  meanGroupReaches <- list() #empty list so that it plots the means last
-  
-  #NA to create empty plot
-  # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
-       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
-       main = "Reach Learning over Time: MIR", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
-  abline(h = c(0, 15, 30, 45), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
-  axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
-  
-  
-  #read in files created by getGroupConfidenceInterval in filehandling.R
-  groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
-  
-  colourscheme <- list('S'='#e51636ff', #vivid/york red
-                       'T'='#e516362f')
-  
-  #colourscheme <- getColourScheme(groups = group)
-  #take only first, last and middle columns of file
-  lower <- groupconfidence[,1]
-  upper <- groupconfidence[,3]
-  mid <- groupconfidence[,2]
-  
-  col <- colourscheme[['T']] #use colour scheme according to group
-  
-  #upper and lower bounds create a polygon
-  #polygon creates it from low left to low right, then up right to up left -> use rev
-  #x is just trial nnumber, y depends on values of bounds
-  polygon(x = c(c(1:90), rev(c(1:90))), y = c(lower, rev(upper)), border=NA, col=col)
-  
-  meanGroupReaches <- mid #use mean to fill in empty list for each group
-  
-  
-  
-  
-  # plot mean reaches for each group
-  col <- colourscheme[['S']]
-  lines(meanGroupReaches,col=col,lty=1)
-  
-  
-  #add legend
-  # legend(70,-100,legend=c('Non-Instructed','Instructed'),
-  #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
-  #        lty=1,bty='n',cex=1,lwd=2)
-  
-  #close everything if you saved plot as svg
-  if (target=='svg') {
-    dev.off()
-  }
-  
-}
-
-#plot aligned and learning curves for rot and random----
-plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inline') {
-  
-  
-  #but we can save plot as svg file
-  if (target=='svg') {
-    svglite(file='doc/fig/Fig3_ROTRDM_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
-  }
-  
-  # create plot
-  meanGroupReaches <- list() #empty list so that it plots the means last
-  
-  #NA to create empty plot
-  # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(0,187), ylim = c(-10,35), 
-       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
-       main = "Reach learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
-  abline(h = c(0, 30), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  axis(side=1, at=c(1,48), labels=c('1','48'))
-  axis(side=1, at=c(49,96), labels=c('1','48'))
-  axis(side=1, at=c(97,186), labels=c('1','90'))
-  axis(2, at = c(0, 5, 10, 15, 20, 25, 30), las = 2) #tick marks for y axis
-  
-  
-  #read in files created by getGroupConfidenceInterval in filehandling.R
-  for(task in tasks){
-    if(task == 'rot'){
-      groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
-    } else if(task == 'rdm'){
-      groupconfidence <- read.csv(file='data/RDMROT_CI_learningcurve.csv')
-    } else if(task == 'aln'){
-      groupconfidence <- read.csv(file='data/ALN_CI_learningcurve.csv')
-    }
-    
-    
-    colourscheme <- getPtypeColourScheme(tasks=task)
-    
-    #colourscheme <- getColourScheme(groups = group)
-    #take only first, last and middle columns of file
-    lower <- groupconfidence[,1]
-    upper <- groupconfidence[,3]
-    mid <- groupconfidence[,2]
-    
-    col <- colourscheme[[task]][['T']]
-    
-    #upper and lower bounds create a polygon
-    #polygon creates it from low left to low right, then up right to up left -> use rev
-    #x is just trial nnumber, y depends on values of bounds
-    if(task == 'rot'){
-      polygon(x = c(c(97:186), rev(c(97:186))), y = c(lower, rev(upper)), border=NA, col=col)
-      meanGroupReaches <- mid #use mean to fill in empty list for each group
-      # plot mean reaches for each group
-      col <- colourscheme[[task]][['S']]
-      lines(x = c(97:186), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
-    } else if (task == 'rdm'){
-      polygon(x = c(c(49:96), rev(c(49:96))), y = c(lower, rev(upper)), border=NA, col=col)
-      meanGroupReaches <- mid #use mean to fill in empty list for each group
-      # plot mean reaches for each group
-      col <- colourscheme[[task]][['S']]
-      lines(x = c(49:96), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
-    } else if (task == 'aln'){
-      polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
-      meanGroupReaches <- mid #use mean to fill in empty list for each group
-      # plot mean reaches for each group
-      col <- colourscheme[[task]][['S']]
-      lines(x = c(1:48), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
-    }
-    
-    
-    
-
-  }
-  
-  
-  
-  #add legend
-  legend(110,0,legend=c('ALIGNED', 'ROT','RDM'),
-         col=c(colourscheme[['aln']][['S']],colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
-  
-  #close everything if you saved plot as svg
-  if (target=='svg') {
-    dev.off()
-  }
-  
-}
-
-#plot histograms for error distribution-----
-getDists <- function(maxppid = 31, location = 'feedback'){
-  
-  participants <- seq(0,maxppid,1)
-  par(mfrow = c(3,3))
-  
-  for(participant in participants){
-    #specify function for perturbation
-    data <- getMIRParticipantLearningCurve(id = participant, location = location)
-    hist(data$reachdev, xlim = c(-180, 180), ylim = c(0,15), breaks = 90,
-         main = sprintf('Participant %s', participant), xlab = 'Degrees')
-  }
-}
-
-
+# plotROTLearningCurves <- function(target='inline') {
+#   
+#   
+#   #but we can save plot as svg file
+#   if (target=='svg') {
+#     svglite(file='doc/fig/FigX_ROT_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+#   }
+#   
+#   # create plot
+#   meanGroupReaches <- list() #empty list so that it plots the means last
+#   
+#   #NA to create empty plot
+#   # could maybe use plot.new() ?
+#   plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
+#        xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+#        main = "Reach Learning over Time: MIR", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+#   abline(h = c(0, 15, 30, 45), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+#   axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
+#   axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+#   
+#   
+#   #read in files created by getGroupConfidenceInterval in filehandling.R
+#   groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
+#   
+#   colourscheme <- list('S'='#e51636ff', #vivid/york red
+#                        'T'='#e516362f')
+#   
+#   #colourscheme <- getColourScheme(groups = group)
+#   #take only first, last and middle columns of file
+#   lower <- groupconfidence[,1]
+#   upper <- groupconfidence[,3]
+#   mid <- groupconfidence[,2]
+#   
+#   col <- colourscheme[['T']] #use colour scheme according to group
+#   
+#   #upper and lower bounds create a polygon
+#   #polygon creates it from low left to low right, then up right to up left -> use rev
+#   #x is just trial nnumber, y depends on values of bounds
+#   polygon(x = c(c(1:90), rev(c(1:90))), y = c(lower, rev(upper)), border=NA, col=col)
+#   
+#   meanGroupReaches <- mid #use mean to fill in empty list for each group
+#   
+#   
+#   
+#   
+#   # plot mean reaches for each group
+#   col <- colourscheme[['S']]
+#   lines(meanGroupReaches,col=col,lty=1)
+#   
+#   
+#   #add legend
+#   # legend(70,-100,legend=c('Non-Instructed','Instructed'),
+#   #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
+#   #        lty=1,bty='n',cex=1,lwd=2)
+#   
+#   #close everything if you saved plot as svg
+#   if (target=='svg') {
+#     dev.off()
+#   }
+#   
+# }
 
 # Learning Curves MIRROR----
 getMIRParticipantLearningCurve <- function(id, location){
@@ -1955,7 +2079,7 @@ getMIRGroupLearningCurves <- function(maxppid, location, angles = c(15, 30, 45))
   #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
   
   participants <- seq(0,maxppid,1)
-
+  
   
   #get csv for each angle, combining all into one plot will produce great variabilities
   
@@ -1987,8 +2111,8 @@ getMIRGroupLearningCurves <- function(maxppid, location, angles = c(15, 30, 45))
       reaches <- ppangles$reachdev #get reach deviations column from learning curve data
       trial <- c(1:length(reaches)) #sets up trial column
       dat <- cbind(trial, reaches)
-        
-        
+      
+      
       if (prod(dim(dataoutput)) == 0){
         dataoutput <- dat
       } else {
@@ -2098,6 +2222,232 @@ plotMIRLearningCurves <- function(angles = c(15,30,45), target='inline') {
   }
   
 }
+
+
+#plot aligned and learning curves for rot and random----
+plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig3_ROTRDM_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,187), ylim = c(-10,35), 
+       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reach learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(0, 30), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(side=1, at=c(1,48), labels=c('1','48'))
+  axis(side=1, at=c(49,96), labels=c('1','48'))
+  axis(side=1, at=c(97,186), labels=c('1','90'))
+  axis(2, at = c(0, 5, 10, 15, 20, 25, 30), las = 2) #tick marks for y axis
+  
+  
+  #read in files created by getGroupConfidenceInterval in filehandling.R
+  for(task in tasks){
+    if(task == 'rot'){
+      groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
+    } else if(task == 'rdm'){
+      groupconfidence <- read.csv(file='data/RDMROT_CI_learningcurve.csv')
+    } else if(task == 'aln'){
+      groupconfidence <- read.csv(file='data/ALN_CI_learningcurve.csv')
+    }
+    
+    
+    colourscheme <- getPtypeColourScheme(tasks=task)
+    
+    #colourscheme <- getColourScheme(groups = group)
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[task]][['T']]
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    if(task == 'rot'){
+      polygon(x = c(c(97:186), rev(c(97:186))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(97:186), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'rdm'){
+      polygon(x = c(c(49:96), rev(c(49:96))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(49:96), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'aln'){
+      polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(1:48), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    }
+    
+    
+    
+
+  }
+  
+  
+  
+  #add legend
+  legend(110,0,legend=c('ALIGNED', 'ROT','RDM'),
+         col=c(colourscheme[['aln']][['S']],colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+#plot aligned, rdmrot, rot, rdmmir, mir----
+plotExperimentLearningCurves <- function(tasks = c('aln', 'rdmrot', 'rot', 'rdmmir', 'mir15', 'mir30', 'mir45'), target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig12_Experiment_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,325), ylim = c(-20,65), 
+       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reach learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(0, 15, 30, 45), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(side=1, at=c(1,48), labels=c('1','48'))
+  axis(side=1, at=c(49,96), labels=c('','48'))
+  axis(side=1, at=c(97,186), labels=c('','90'))
+  axis(side=1, at=c(187,234), labels=c('','48'))
+  axis(side=1, at=c(235,324), labels=c('','90'))
+  axis(2, at = c(-15, 0, 15, 25, 30, 35, 45), las = 2) #tick marks for y axis
+  
+  
+  #read in files created by getGroupConfidenceInterval in filehandling.R
+  for(task in tasks){
+    if(task == 'rot'){
+      groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
+    } else if(task == 'rdmrot'){
+      groupconfidence <- read.csv(file='data/RDMROT_CI_learningcurve.csv')
+    } else if(task == 'aln'){
+      groupconfidence <- read.csv(file='data/ALN_CI_learningcurve.csv')
+    } else if(task == 'rdmmir'){
+      groupconfidence <- read.csv(file='data/RDMMIR_CI_learningcurve.csv')
+    } else if(task == 'mir15'){
+      groupconfidence <- read.csv(file='data/MIR_CI_learningcurve_15.csv')
+    } else if(task == 'mir30'){
+      groupconfidence <- read.csv(file='data/MIR_CI_learningcurve_30.csv')
+    } else if(task == 'mir45'){
+      groupconfidence <- read.csv(file='data/MIR_CI_learningcurve_45.csv')
+    }
+    
+    
+    colourscheme <- getPtypeColourScheme(tasks=task)
+    
+    #colourscheme <- getColourScheme(groups = group)
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[task]][['T']]
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    if(task == 'rot'){
+      polygon(x = c(c(97:186), rev(c(97:186))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(97:186), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'rdmrot'){
+      polygon(x = c(c(49:96), rev(c(49:96))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(49:96), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'aln'){
+      polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(1:48), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'rdmmir'){
+      polygon(x = c(c(187:234), rev(c(187:234))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(187:234), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'mir15'){
+      polygon(x = c(c(235:324), rev(c(235:324))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(235:324), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'mir30'){
+      polygon(x = c(c(235:324), rev(c(235:324))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(235:324), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    } else if (task == 'mir45'){
+      polygon(x = c(c(235:324), rev(c(235:324))), y = c(lower, rev(upper)), border=NA, col=col)
+      meanGroupReaches <- mid #use mean to fill in empty list for each group
+      # plot mean reaches for each group
+      col <- colourscheme[[task]][['S']]
+      lines(x = c(235:324), y = meanGroupReaches, col = col, lty = 1, lwd = 2)
+    }
+    
+    
+    
+    
+  }
+  
+  
+  
+  #add legend
+  legend(1,65,legend=c('ALIGNED', 'RDM','ROT','MIR, 15°', 'MIR, 30°', 'MIR, 45°'),
+         col=c(colourscheme[['aln']][['S']],colourscheme[['rdmrot']][['S']],colourscheme[['rot']][['S']],colourscheme[['mir15']][['S']],colourscheme[['mir30']][['S']],colourscheme[['mir45']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+#plot histograms for error distribution-----
+getDists <- function(maxppid = 31, location = 'feedback'){
+  
+  participants <- seq(0,maxppid,1)
+  par(mfrow = c(3,3))
+  
+  for(participant in participants){
+    #specify function for perturbation
+    data <- getMIRParticipantLearningCurve(id = participant, location = location)
+    hist(data$reachdev, xlim = c(-180, 180), ylim = c(0,15), breaks = 90,
+         main = sprintf('Participant %s', participant), xlab = 'Degrees')
+  }
+}
+
+
+
 
 # Learning Curves WITHOUT NEAR TARGET----
 
