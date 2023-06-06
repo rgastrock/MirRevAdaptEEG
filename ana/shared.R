@@ -238,25 +238,55 @@ getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlmir', 'l
   return(colourscheme)
 }
 
-getTrainingColourScheme <- function(training = c('early','late')){
+getP3ColourScheme <- function(groups = c('aln','rot_b0', 'rot_b4', 'mir_b0', 'mir_b4', 'rdm_b0', 'rdm_b4')){
   #create a list containing the colourscheme per group
-  for (t in training){
+  for (group in groups){
     colourscheme <- list()
     
-    # colourscheme[['smlrot']] <- list('S'='#ff8200ff', # pure orange
-    #                                  'T'='#ff82002f')    #2f gives a lighter shade of the color
+    colourscheme[['rot_b0']] <- list('S'='#ff8200ff', # pure orange
+                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
     
-    colourscheme[['early']] <- list('S'='#e51636ff', #vivid/york red
+    colourscheme[['rot_b4']] <- list('S'='#e51636ff', #vivid/york red
+                                     'T'='#e516362f')
+    
+    colourscheme[['mir_b0']] <- list('S'='#c400c4ff', #strong magenta
+                                     'T'='#c400c42f')
+    
+    colourscheme[['mir_b4']] <-   list('S'='#005de4ff', #pure blue
+                                       'T'='#005de42f')
+    
+    colourscheme[['rdm_b0']] <-   list('S'='#fff44fff', #lemon yellow
+                                       'T'='#fff44f2f')
+    
+    colourscheme[['rdm_b3']] <-   list('S'='#00FA9Aff', #spring green
+                                       'T'='#00FA9A2f')
+    
+    colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #dark grey
+                                    'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
+getTrainingColourScheme <- function(errsize = c('hits','small','large')){
+  #create a list containing the colourscheme per group
+  for (err in errsize){
+    colourscheme <- list()
+    
+    colourscheme[['small']] <- list('S'='#ff8200ff', # pure orange
+                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['large']] <- list('S'='#e51636ff', #vivid/york red
                                  'T'='#e516362f')
     
     # colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
     #                                  'T'='#c400c42f')
     
-    colourscheme[['late']] <-   list('S'='#005de4ff', #pure blue
-                                   'T'='#005de42f')
+    # colourscheme[['late']] <-   list('S'='#005de4ff', #pure blue
+    #                                'T'='#005de42f')
     
-    # colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
-    #                                    'T'='#A9A9A92f')
+    colourscheme[['hits']] <-   list('S'='#A9A9A9ff', #dark grey
+                                       'T'='#A9A9A92f')
     
   }
   return(colourscheme)
@@ -321,23 +351,26 @@ getPtypeColourScheme <- function(tasks = c('aln', 'rdmrot','rot', 'rdmmir', 'mir
     colourscheme[['rot']] <- list('S'='#005de4ff', #blue
                                   'T'='#005de42f')
     
-    colourscheme[['rdmrot']] <- list('S'='#c400c4ff', #strong magenta
-                                    'T'='#c400c42f')
+    colourscheme[['rdmrot']] <- list('S'='#767676ff', #dark grey
+                                    'T'='#7676762f')
     
-    colourscheme[['rdmmir']] <- list('S'='#c400c4ff', #strong magenta
-                                     'T'='#c400c42f')
+    colourscheme[['rdmmir']] <- list('S'='#767676ff', #dark grey
+                                     'T'='#7676762f')
     
     colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #grey
                                     'T'='#A9A9A92f')
     
-    colourscheme[['mir45']] <-   list('S'='#e51636ff', #york red
+    colourscheme[['mir30']] <-   list('S'='#e51636ff', #york red
                                     'T'='#e516362f')
     
     colourscheme[['mir15']] <-   list('S'='#ff8200ff', #orange
                                       'T'='#ff82002f')
     
-    colourscheme[['mir30']] <-   list('S'='#A38A00', #gold
-                                      'T'='#A38A002f')
+    # colourscheme[['mir45']] <-   list('S'='#FFBF00', #amber
+    #                                   'T'='#FFBF002f')
+    
+    colourscheme[['mir45']] <- list('S'='#c400c4ff', #strong magenta
+                                  'T'='#c400c42f')
     
   }
   return(colourscheme)

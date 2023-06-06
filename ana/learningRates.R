@@ -224,10 +224,12 @@ getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'mir'
         if (participant%%2 == 1){
           #mirror then rotation if odd id
           mo <- getMovementOnset(id = participant, taskno = 9, task = 'random1')
+          mo1 <- getMovementOnset(id = participant, taskno = 3, task = 'random0')
         } else if (participant%%2 == 0){
           #if pp id is even
           #rotation first then mirror
           mo <- getMovementOnset(id = participant, taskno = 3, task = 'random0')
+          mo1 <- getMovementOnset(id = participant, taskno = 9, task = 'random1')
         }
       } else if (group == 'mir'){
         if (participant%%2 == 1){
@@ -242,6 +244,10 @@ getMovementOnsetGroup <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'mir'
       
       
       reaches <- mo$movement_onset#get reach deviations column from learning curve data
+      if (group =='rdm'){
+        reaches1 <- mo1$movement_onset
+        reaches <- c(reaches, reaches1)
+      }
       trial <- c(1:length(reaches)) #sets up trial column
       dat <- cbind(trial, reaches)
       #rdat <- dat$reaches
@@ -329,8 +335,8 @@ getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
   }
 }
 
-
-plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
+#c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir')
+plotERPs <- function(groups = c('aln','smlmir', 'lrgmir'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -368,13 +374,22 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s.csv', group, erps))
     
-    colourscheme <- getERPColourScheme(groups = group)
+    if(group == 'smlrot'|group == 'smlrdm'|group == 'smlmir'){
+      err <- 'small'
+    } else if (group == 'lrgrot'|group == 'lrgrdm'|group == 'lrgmir'){
+      err <- 'large'
+    } else if (group == 'aln'){
+      err <- 'hits'
+    }
+    
+    
+    colourscheme <- getTrainingColourScheme(err = err)
     #take only first, last and middle columns of file
     lower <- groupconfidence[,1]
     upper <- groupconfidence[,3]
     mid <- groupconfidence[,2]
     
-    col <- colourscheme[[group]][['T']] #use colour scheme according to group
+    col <- colourscheme[[err]][['T']] #use colour scheme according to group
     
     #upper and lower bounds create a polygon
     #polygon creates it from low left to low right, then up right to up left -> use rev
@@ -386,8 +401,15 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
   
   
   for (group in groups) {
+    if(group == 'smlrot'|group == 'smlrdm'|group == 'smlmir'){
+      err <- 'small'
+    } else if (group == 'lrgrot'|group == 'lrgrdm'|group == 'lrgmir'){
+      err <- 'large'
+    } else if (group == 'aln'){
+      err <- 'hits'
+    }
     # plot mean reaches for each group
-    col <- colourscheme[[group]][['S']]
+    col <- colourscheme[[err]][['S']]
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
@@ -395,35 +417,35 @@ plotERPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
   #add movement onset 
   if (erps == 'frn'){
     mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
-    mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
-    mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+    #mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+    #mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
     mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
     
-    col <- colourscheme[['aln']][['T']]
+    col <- colourscheme[['hits']][['T']]
     lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['aln']][['S']]
+    col <- colourscheme[['hits']][['S']]
     points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
     
-    col <- colourscheme[['lrgrot']][['T']]
-    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['lrgrot']][['S']]
-    points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    # col <- colourscheme[['large']][['T']]
+    # lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    # col <- colourscheme[['large']][['S']]
+    # points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
     
-    col <- colourscheme[['lrgrdm']][['T']]
-    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['lrgrdm']][['S']]
-    points(x = mo_rdm[,2], y = 4, pch = 20, cex = 1.5, col=col)
+    # col <- colourscheme[['large']][['T']]
+    # lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    # col <- colourscheme[['large']][['S']]
+    # points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
     
-    col <- colourscheme[['lrgmir']][['T']]
-    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(3.5, 3.5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['lrgmir']][['S']]
-    points(x = mo_mir[,2], y = 3.5, pch = 20, cex = 1.5, col=col)
+    col <- colourscheme[['large']][['T']]
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['large']][['S']]
+    points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
   }
   
   
   #add legend
-  legend(0.8,-5,legend=c('Aligned','Small ROT', 'Large ROT', 'Small RDM', 'Large RDM', 'Small MIR', 'Large MIR'),
-         col=c(colourscheme[['aln']][['S']],colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['smlrdm']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
+  legend(0.8,-5,legend=c('Aligned','Small MIR', 'Large MIR'),
+         col=c(colourscheme[['hits']][['S']],colourscheme[['small']][['S']],colourscheme[['large']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -467,7 +489,8 @@ getDiffWavesConfidenceInterval <- function(groups = c('smlrot', 'lrgrot', 'smlrd
   }
 }
 
-plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir'), target='inline', erps = 'frn') {
+#groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir')
+plotDiffWaves <- function(groups = c('smlmir', 'lrgmir'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -505,13 +528,21 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/DiffWaves_CI_%s_%s.csv', group, erps))
     
-    colourscheme <- getERPColourScheme(groups = group)
+    if(group == 'smlrot'|group == 'smlrdm'|group == 'smlmir'){
+      err <- 'small'
+    } else if (group == 'lrgrot'|group == 'lrgrdm'|group == 'lrgmir'){
+      err <- 'large'
+    } else if (group == 'aln'){
+      err <- 'hits'
+    }
+    
+    colourscheme <- getTrainingColourScheme(err = err)
     #take only first, last and middle columns of file
     lower <- groupconfidence[,1]
     upper <- groupconfidence[,3]
     mid <- groupconfidence[,2]
     
-    col <- colourscheme[[group]][['T']] #use colour scheme according to group
+    col <- colourscheme[[err]][['T']] #use colour scheme according to group
     
     #upper and lower bounds create a polygon
     #polygon creates it from low left to low right, then up right to up left -> use rev
@@ -523,8 +554,15 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
   
   
   for (group in groups) {
+    if(group == 'smlrot'|group == 'smlrdm'|group == 'smlmir'){
+      err <- 'small'
+    } else if (group == 'lrgrot'|group == 'lrgrdm'|group == 'lrgmir'){
+      err <- 'large'
+    } else if (group == 'aln'){
+      err <- 'hits'
+    }
     # plot mean reaches for each group
-    col <- colourscheme[[group]][['S']]
+    col <- colourscheme[[err]][['S']]
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
@@ -532,8 +570,8 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
   #add movement onset 
   if(erps=='frn'){
     #mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
-    mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
-    mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+    #mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+    #mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
     mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
     
     # col <- colourscheme[['aln']][['T']]
@@ -541,26 +579,26 @@ plotDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'sm
     # col <- colourscheme[['aln']][['S']]
     # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
     
-    col <- colourscheme[['lrgrot']][['T']]
-    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['lrgrot']][['S']]
-    points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    # col <- colourscheme[['large']][['T']]
+    # lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    # col <- colourscheme[['large']][['S']]
+    # points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
     
-    col <- colourscheme[['lrgrdm']][['T']]
-    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['lrgrdm']][['S']]
-    points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    # col <- colourscheme[['large']][['T']]
+    # lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    # col <- colourscheme[['large']][['S']]
+    # points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
     
-    col <- colourscheme[['lrgmir']][['T']]
-    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4, 4), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['lrgmir']][['S']]
-    points(x = mo_mir[,2], y = 4, pch = 20, cex = 1.5, col=col)
+    col <- colourscheme[['large']][['T']]
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['large']][['S']]
+    points(x = mo_mir[,2], y = 5, pch = 20, cex = 1.5, col=col)
     
   }
   
   #add legend
-  legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned', 'Small RDM - Aligned', 'Large RDM - Aligned', 'Small MIR - Aligned', 'Large MIR - Aligned'),
-         col=c(colourscheme[['smlrot']][['S']],colourscheme[['lrgrot']][['S']],colourscheme[['smlrdm']][['S']],colourscheme[['lrgrdm']][['S']],colourscheme[['smlmir']][['S']],colourscheme[['lrgmir']][['S']]),
+  legend(0.8,-5,legend=c('Small MIR - Aligned', 'Large MIR - Aligned'),
+         col=c(colourscheme[['small']][['S']],colourscheme[['large']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #close everything if you saved plot as svg
@@ -647,10 +685,12 @@ getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'm
         if (participant%%2 == 1){
           #mirror then rotation if odd id
           mo <- getMovementOnsetLRP(id = participant, taskno = 9, task = 'random1')
+          mo1 <- getMovementOnsetLRP(id = participant, taskno = 3, task = 'random0')
         } else if (participant%%2 == 0){
           #if pp id is even
           #rotation first then mirror
           mo <- getMovementOnsetLRP(id = participant, taskno = 3, task = 'random0')
+          mo1 <- getMovementOnsetLRP(id = participant, taskno = 9, task = 'random1')
         }
       } else if (group == 'mir'){
         if (participant%%2 == 1){
@@ -665,6 +705,10 @@ getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'm
       
       
       reaches <- mo$movement_onset#get reach deviations column from learning curve data
+      if (group =='rdm'){
+        reaches1 <- mo1$movement_onset
+        reaches <- c(reaches, reaches1)
+      }
       trial <- c(1:length(reaches)) #sets up trial column
       dat <- cbind(trial, reaches)
       #rdat <- dat$reaches
@@ -676,8 +720,8 @@ getMovementOnsetGroupLRP <- function(maxppid, groups = c('aln', 'rot', 'rdm', 'm
       }
       
     }
-    return(dataoutput)
-    #write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s_lrp.csv', group), row.names = F)
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/Movement_Onset_%s_lrp.csv', group), row.names = F)
   }
   
 }

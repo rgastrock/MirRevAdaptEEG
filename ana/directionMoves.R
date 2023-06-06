@@ -500,16 +500,16 @@ getWorkspaceLRPConfidenceInterval <- function(groups = c('aln_right', 'aln_left'
   }
 }
 
-
-plotWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+#, 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'
+plotWorkspaceLRPs <- function(groups = c('aln_left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig6_Workspace_LRP.svg', width=16, height=24, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig6_Workspace_LRP.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
-  par(mfrow = c(4,2))
+  #par(mfrow = c(4,2))
   
   for (group in groups){
     #NA to create empty plot
