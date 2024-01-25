@@ -44,7 +44,7 @@ getMissingTriggers <- function(pp, startmark, endmark = 16156, trigger){
 }
 
 #single participant, all tasks
-getAllTriggers <- function(maxppid = 31, trigger = 16141, endmark = 16156){
+getAllTriggers <- function(maxppid = 31, trigger = 16142, endmark = 16156){
   
   participants <- seq(0,maxppid,1)
 

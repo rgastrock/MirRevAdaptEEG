@@ -56,6 +56,7 @@ plotP3 <- function(groups = c('aln', 'rot_b0', 'rot_b4', 'mir_b0', 'mir_b4', 'rd
   for (group in groups){
     data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
     timepts <- data$time
+    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
   }
   
   #NA to create empty plot
@@ -75,6 +76,7 @@ plotP3 <- function(groups = c('aln', 'rot_b0', 'rot_b4', 'mir_b0', 'mir_b4', 'rd
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s.csv', group, erps))
+    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
     
 
     colourscheme <- getP3ColourScheme(group=group)
@@ -118,13 +120,13 @@ plotP3 <- function(groups = c('aln', 'rot_b0', 'rot_b4', 'mir_b0', 'mir_b4', 'rd
 getAverageBLockedP3<- function(component, group){
   #cannot detect specific time point we want
   #rowidx will be consistent across blocks anyway, so we can hard code this
-  #for p3a: we want 0.15 to 0.28 | for p3b: we want 0.29 to 0.50 (179 to 200)
+  #for p3a: we want 0.15 to 0.28 | for p3b: we want 0.29 to 0.50
   if(component == 'a'){
-    startidx <- 165
-    endidx <- 178
+    startidx <- 430 
+    endidx <- 456 
   } else if (component == 'b'){
-    startidx <- 179
-    endidx <- 200
+    startidx <- 457
+    endidx <- 500
   }
   idxs <- seq(startidx, endidx, 1)
   
@@ -256,7 +258,7 @@ plotBlockedP3 <- function(groups = c('aln', 'rot', 'rdm', 'mir'), target='inline
   #component = 'a' or 'b'
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file=sprintf('doc/fig/Fig14_Blocked_P3%s.svg', component), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file=sprintf('doc/fig/Fig14_Blocked_P3%s.svg', component), width=12, height=7, pointsize=18, system_fonts=list(sans="Arial"))
   }
   
   #par(mfrow = c(4,2))
@@ -334,7 +336,7 @@ plotBlockedP3 <- function(groups = c('aln', 'rot', 'rdm', 'mir'), target='inline
   }
   
   #add legend
-  legend(4.5,-5,legend=c('aligned', 'random', 'rotation', 'mirror'),
+  legend(4.5,-5,legend=c('aligned', 'random rotation', ' fixed rotation', 'mirror reversal'),
          col=c(colourscheme[['aln']][['S']],colourscheme[['rdm']][['S']],colourscheme[['rot']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   

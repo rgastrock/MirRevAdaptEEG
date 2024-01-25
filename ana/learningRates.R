@@ -341,9 +341,9 @@ plotERPs <- function(groups = c('aln','smlmir', 'lrgmir'), target='inline', erps
   
   #but we can save plot as svg file
   if (target=='svg' & erps=='frn') {
-    svglite(file='doc/fig/Fig1_FRN.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig1_FRN_MIR.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   } else if (target=='svg' & erps=='ern') {
-    svglite(file='doc/fig/Fig10_ERN.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig10_ERN_MIR.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -352,6 +352,7 @@ plotERPs <- function(groups = c('aln','smlmir', 'lrgmir'), target='inline', erps
   for (group in groups){
     data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
     timepts <- data$time
+    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
   }
   
   #NA to create empty plot
@@ -373,6 +374,7 @@ plotERPs <- function(groups = c('aln','smlmir', 'lrgmir'), target='inline', erps
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s.csv', group, erps))
+    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
     
     if(group == 'smlrot'|group == 'smlrdm'|group == 'smlmir'){
       err <- 'small'
@@ -495,9 +497,9 @@ plotDiffWaves <- function(groups = c('smlmir', 'lrgmir'), target='inline', erps 
   
   #but we can save plot as svg file
   if (target=='svg' & erps == 'frn') {
-    svglite(file='doc/fig/Fig2_FRN_DiffWaves.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig2_FRN_DiffWaves_MIR.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   } else if (target=='svg' & erps == 'ern') {
-    svglite(file='doc/fig/Fig11_ERN_DiffWaves.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig11_ERN_DiffWaves_MIR.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -506,6 +508,7 @@ plotDiffWaves <- function(groups = c('smlmir', 'lrgmir'), target='inline', erps 
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
     timepts <- data$time
+    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
   }
   
   #NA to create empty plot
@@ -527,6 +530,7 @@ plotDiffWaves <- function(groups = c('smlmir', 'lrgmir'), target='inline', erps 
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/DiffWaves_CI_%s_%s.csv', group, erps))
+    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
     
     if(group == 'smlrot'|group == 'smlrdm'|group == 'smlmir'){
       err <- 'small'
@@ -823,9 +827,11 @@ plotLRPs <- function(groups = c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 's
     for (channel in channels){
       data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s.csv', group, erps, channel))
       timepts <- data$time
+      timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in files created by getGroupConfidenceInterval in filehandling.R
       groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s_%s.csv', group, erps, channel))
+      groupconfidence <- groupconfidence[101:701,] #grab timepts we need
       
       colourscheme <- getLRPColourScheme(channels = channel)
       #take only first, last and middle columns of file
@@ -933,6 +939,7 @@ plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s_C3.csv', group, erps))
     timepts <- data$time
+    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
   }
   
   #NA to create empty plot
@@ -949,6 +956,7 @@ plotLRPDiffWaves <- function(groups = c('smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/DiffWaves_CI_%s_%s_C3.csv', group, erps))
+    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
     
     colourscheme <- getERPColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -1081,9 +1089,11 @@ plotAllLRPs <- function(groups = c('aln', 'lrgrot', 'lrgrdm', 'lrgmir'),target='
   for (channel in channels){
     data <- read.csv(file=sprintf('data/Evoked_DF_alldata_%s_%s.csv', erps, channel))
     timepts <- data$time
+    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
     
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/ERP_CI_alldata_%s_%s.csv', erps, channel))
+    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
     
     colourscheme <- getLRPColourScheme(channels = channel)
     #take only first, last and middle columns of file
@@ -1366,6 +1376,8 @@ getALNGroupConfidenceInterval <- function(maxppid, location, type){
   #}
 }
 
+#can change function below to include a cutoff and check data
+#not necessary for just running functions, since we index in python scripts
 getsmallALNErrors <- function(maxppid = 31, location = 'feedback'){#, cutoff = 5){
  
   data <- getALNGroupLearningCurves(maxppid = maxppid, location = location)

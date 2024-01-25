@@ -501,15 +501,15 @@ getWorkspaceLRPConfidenceInterval <- function(groups = c('aln_right', 'aln_left'
 }
 
 #, 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'
-plotWorkspaceLRPs <- function(groups = c('aln_left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+plotWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
   
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig6_Workspace_LRP.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig6_Workspace_LRP.svg', width=14, height=18, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
-  #par(mfrow = c(4,2))
+  par(mfrow = c(4,2))
   
   for (group in groups){
     #NA to create empty plot
@@ -526,9 +526,11 @@ plotWorkspaceLRPs <- function(groups = c('aln_left'), target='inline', erps = 'l
     for (channel in channels){
       data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s.csv', group, erps, channel))
       timepts <- data$time
+      timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in files created by getGroupConfidenceInterval in filehandling.R
       groupconfidence <- read.csv(file=sprintf('data/ERP_CI_%s_%s_%s.csv', group, erps, channel))
+      groupconfidence <- groupconfidence[101:701,] #grab timepts we need
       
       colourscheme <- getLRPColourScheme(channels = channel)
       #take only first, last and middle columns of file
@@ -670,9 +672,11 @@ plotSubtractedLRPs <- function(groups = c('aln', 'rot', 'rdm', 'mir'), target='i
   for (group in groups){
     data <- read.csv(file=sprintf('data/Subtracted_LRP_DF_%s.csv', group))
     timepts <- data$time
+    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
     
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/Subtracted_LRP_CI_%s.csv', group))
+    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
     
     colourscheme <- getSubtractedLRPColourScheme(groups=group)
     #take only first, last and middle columns of file
@@ -818,7 +822,7 @@ getAverageBLockedLRP <- function(group){
     data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s.csv', group))
     #subset for rows from -300 ms to 0
     startidx <- data$rowidx[which(data$timepts == -0.30)]
-    endidx <- (startidx + 30) - 1
+    endidx <- (startidx + 60) - 1
     idxs <- seq(startidx, endidx, 1)
     ndat <- data.frame()
     for(i in idxs){
@@ -843,7 +847,7 @@ getAverageBLockedLRP <- function(group){
       data <- read.csv(file=sprintf('data/BLocked_LRP_DF_%s_b%d.csv', group, blockno))
       #subset for rows from -300 ms to 0
       startidx <- data$rowidx[which(data$timepts == -0.30)]
-      endidx <- (startidx + 30) - 1
+      endidx <- (startidx + 60) - 1
       idxs <- seq(startidx, endidx, 1)
       ndat <- data.frame()
       for(i in idxs){
@@ -874,7 +878,7 @@ getAverageBLockedLRP <- function(group){
       data <- read.csv(file=sprintf('data/BLocked_LRP_DF_%s_b%d.csv', group, blockno))
       #subset for rows from -300 ms to 0
       startidx <- data$rowidx[which(data$timepts == -0.30)]
-      endidx <- (startidx + 30) - 1
+      endidx <- (startidx + 60) - 1
       idxs <- seq(startidx, endidx, 1)
       ndat <- data.frame()
       for(i in idxs){
@@ -1050,16 +1054,16 @@ getAverageBlockedLRPComparisons <- function(){
   mir <- getAverageBLockedLRP(group='mir')
   
   cat('t-test (Aligned vs. Random): \n')
-  t.test(aln, rdm)
+  print(t.test(aln, rdm))
   
   cat('t-test (Aligned vs. Rotation Block 1): \n')
-  t.test(aln, rot[1,])
+  print(t.test(aln, rot[1,]))
   
   cat('t-test (Aligned vs. Mirror Block 1): \n')
-  t.test(aln, mir[1,])
+  print(t.test(aln, mir[1,]))
   
   cat('t-test (Rotation Block 1 vs. Mirror Block 1): \n')
-  t.test(rot[1,], mir[1,])
+  print(t.test(rot[1,], mir[1,]))
   
 }
 
