@@ -336,7 +336,7 @@ getERPConfidenceInterval <- function(groups = c('aln', 'smlrot', 'lrgrot', 'smlr
 }
 
 #c('aln','smlrot', 'lrgrot', 'smlrdm', 'lrgrdm', 'smlmir', 'lrgmir')
-plotERPs <- function(groups = c('aln','smlmir', 'lrgmir'), target='inline', erps = 'frn') {
+plotERPs <- function(groups = c('aln','smlrdm', 'lrgrdm'), target='inline', erps = 'frn') {
   
   
   #but we can save plot as svg file
@@ -421,7 +421,7 @@ plotERPs <- function(groups = c('aln','smlmir', 'lrgmir'), target='inline', erps
     mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
     #mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
     #mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
-    mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+    #mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
     
     col <- colourscheme[['hits']][['T']]
     lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)

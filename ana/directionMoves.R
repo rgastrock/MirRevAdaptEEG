@@ -246,6 +246,8 @@ source('ana/learningRates.R')
 #   return(AT)
 # }
 
+# movement workspace direction: targets on HORIZONTAL axis----
+
 getAnglesWorkspace <- function(id, taskno, task, location){
   
   data <- getParticipantTaskData(id = id, taskno = taskno, task = task)
@@ -462,8 +464,224 @@ getRDMMovementWorkspaceDirection <- function(){
   
 }
 
+# movement workspace direction: targets on VERTICAL axis----
+getAnglesVerticalWorkspace <- function(id, taskno, task, location){
+  
+  data <- getParticipantTaskData(id = id, taskno = taskno, task = task)
+  
+  if(task == 'aligned' | task == 'random0' | task == 'random1'){
+    AT<- getReachAngles(data, starttrial=0, endtrial=47, location = location)
+  } else if (task == 'rotation' | task == 'mirror'){
+    AT<- getReachAngles(data, starttrial=0, endtrial=89, location = location)
+  }
+  
+  
+  
+  trials <- c(1:length(AT$trial))-1
+  AT$direction <- NA
+  
+  for(trialno in trials){
+    subdat <- AT[which(AT$trial == trialno),]
+    target <- subdat$targetangle
+    
+    #ensure that reachdev is either in the left or right side of the workspace, relative to vertical midline
+    #right targets
+    if(target == 67.5){
+      x <- subdat$reachdev
+      if(x < -157.5 | x > 22.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 75){
+      x <- subdat$reachdev
+      if(x < -165 | x > 15){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 82.5){
+      x <- subdat$reachdev
+      if(x < -172.5 | x > 7.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 277.5){
+      x <- subdat$reachdev
+      if(x < -7.5 | x > 172.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 285){
+      x <- subdat$reachdev
+      if(x < -15 | x > 165){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 292.5){
+      x <- subdat$reachdev
+      if(x < -22.5 | x > 157.5){
+        dir <- 'l'
+      } else {
+        dir <- 'r'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 97.5){ #left targets
+      x <- subdat$reachdev
+      if(x < -7.5 | x > 172.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 105){
+      x <- subdat$reachdev
+      if(x < -15 | x > 165){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 112.5){
+      x <- subdat$reachdev
+      if(x < -22.5 | x > 157.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 247.5){
+      x <- subdat$reachdev
+      if(x < -157.5 | x > 22.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 255){
+      x <- subdat$reachdev
+      if(x < -165 | x > 15){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else if(target == 262.5){
+      x <- subdat$reachdev
+      if(x < -172.5 | x > 7.5){
+        dir <- 'r'
+      } else {
+        dir <- 'l'
+      }
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    } else {
+      dir <- NA
+      subdat$direction <- dir
+      AT[which(AT$trial == trialno),] <- subdat
+    }
+  }
+  
+  return(AT)
+}
 
-# plot LRP differences for right and left moves ----
+getGroupMovementVerticalWorkspaceDirection <- function(maxppid = 31, groups = c('aln', 'rot', 'rdmrot', 'rdmmir', 'mir'), location = 'feedback') {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  for(group in groups){
+    participants <- seq(0,maxppid,1)
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      if (group == 'aln'){
+        ppangles <- getAnglesVerticalWorkspace(id=participant, taskno = 1, task = 'aligned', location = location)
+      } else if (group == 'rot'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 11, task = 'rotation', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 5, task = 'rotation', location = location)
+        }
+      } else if (group == 'rdmrot'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 9, task = 'random1', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 3, task = 'random0', location = location)
+        }
+      } else if (group == 'rdmmir'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 3, task = 'random0', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 9, task = 'random1', location = location)
+        }
+      } else if (group == 'mir'){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 5, task = 'mirror', location = location)
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          ppangles <- getAnglesVerticalWorkspace(id = participant, taskno = 11, task = 'mirror', location = location)
+        }
+      }
+      reaches <- ppangles$direction #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      #rdat <- dat$reaches
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+    }
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/%s_MovementVerticalWorkspace_direction.csv', group), row.names = F) 
+  }
+  
+}
+
+getRDMMovementVerticalWorkspaceDirection <- function(){
+  
+  rdmrot <- read.csv(file='data/rdmrot_MovementVerticalWorkspace_direction.csv')
+  rdmmir <- read.csv(file='data/rdmmir_MovementVerticalWorkspace_direction.csv')
+  
+  #assign rdmmir values to NA values in rdmrot
+  rdmrot[is.na(rdmrot)] <- rdmmir[is.na(rdmrot)]
+  
+  write.csv(rdmrot, file='data/rdm_MovementVerticalWorkspace_direction.csv', row.names = F) 
+  
+}
+
+# plot LRP differences for right and left moves on HORIZONTAL axis ----
 getWorkspaceLRPConfidenceInterval <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
   for(channel in channels){
     for (group in groups){
@@ -570,6 +788,128 @@ plotWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_right', '
     
     colourscheme<-   list('S'='#A9A9A9ff', #dark grey
                                     'T'='#A9A9A92f')
+    col <- colourscheme[['T']]
+    lines(x = c(mo[,1], mo[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['S']]
+    points(x = mo[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    
+    
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+# plot LRP differences for right and left moves on VERTICAL axis ----
+getVerticalWorkspaceLRPConfidenceInterval <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
+  for(channel in channels){
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/Evoked_DF_vertical_%s_%s_%s.csv', group, erps, channel))
+      data <- data[,2:length(data)]
+      
+      data <- as.data.frame(data)
+      timepts <- data$time
+      data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+      
+      confidence <- data.frame()
+      
+      
+      for (time in timepts){
+        cireaches <- data1[which(data$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+        
+        write.csv(confidence, file=sprintf('data/ERP_CI_vertical_%s_%s_%s.csv', group, erps, channel), row.names = F) 
+        
+      }
+    }
+  }
+}
+
+#, 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'
+plotVerticalWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), target='inline', erps = 'lrp', channels = c('C3','C4')) {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig6A_Vertical_Workspace_LRP.svg', width=14, height=18, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  par(mfrow = c(4,2))
+  
+  for (group in groups){
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Move to %s side of workspace", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    text(-1, 6, 'target onset', cex = 0.85)
+    text(0, 6, 'go signal', cex = 0.85)
+    axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    for (channel in channels){
+      data <- read.csv(file=sprintf('data/Evoked_DF_vertical_%s_%s_%s.csv', group, erps, channel))
+      timepts <- data$time
+      timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+      
+      #read in files created by getGroupConfidenceInterval in filehandling.R
+      groupconfidence <- read.csv(file=sprintf('data/ERP_CI_vertical_%s_%s_%s.csv', group, erps, channel))
+      groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+      
+      colourscheme <- getLRPColourScheme(channels = channel)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[channel]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[channel]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    
+    #add legend
+    legend(0.2,-10,legend=c('C3','C4'),
+           col=c(colourscheme[['C3']][['S']],colourscheme[['C4']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    #add movement onset
+    if(group == 'aln_right' | group == 'aln_left'){
+      mo <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+    } else if (group == 'rot_right' | group == 'rot_left'){
+      mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+    } else if (group == 'rdm_right' | group == 'rdm_left'){
+      mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+    } else if (group == 'mir_right' | group == 'mir_left'){
+      mo <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+    }
+    
+    colourscheme<-   list('S'='#A9A9A9ff', #dark grey
+                          'T'='#A9A9A92f')
     col <- colourscheme[['T']]
     lines(x = c(mo[,1], mo[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['S']]
