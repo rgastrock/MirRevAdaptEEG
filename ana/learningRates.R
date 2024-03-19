@@ -1480,7 +1480,7 @@ getRDMGroupLCALL <- function(maxppid, location) {
     
   }
   return(dataoutput)
-  #write.csv(dataoutput, file='data/ROT_learningcurve_degrees.csv', row.names = F) 
+  #write.csv(dataoutput, file='data/RDMROT_learningcurve_degrees.csv', row.names = F) 
 }
 
 getRDMGroupLearningCurves <- function(maxppid, location, angles = c(15, 25, 35)) {
@@ -2126,7 +2126,7 @@ getMIRGroupLCALL <- function(maxppid=31, location='feedback') { # add angle?
       dataoutput <- cbind(dataoutput, reaches)
     }
   }
-  write.csv(dataoutput, file='data/MIR_learningcurve_degrees_ALL.csv', row.names = F) 
+  write.csv(dataoutput, file='data/MIR_learningcurve_degrees.csv', row.names = F) 
   #return(dataoutput)
   
 }
