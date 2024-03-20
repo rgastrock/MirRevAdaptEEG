@@ -238,6 +238,36 @@ getERPColourScheme <- function(groups = c('aln','smlrot', 'lrgrot', 'smlmir', 'l
   return(colourscheme)
 }
 
+getEarlyLateERPColourScheme <- function(groups = c('aln','earlyrot', 'laterot', 'earlymir', 'latemir', 'earlyrdm', 'laterdm')){
+  #create a list containing the colourscheme per group
+  for (group in groups){
+    colourscheme <- list()
+    
+    colourscheme[['earlyrot']] <- list('S'='#ff8200ff', # pure orange
+                                     'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['laterot']] <- list('S'='#e51636ff', #vivid/york red
+                                     'T'='#e516362f')
+    
+    colourscheme[['latemir']] <- list('S'='#c400c4ff', #strong magenta
+                                     'T'='#c400c42f')
+    
+    colourscheme[['earlymir']] <-   list('S'='#005de4ff', #pure blue
+                                       'T'='#005de42f')
+    
+    colourscheme[['earlyrdm']] <-   list('S'='#fff44fff', #lemon yellow
+                                       'T'='#fff44f2f')
+    
+    colourscheme[['laterdm']] <-   list('S'='#00FA9Aff', #spring green
+                                       'T'='#00FA9A2f')
+    
+    colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #dark grey
+                                    'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
 getP3ColourScheme <- function(groups = c('aln','rot_b0', 'rot_b4', 'mir_b0', 'mir_b4', 'rdm_b0', 'rdm_b4')){
   #create a list containing the colourscheme per group
   for (group in groups){
@@ -268,15 +298,15 @@ getP3ColourScheme <- function(groups = c('aln','rot_b0', 'rot_b4', 'mir_b0', 'mi
   return(colourscheme)
 }
 
-getTrainingColourScheme <- function(errsize = c('hits','small','large')){
+getTrainingColourScheme <- function(errsize = c('aligned','early','late')){
   #create a list containing the colourscheme per group
   for (err in errsize){
     colourscheme <- list()
     
-    colourscheme[['small']] <- list('S'='#ff8200ff', # pure orange
+    colourscheme[['early']] <- list('S'='#ff8200ff', # pure orange
                                      'T'='#ff82002f')    #2f gives a lighter shade of the color
     
-    colourscheme[['large']] <- list('S'='#e51636ff', #vivid/york red
+    colourscheme[['late']] <- list('S'='#e51636ff', #vivid/york red
                                  'T'='#e516362f')
     
     # colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
@@ -285,8 +315,32 @@ getTrainingColourScheme <- function(errsize = c('hits','small','large')){
     # colourscheme[['late']] <-   list('S'='#005de4ff', #pure blue
     #                                'T'='#005de42f')
     
-    colourscheme[['hits']] <-   list('S'='#A9A9A9ff', #dark grey
+    colourscheme[['aligned']] <-   list('S'='#A9A9A9ff', #dark grey
                                        'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
+getErrSizeColourScheme <- function(errsize = c('aligned','sml','lrg')){
+  #create a list containing the colourscheme per group
+  for (err in errsize){
+    colourscheme <- list()
+    
+    colourscheme[['sml']] <- list('S'='#ff8200ff', # pure orange
+                                    'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['lrg']] <- list('S'='#e51636ff', #vivid/york red
+                                   'T'='#e516362f')
+    
+    # colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
+    #                                  'T'='#c400c42f')
+    
+    # colourscheme[['late']] <-   list('S'='#005de4ff', #pure blue
+    #                                'T'='#005de42f')
+    
+    colourscheme[['aligned']] <-   list('S'='#A9A9A9ff', #dark grey
+                                        'T'='#A9A9A92f')
     
   }
   return(colourscheme)
