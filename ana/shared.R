@@ -582,3 +582,21 @@ getMoveThroughColourScheme <- function(moves = c('0','1')){
   }
   return(colourscheme)
 }
+
+getPerturbationColourScheme <- function(perturbations = c('rot', 'mir', 'rdm')){
+  #create a list containing the colourscheme per group
+  for (p in perturbations){
+    colourscheme <- list()
+    
+    colourscheme[['mir']] <- list('S'='#e51636ff', #vivid/york red
+                               'T'='#e516362f')
+    
+    colourscheme[['rot']] <-   list('S'='#005de4ff', #pure blue
+                                 'T'='#005de42f')
+    
+    colourscheme[['rdm']] <-   list('S'='#A9A9A9ff', #dark grey
+                                  'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
