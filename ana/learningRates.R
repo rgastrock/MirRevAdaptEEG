@@ -992,6 +992,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
@@ -1083,6 +1084,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
@@ -1175,6 +1177,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
