@@ -1,7 +1,6 @@
 source('ana/shared.R')
 source('ana/learningRates.R')
 
-
 plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'earlyrdm', 'laterdm', 'earlymir', 'latemir'), target='inline', erps = 'frn') {
   
   for(ptype in perturbs){
@@ -677,7 +676,334 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
   }
 }
 
-
+plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'frn') {
+  
+  for(ptype in perturbs){
+    #but we can save plot as svg file
+    if (target=='svg' & erps == 'frn') {
+      svglite(file=sprintf('doc/fig/Fig2C_FRN_DiffWaves_EarlyLate_PermTest_%s.svg', ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    if(ptype == 'rot'){
+      groups = c('earlyrot', 'laterot')
+      
+      # create plot
+      meanGroupReaches <- list() #empty list so that it plots the means last
+      #NA to create empty plot
+      # could maybe use plot.new() ?
+      if(erps == 'frn'){
+        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+             main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      } else if (erps == 'ern'){
+        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+             main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      }
+      
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      
+      for (group in groups){
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
+        full_timepts <- data$time
+        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        
+        groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
+        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        
+        if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+          err <- 'early'
+        } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+          err <- 'late'
+        } else if (group == 'aln'){
+          err <- 'aligned'
+        }
+        
+        colourscheme <- getTrainingColourScheme(err = err)
+        #take only first, last and middle columns of file
+        lower <- groupconfidence[,1]
+        upper <- groupconfidence[,3]
+        mid <- groupconfidence[,2]
+        
+        col <- colourscheme[[err]][['T']] #use colour scheme according to group
+        
+        #upper and lower bounds create a polygon
+        #polygon creates it from low left to low right, then up right to up left -> use rev
+        #x is just trial nnumber, y depends on values of bounds
+        polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+        
+        meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+      }
+      
+      for (group in groups) {
+        if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+          err <- 'early'
+        } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+          err <- 'late'
+        } else if (group == 'aln'){
+          err <- 'aligned'
+        }
+        # plot mean reaches for each group
+        col <- colourscheme[[err]][['S']]
+        #lines(x = timepts, y = mid, col=col)
+        lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+      }
+      
+      #add movement onset 
+      if(erps=='frn'){
+        mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        
+      }
+      
+      #add in permutation clusters and any significant results
+      permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+      subdat <- permdat[which(permdat$condition == ptype),]
+      for(i in c(1:nrow(subdat))){
+        start <- subdat$clust_idx_start[i] + 1
+        end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+        
+        if(start %in% c(101:701) & end %in% c(101:701)){
+          permtime <- full_timepts[start:end]
+        } else {
+          next
+        }
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['late']][['T']]
+        } else {
+          col <- colourscheme[['late']][['S']]
+        }
+        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+      }
+      
+      #add legend
+      legend(0.8,-5,legend=c('Early ROT - Aligned', 'Late ROT - Aligned'),
+             col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+      
+    } else if (ptype == 'rdm'){
+      groups = c('earlyrdm', 'laterdm')
+      
+      # create plot
+      meanGroupReaches <- list() #empty list so that it plots the means last
+      #NA to create empty plot
+      # could maybe use plot.new() ?
+      if(erps == 'frn'){
+        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+             main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      } else if (erps == 'ern'){
+        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+             main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      }
+      
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      
+      for (group in groups){
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
+        full_timepts <- data$time
+        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        
+        groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
+        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        
+        if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+          err <- 'early'
+        } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+          err <- 'late'
+        } else if (group == 'aln'){
+          err <- 'aligned'
+        }
+        
+        colourscheme <- getTrainingColourScheme(err = err)
+        #take only first, last and middle columns of file
+        lower <- groupconfidence[,1]
+        upper <- groupconfidence[,3]
+        mid <- groupconfidence[,2]
+        
+        col <- colourscheme[[err]][['T']] #use colour scheme according to group
+        
+        #upper and lower bounds create a polygon
+        #polygon creates it from low left to low right, then up right to up left -> use rev
+        #x is just trial nnumber, y depends on values of bounds
+        polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+        
+        meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+      }
+      
+      for (group in groups) {
+        if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+          err <- 'early'
+        } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+          err <- 'late'
+        } else if (group == 'aln'){
+          err <- 'aligned'
+        }
+        # plot mean reaches for each group
+        col <- colourscheme[[err]][['S']]
+        #lines(x = timepts, y = mid, col=col)
+        lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+      }
+      
+      #add movement onset 
+      if(erps=='frn'){
+        mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        
+      }
+      
+      #add in permutation clusters and any significant results
+      permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+      subdat <- permdat[which(permdat$condition == ptype),]
+      for(i in c(1:nrow(subdat))){
+        start <- subdat$clust_idx_start[i] + 1
+        end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+        
+        if(start %in% c(101:701) & end %in% c(101:701)){
+          permtime <- full_timepts[start:end]
+        } else {
+          next
+        }
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['late']][['T']]
+        } else {
+          col <- colourscheme[['late']][['S']]
+        }
+        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+      }
+      
+      #add legend
+      legend(0.8,-5,legend=c('Early RDM - Aligned', 'Late RDM - Aligned'),
+             col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'mir'){
+      groups = c('earlymir', 'latemir')
+      
+      # create plot
+      meanGroupReaches <- list() #empty list so that it plots the means last
+      #NA to create empty plot
+      # could maybe use plot.new() ?
+      if(erps == 'frn'){
+        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+             main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      } else if (erps == 'ern'){
+        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+             main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      }
+      
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      
+      for (group in groups){
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
+        full_timepts <- data$time
+        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        
+        groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
+        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        
+        if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+          err <- 'early'
+        } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+          err <- 'late'
+        } else if (group == 'aln'){
+          err <- 'aligned'
+        }
+        
+        colourscheme <- getTrainingColourScheme(err = err)
+        #take only first, last and middle columns of file
+        lower <- groupconfidence[,1]
+        upper <- groupconfidence[,3]
+        mid <- groupconfidence[,2]
+        
+        col <- colourscheme[[err]][['T']] #use colour scheme according to group
+        
+        #upper and lower bounds create a polygon
+        #polygon creates it from low left to low right, then up right to up left -> use rev
+        #x is just trial nnumber, y depends on values of bounds
+        polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+        
+        meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+      }
+      
+      for (group in groups) {
+        if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+          err <- 'early'
+        } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+          err <- 'late'
+        } else if (group == 'aln'){
+          err <- 'aligned'
+        }
+        # plot mean reaches for each group
+        col <- colourscheme[[err]][['S']]
+        #lines(x = timepts, y = mid, col=col)
+        lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+      }
+      
+      #add movement onset 
+      if(erps=='frn'){
+        mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_mir[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        
+      }
+      
+      #add in permutation clusters and any significant results
+      permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+      subdat <- permdat[which(permdat$condition == ptype),]
+      for(i in c(1:nrow(subdat))){
+        start <- subdat$clust_idx_start[i] + 1
+        end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+        
+        if(start %in% c(101:701) & end %in% c(101:701)){
+          permtime <- full_timepts[start:end]
+        } else {
+          next
+        }
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['late']][['T']]
+        } else {
+          col <- colourscheme[['late']][['S']]
+        }
+        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+      }
+      
+      #add legend
+      legend(0.8,-5,legend=c('Early MIR - Aligned', 'Late MIR - Aligned'),
+             col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    }
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
 
 
 
