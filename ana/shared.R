@@ -600,3 +600,39 @@ getPerturbationColourScheme <- function(perturbations = c('rot', 'mir', 'rdm')){
   }
   return(colourscheme)
 }
+
+getPTypeDiffWavesColourScheme <- function(groups = c('rot', 'mir', 'rdm')){
+  #create a list containing the colourscheme per group
+  for (group in groups){
+    colourscheme <- list()
+    
+    colourscheme[['mir']] <- list('S'='#e51636ff', #vivid/york red
+                                  'T'='#e516362f')
+    
+    colourscheme[['rdm']] <-   list('S'='#005de4ff', #pure blue
+                                    'T'='#005de42f')
+    
+    colourscheme[['rot']] <-   list('S'='#ff8200ff', #orange
+                                    'T'='#ff82002f')
+    
+  }
+  return(colourscheme)
+}
+
+getPermTestDiffWavesColourScheme <- function(perturbs = c('rotvmir', 'rotvrdm', 'mirvrdm')){
+  #create a list containing the colourscheme per group
+  for (ptype in perturbs){
+    colourscheme <- list()
+    
+    colourscheme[['rotvmir']] <- list('S'='#e51636ff', #vivid/york red
+                                  'T'='#e516362f')
+    
+    colourscheme[['rotvrdm']] <-   list('S'='#005de4ff', #pure blue
+                                    'T'='#005de42f')
+    
+    colourscheme[['mirvrdm']] <-   list('S'='#c400c4ff', #orange
+                                    'T'='#c400c42f')
+    
+  }
+  return(colourscheme)
+}
