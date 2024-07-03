@@ -17,24 +17,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
             main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -99,19 +99,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['early']][['T']]
         } else {
-          col <- colourscheme[['early']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['early']][['T']]
+          } else {
+            col <- colourscheme[['learly']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -126,24 +131,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -208,19 +213,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['late']][['T']]
         } else {
-          col <- colourscheme[['late']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['late']][['T']]
+          } else {
+            col <- colourscheme[['late']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -236,24 +246,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -318,19 +328,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['early']][['T']]
         } else {
-          col <- colourscheme[['early']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['early']][['T']]
+          } else {
+            col <- colourscheme[['early']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -346,24 +361,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -428,19 +443,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['late']][['T']]
         } else {
-          col <- colourscheme[['late']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['late']][['T']]
+          } else {
+            col <- colourscheme[['late']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -456,24 +476,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -538,19 +558,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['early']][['T']]
         } else {
-          col <- colourscheme[['early']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['early']][['T']]
+          } else {
+            col <- colourscheme[['early']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -566,24 +591,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -648,19 +673,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['late']][['T']]
         } else {
-          col <- colourscheme[['late']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['late']][['T']]
+          } else {
+            col <- colourscheme[['late']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -692,26 +722,26 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
       #NA to create empty plot
       # could maybe use plot.new() ?
       if(erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -769,19 +799,24 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['late']][['T']]
         } else {
-          col <- colourscheme[['late']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['late']][['T']]
+          } else {
+            col <- colourscheme[['late']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -797,26 +832,26 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
       #NA to create empty plot
       # could maybe use plot.new() ?
       if(erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -874,19 +909,24 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['late']][['T']]
         } else {
-          col <- colourscheme[['late']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['late']][['T']]
+          } else {
+            col <- colourscheme[['late']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -901,26 +941,26 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
       #NA to create empty plot
       # could maybe use plot.new() ?
       if(erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
         full_timepts <- data$time
-        timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
         
         groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:701,] #grab timepts we need
         
         if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
           err <- 'early'
@@ -978,19 +1018,24 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
         start <- subdat$clust_idx_start[i] + 1
         end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
         
-        if(start %in% c(101:701) & end %in% c(101:701)){
-          permtime <- full_timepts[start:end]
-        } else {
+        if(is.na(start) & is.na(end)){
           next
-        }
-        
-        p_clust <- subdat$p_values[i]
-        if(p_clust >= 0.05){
-          col <- colourscheme[['late']][['T']]
         } else {
-          col <- colourscheme[['late']][['S']]
+          permtime <- timepts[start:end]
+          
+          p_clust <- subdat$p_values[i]
+          if(p_clust >= 0.05){
+            col <- colourscheme[['late']][['T']]
+          } else {
+            col <- colourscheme[['late']][['S']]
+          }
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        # if(start %in% c(101:701) & end %in% c(101:701)){
+        #   permtime <- full_timepts[start:end]
+        # } else {
+        #   next
+        # }
       }
       
       #add legend
@@ -1017,22 +1062,22 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   #NA to create empty plot
   # could maybe use plot.new() ?
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
-  abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+  abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
   axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_EvL_%s_diff_%s.csv', group, erps))
     full_timepts <- data$time
-    timepts <- full_timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+    timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
     
     groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_EvL_CI_%s_diff_%s.csv', group, erps))
-    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+    groupconfidence <- groupconfidence[351:701,] #grab timepts we need
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -1081,47 +1126,53 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   }
   
   #add legend
-  legend(0.8,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  legend(1.11,-5,legend=c('Rot', 'Rdm', 'Mir'),
          col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
   #add in permutation clusters and any significant results
   for(ptype in perturbs){
-    colourscheme <- getPermTestDiffWavesColourScheme(perturbs = ptype)
+    colourscheme <- getPermTestColourScheme()
     permdat <- read.csv(file=sprintf('data/Permutation_test_PerturbTypeComp_%s.csv', erps))
     subdat <- permdat[which(permdat$condition == ptype),]
     for(i in c(1:nrow(subdat))){
       start <- subdat$clust_idx_start[i] + 1
       end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
       
-      if(start %in% c(101:701) & end %in% c(101:701)){
-        permtime <- full_timepts[start:end]
-      } else {
+      if(is.na(start) & is.na(end)){
         next
-      }
-      
-      p_clust <- subdat$p_values[i]
-      if(p_clust >= 0.05 & ptype == 'rotvmir'){
-        col <- colourscheme[[ptype]][['T']]
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-      } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
-        col <- colourscheme[[ptype]][['T']]
-        lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
-      } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
-        col <- colourscheme[[ptype]][['T']]
-        lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
-      } else if(p_clust < 0.05 & ptype == 'rotvmir') {
-        col <- colourscheme[[ptype]][['S']]
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-      } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
-        col <- colourscheme[[ptype]][['S']]
-        lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
-      } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
-        col <- colourscheme[[ptype]][['S']]
-        lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+      } else {
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05 & ptype == 'rotvmir'){
+          col <- colourscheme[['T']]
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
+          col <- colourscheme[['T']]
+          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
+          col <- colourscheme[['T']]
+          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust < 0.05 & ptype == 'rotvmir') {
+          col <- colourscheme[['S']]
+          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
+          col <- colourscheme[['S']]
+          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
+          col <- colourscheme[['S']]
+          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+        }
       }
     }
   }
+  
+  #add permutation results labels
+  col <- colourscheme[['S']]
+  text(1.25, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1.25, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1.25, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {

@@ -636,3 +636,15 @@ getPermTestDiffWavesColourScheme <- function(perturbs = c('rotvmir', 'rotvrdm', 
   }
   return(colourscheme)
 }
+
+getPermTestColourScheme <- function(){
+  #create a list containing the colourscheme per group
+  
+  colourscheme <- list()
+  
+  colourscheme <-   list('S'='#c400c4ff',
+                         'T'='#c400c42f') #purple
+  
+  
+  return(colourscheme)
+}
