@@ -925,7 +925,7 @@ plotVerticalWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_r
   
 }
 
-#Calculate LRPs-----
+#Calculate initial error categories LRPs-----
 # Right(C3-C4) - Left(C3-C4)
 getSubtractedLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), type = 'b', erps = 'lrp', directions = c('right', 'left')){
   
@@ -1076,7 +1076,7 @@ plotSubtractedLRPs <- function(groups = c('aln', 'rot', 'rdm', 'mir'), target='i
 
 
 
-#CALCULATE LRPs ACROSS LEARNING BLOCKS-----
+#CALCULATE INITIAL CATEGORIES LRPs ACROSS LEARNING BLOCKS-----
 # Right(C3-C4) - Left(C3-C4)
 getBLockedLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), directions = c('right', 'left')){
   
