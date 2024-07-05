@@ -1409,11 +1409,32 @@ getAverageBlockedLRPComparisons <- function(){
 
 #CALCULATE EARLY/ LATE LRPs-----
 # Right(C3-C4) - Left(C3-C4)
-getEarlyLateLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), directions = c('right', 'left')){
+getEarlyLateLRP <- function(groups = c('aln', 'alnrot', 'alnmir', 'rot', 'rdm', 'mir'), directions = c('right', 'left')){
   
   for(group in groups){
     #separate condition for aligned
     if(group == 'aln'){
+      for(direction in directions){
+        
+        C3data <- read.csv(file=sprintf('data/Evoked_DF_EarlyLate_%s_%s_C3.csv', group, direction))
+        C4data <- read.csv(file=sprintf('data/Evoked_DF_EarlyLate_%s_%s_C4.csv', group, direction))
+        
+        rowidx <- C3data$X
+        timepts <- C3data$time
+        
+        diffdata <- C3data - C4data
+        if(direction == 'right'){
+          rightdiff <- diffdata[,2:(dim(diffdata)[2]-1)]
+        } else if(direction == 'left'){
+          leftdiff <- diffdata[,2:(dim(diffdata)[2]-1)]
+        }
+      }
+      
+      latdiff <- rightdiff - leftdiff
+      groupLRP <- data.frame(rowidx, latdiff, timepts)
+      
+      write.csv(groupLRP, file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group), row.names = F) 
+    } else if (group == 'alnrot' | group == 'alnmir'){
       for(direction in directions){
         
         C3data <- read.csv(file=sprintf('data/Evoked_DF_EarlyLate_%s_%s_C3.csv', group, direction))
@@ -1484,7 +1505,7 @@ getEarlyLateLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), directions =
   }
 }
 
-getEarlyLateLateralizedCI <- function(groups = c('aln', 'rot_b0', 'rot_b1', 'rdm_b0', 'rdm_b1', 'mir_b0', 'mir_b1'), type = 'b'){
+getEarlyLateLateralizedCI <- function(groups = c('aln', 'alnrot', 'alnmir', 'rot_b0', 'rot_b1', 'rdm_b0', 'rdm_b1', 'mir_b0', 'mir_b1'), type = 'b'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
     data <- data[,2:length(data)]
@@ -1527,36 +1548,36 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
     }
     
     if(ptype == 'rot'){
-      groups = c('aln', 'rot_b0', 'rot_b1')
+      groups = c('alnrot', 'rot_b0', 'rot_b1')
       # create plot
       meanGroupReaches <- list() #empty list so that it plots the means last
       
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
             xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
             main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/EarlyLate_LRP_CI_%s.csv', group))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[101:401,] #grab timepts we need
         
         if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
           err <- 'early'
         } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
           err <- 'late'
-        } else if (group == 'aln'){
+        } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
           err <- 'aligned'
         }
         
@@ -1583,7 +1604,7 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
           err <- 'early'
         } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
           err <- 'late'
-        } else if (group == 'aln'){
+        } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
           err <- 'aligned'
         }
         # plot mean reaches for each group
@@ -1593,23 +1614,23 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
       }
       
       #add movement onset 
-      mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
-      mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
-        
-      col <- colourscheme[['aligned']][['T']]
-      lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[['aligned']][['S']]
-      points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
-        
-      col <- colourscheme[['late']][['T']]
-      lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[['late']][['S']]
-      points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+      # mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+      # mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+      #   
+      # col <- colourscheme[['aligned']][['T']]
+      # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+      # col <- colourscheme[['aligned']][['S']]
+      # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+      #   
+      # col <- colourscheme[['late']][['T']]
+      # lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      # col <- colourscheme[['late']][['S']]
+      # points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
       
       
       
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early ROT', 'Late ROT'),
+      legend(-1.5,-5,legend=c('Aligned','Early ROT', 'Late ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'rdm'){
@@ -1620,29 +1641,29 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/EarlyLate_LRP_CI_%s.csv', group))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[101:401,] #grab timepts we need
         
         if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
           err <- 'early'
         } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
           err <- 'late'
-        } else if (group == 'aln'){
+        } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
           err <- 'aligned'
         }
         
@@ -1669,7 +1690,7 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
           err <- 'early'
         } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
           err <- 'late'
-        } else if (group == 'aln'){
+        } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
           err <- 'aligned'
         }
         # plot mean reaches for each group
@@ -1679,57 +1700,57 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
       }
       
       #add movement onset 
-      mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
-      mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
-      
-      col <- colourscheme[['aligned']][['T']]
-      lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[['aligned']][['S']]
-      points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
-      
-      col <- colourscheme[['late']][['T']]
-      lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[['late']][['S']]
-      points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+      # mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+      # mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+      # 
+      # col <- colourscheme[['aligned']][['T']]
+      # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+      # col <- colourscheme[['aligned']][['S']]
+      # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+      # 
+      # col <- colourscheme[['late']][['T']]
+      # lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      # col <- colourscheme[['late']][['S']]
+      # points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
       
       
       
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early RDM', 'Late RDM'),
+      legend(-1.5,-5,legend=c('Aligned','Early RDM', 'Late RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
       
     } else if (ptype == 'mir'){
-      groups = c('aln', 'mir_b0', 'mir_b1')
+      groups = c('alnmir', 'mir_b0', 'mir_b1')
       # create plot
       meanGroupReaches <- list() #empty list so that it plots the means last
       
       #NA to create empty plot
       # could maybe use plot.new() ?
       
-      plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       
       
-      abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/EarlyLate_LRP_CI_%s.csv', group))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[101:401,] #grab timepts we need
         
         if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
           err <- 'early'
         } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
           err <- 'late'
-        } else if (group == 'aln'){
+        } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
           err <- 'aligned'
         }
         
@@ -1756,7 +1777,7 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
           err <- 'early'
         } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
           err <- 'late'
-        } else if (group == 'aln'){
+        } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
           err <- 'aligned'
         }
         # plot mean reaches for each group
@@ -1766,23 +1787,23 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
       }
       
       #add movement onset 
-      mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
-      mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
-      
-      col <- colourscheme[['aligned']][['T']]
-      lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[['aligned']][['S']]
-      points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
-      
-      col <- colourscheme[['late']][['T']]
-      lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-      col <- colourscheme[['late']][['S']]
-      points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+      # mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+      # mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+      # 
+      # col <- colourscheme[['aligned']][['T']]
+      # lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+      # col <- colourscheme[['aligned']][['S']]
+      # points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+      # 
+      # col <- colourscheme[['late']][['T']]
+      # lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      # col <- colourscheme[['late']][['S']]
+      # points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
       
       
       
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early MIR', 'Late MIR'),
+      legend(-1.5,-5,legend=c('Aligned','Early MIR', 'Late MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
       
