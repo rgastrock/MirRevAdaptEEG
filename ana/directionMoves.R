@@ -1815,6 +1815,125 @@ plotEarlyLateLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target='
   }
 }
 
+#need difference waves between each condition and aligned, as well as early vs rot
+getEarlyLatevsALignedLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    if (ptype == 'rot'){
+      groups = c('rot_b0', 'rot_b1')
+      adata <- read.csv(file='data/Blocked_LRP_DF_EarlyLate_alnrot.csv')
+    } else if (ptype == 'mir'){
+      groups = c('mir_b0', 'mir_b1')
+      adata <- read.csv(file='data/Blocked_LRP_DF_EarlyLate_alnmir.csv')
+    } else if (ptype == 'rdm'){
+      groups = c('rdm_b0', 'rdm_b1')
+      adata <- read.csv(file='data/Blocked_LRP_DF_EarlyLate_aln.csv')
+    }
+    
+    for (group in groups){
+      pdata <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
+      row_idx <- adata$rowidx
+      timepts <- adata$timepts
+      n <- length(adata) - 1
+      diffdata <- pdata[,2:n] - adata[,2:n]
+      diffdata$idx <- row_idx
+      diffdata$timepts <- timepts
+      write.csv(diffdata, file=sprintf('data/Blocked_LRP_DF_%s_vsAligned.csv', group), row.names = F) 
+    }
+  }
+}
+
+getEarlyLatevsALignedLRPDiffWavesCI <- function(groups = c('rot_b0', 'rot_b1', 'rdm_b0', 'rdm_b1', 'mir_b0', 'mir_b1'), type = 'b'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsAligned.csv', group))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Blocked_LRP_DF_%s_vsAligned_CI.csv', group), row.names = F) 
+      
+    }
+  }
+}
+
+#need difference waves between each condition and aligned, as well as early vs rot
+getEarlyvsLatePTypeLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    
+    earlydat <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_b0_vsALigned.csv', ptype))
+    latedat <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_b1_vsALigned.csv', ptype))
+    
+    row_idx <- earlydat$idx
+    timepts <- earlydat$timepts
+    n <- length(earlydat) - 2
+    diffdata <- latedat[,1:n] - earlydat[,1:n]
+    diffdata$idx <- row_idx
+    diffdata$timepts <- timepts
+    write.csv(diffdata, file=sprintf('data/Blocked_LRP_DF_EarlyvsLate_%s.csv', ptype), row.names = F) 
+    
+  }
+}
+
+getEarlyvsLatePTypeLRPDiffWavesCI <- function(perturbs = c('rot', 'rdm', 'mir'), type = 'b'){
+  for (ptype in perturbs){
+    data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyvsLate_%s.csv', ptype))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Blocked_LRP_DF_EarlyvsLate_%s_CI.csv', ptype), row.names = F) 
+      
+    }
+  }
+}
+
 #then we want to get the average LRP (uV) for every participant, around 300 ms to 0 s
 getAverageEarlyLateLRP <- function(group){
   
