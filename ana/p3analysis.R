@@ -434,6 +434,123 @@ plotEarlyLateP3 <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', 
   }
 }
 
+#need difference waves between each condition and aligned, as well as early vs rot
+getEarlyLatevsALignedP3DiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    if (ptype == 'rot'){
+      groups = c('rot_b0', 'rot_b1')
+    } else if (ptype == 'mir'){
+      groups = c('mir_b0', 'mir_b1')
+    } else if (ptype == 'rdm'){
+      groups = c('rdm_b0', 'rdm_b1')
+    }
+    
+    for (group in groups){
+      adata <- read.csv(file='data/Evoked_DF_EarlyLate_aln_P3.csv')
+      pdata <- read.csv(file=sprintf('data/Evoked_DF_EarlyLate_%s_P3.csv', group))
+      row_idx <- adata[,1]
+      timepts <- adata$time
+      n <- length(adata) - 1
+      diffdata <- pdata[,2:n] - adata[,2:n]
+      diffdata$idx <- row_idx
+      diffdata$timepts <- timepts
+      write.csv(diffdata, file=sprintf('data/Evoked_DF_vsAligned_%s_P3.csv', group), row.names = F) 
+    }
+  }
+}
+
+getEarlyLatevsALignedP3DiffWavesCI <- function(groups = c('rot_b0', 'rot_b1', 'rdm_b0', 'rdm_b1', 'mir_b0', 'mir_b1'), type = 'b'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Evoked_DF_vsAligned_%s_P3.csv', group))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Evoked_DF_vsAligned_%s_P3_CI.csv', group), row.names = F) 
+      
+    }
+  }
+}
+
+getEarlyvsLatePTypeP3DiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    
+    earlydat <- read.csv(file=sprintf('data/Evoked_DF_vsAligned_%s_b0_P3.csv', ptype))
+    latedat <- read.csv(file=sprintf('data/Evoked_DF_vsAligned_%s_b1_P3.csv', ptype))
+    
+    row_idx <- earlydat$idx
+    timepts <- earlydat$timepts
+    n <- length(earlydat) - 2
+    diffdata <- latedat[,1:n] - earlydat[,1:n]
+    diffdata$idx <- row_idx
+    diffdata$timepts <- timepts
+    write.csv(diffdata, file=sprintf('data/Evoked_DF_EarlyvsLate_%s_P3.csv', ptype), row.names = F) 
+    
+  }
+}
+
+getEarlyvsLatePTypeP3DiffWavesCI <- function(perturbs = c('rot', 'rdm', 'mir'), type = 'b'){
+  for (ptype in perturbs){
+    data <- read.csv(file=sprintf('data/Evoked_DF_EarlyvsLate_%s_P3.csv', ptype))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Evoked_DF_EarlyvsLate_%s_P3_CI.csv', ptype), row.names = F) 
+      
+    }
+  }
+}
+
+
 #plot Small/ Large ERP for P3----
 #P3 has two components: P3a (150-280 ms post feedback onset) and P3b (280 - 500 ms post feedback onset)
 
