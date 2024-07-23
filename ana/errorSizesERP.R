@@ -900,6 +900,40 @@ plotSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='i
   }
 }
 
+getPTypeDiffWavesSmallLargeCI <- function(groups = c('rot_diff', 'rdm_diff', 'mir_diff'), type = 'b', erps = 'frn'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_SvL_%s_%s.csv', group, erps))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/DiffWaves_SmallLarge_SvL_CI_%s_%s.csv', group, erps), row.names = F) 
+      
+    }
+  }
+}
+
 #Plotting Small/ Large LRPs----
 getLRPSmallLargeCI <- function(groups = c('aln', 'smallrot', 'largerot', 'smallrdm', 'largerdm', 'smallmir', 'largemir'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
   for(channel in channels){
