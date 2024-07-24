@@ -2033,7 +2033,173 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   
 }
 
-
+# LRP Permutation tests (Small vs Large)----
+plotPermTestSmallLargeLRPs <- function(perturbs = c('smallrot', 'largerot', 'smallrdm', 'largerdm', 'smallmir', 'largemir'), target='inline', erps='lrp') {
+  
+  for(ptype in perturbs){
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file=sprintf('doc/fig/Fig8F_SmallLarge_Subtracted_LRP_PermTest_%s.svg', ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    if(ptype == 'smallrot'){
+      groups <- c('alnrot', 'smallrot')
+    } else if (ptype == 'largerot'){
+      groups <- c('alnrot', 'largerot')
+    } else if (ptype == 'smallrdm'){
+      groups <- c('aln', 'smallrdm')
+    } else if (ptype == 'largerdm'){
+      groups <- c('aln', 'largerdm')
+    } else if (ptype == 'smallmir'){
+      groups <- c('alnmir', 'smallmir')
+    } else if (ptype == 'largemir'){
+      groups <- c('alnmir', 'largemir')
+    }
+    
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    
+    plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
+      full_timepts <- data$time
+      timepts <- full_timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
+      
+      #read in CI files created
+      groupconfidence <- read.csv(file=sprintf('data/EarlyLate_LRP_CI_%s.csv', group))
+      groupconfidence <- groupconfidence[101:401,] #grab timepts we need
+      
+      if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
+        err <- 'early'
+      } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
+        err <- 'late'
+      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
+        err <- 'aligned'
+      }
+      
+      
+      colourscheme <- getTrainingColourScheme(err = err)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[err]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+      
+    }
+    
+    for (group in groups) {
+      if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
+        err <- 'early'
+      } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
+        err <- 'late'
+      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
+        err <- 'aligned'
+      }
+      # plot mean reaches for each group
+      col <- colourscheme[[err]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+    }
+    
+    #add in permutation clusters and any significant results
+    permdat <- read.csv(file=sprintf('data/Permutation_test_vsAligned_%s.csv', erps))
+    subdat <- permdat[which(permdat$condition == ptype),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05 & ptype == 'earlyrot'){
+          col <- colourscheme[['early']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'earlyrot') {
+          col <- colourscheme[['early']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'laterot'){
+          col <- colourscheme[['late']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'laterot') {
+          col <- colourscheme[['late']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'earlyrdm'){
+          col <- colourscheme[['early']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'earlyrdm') {
+          col <- colourscheme[['early']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'laterdm'){
+          col <- colourscheme[['late']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'laterdm') {
+          col <- colourscheme[['late']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'earlymir'){
+          col <- colourscheme[['early']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'earlymir') {
+          col <- colourscheme[['early']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'latemir'){
+          col <- colourscheme[['late']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'latemir') {
+          col <- colourscheme[['late']][['S']]
+        }
+        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+      }
+    }
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(-1.5,-5,legend=c('Aligned','Early ROT'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'laterot'){
+      #add legend
+      legend(-1.5,-5,legend=c('Aligned','Late ROT'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'earlyrdm'){
+      #add legend
+      legend(-1.5,-5,legend=c('Aligned','Early RDM'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'laterdm'){
+      #add legend
+      legend(-1.5,-5,legend=c('Aligned','Late RDM'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'earlymir'){
+      #add legend
+      legend(-1.5,-5,legend=c('Aligned','Early MIR'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'latemir'){
+      #add legend
+      legend(-1.5,-5,legend=c('Aligned','Late MIR'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    }
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  } 
+}
 
 
 
