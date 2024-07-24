@@ -2190,7 +2190,7 @@ getAverageEarlyLateLRPComparisons <- function(){
 
 #CALCULATE SMALL/ LARGE LRPs-----
 # Right(C3-C4) - Left(C3-C4)
-getSmallLargeLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), directions = c('right', 'left')){
+getSmallLargeLRP <- function(groups = c('aln', 'alnrot', 'alnmir', 'rot', 'rdm', 'mir'), directions = c('right', 'left')){
   
   for(group in groups){
     #separate condition for aligned
@@ -2214,7 +2214,28 @@ getSmallLargeLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), directions 
       latdiff <- rightdiff - leftdiff
       groupLRP <- data.frame(rowidx, latdiff, timepts)
       
-      write.csv(groupLRP, file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s.csv', group), row.names = F) 
+      write.csv(groupLRP, file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s.csv', group), row.names = F)
+    } else if (group == 'alnrot' | group == 'alnmir'){
+      for(direction in directions){
+        
+        C3data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s_C3.csv', group, direction))
+        C4data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s_C4.csv', group, direction))
+        
+        rowidx <- C3data$X
+        timepts <- C3data$time
+        
+        diffdata <- C3data - C4data
+        if(direction == 'right'){
+          rightdiff <- diffdata[,2:(dim(diffdata)[2]-1)]
+        } else if(direction == 'left'){
+          leftdiff <- diffdata[,2:(dim(diffdata)[2]-1)]
+        }
+      }
+      
+      latdiff <- rightdiff - leftdiff
+      groupLRP <- data.frame(rowidx, latdiff, timepts)
+      
+      write.csv(groupLRP, file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s.csv', group), row.names = F)
     } else if(group == 'rot' | group == 'mir' | group == 'rdm'){
       errsizes <- c('sml', 'lrg')
       for(s in errsizes){
@@ -2241,7 +2262,7 @@ getSmallLargeLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), directions 
   }
 }
 
-getSmallLargeLateralizedCI <- function(groups = c('aln', 'rot_sml', 'rot_lrg', 'rdm_sml', 'rdm_lrg', 'mir_sml', 'mir_lrg'), type = 'b'){
+getSmallLargeLateralizedCI <- function(groups = c('aln', 'alnrot', 'alnmir', 'rot_sml', 'rot_lrg', 'rdm_sml', 'rdm_lrg', 'mir_sml', 'mir_lrg'), type = 'b'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s.csv', group))
     data <- data[,2:length(data)]
