@@ -2572,6 +2572,126 @@ plotSmallLargeLateralized <- function(perturbs = c('rot', 'rdm', 'mir'), target=
   }
 }
 
+#need difference waves between each condition and aligned
+getSmallLargevsALignedLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    if (ptype == 'rot'){
+      groups = c('rot_sml', 'rot_lrg')
+      adata <- read.csv(file='data/Blocked_LRP_DF_SmallLarge_alnrot.csv')
+    } else if (ptype == 'mir'){
+      groups = c('mir_sml', 'mir_lrg')
+      adata <- read.csv(file='data/Blocked_LRP_DF_SmallLarge_alnmir.csv')
+    } else if (ptype == 'rdm'){
+      groups = c('rdm_sml', 'rdm_lrg')
+      adata <- read.csv(file='data/Blocked_LRP_DF_SmallLarge_aln.csv')
+    }
+    
+    for (group in groups){
+      pdata <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s.csv', group))
+      row_idx <- adata$rowidx
+      timepts <- adata$timepts
+      n <- length(adata) - 1
+      diffdata <- pdata[,2:n] - adata[,2:n]
+      diffdata$idx <- row_idx
+      diffdata$timepts <- timepts
+      write.csv(diffdata, file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsAligned.csv', group), row.names = F) 
+    }
+  }
+}
+
+getSmallLargevsALignedLRPDiffWavesCI <- function(groups = c('rot_sml', 'rot_lrg', 'rdm_sml', 'rdm_lrg', 'mir_sml', 'mir_lrg'), type = 'b'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsAligned.csv', group))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsAligned_CI.csv', group), row.names = F) 
+      
+    }
+  }
+}
+
+#need difference waves between each condition and aligned, as well as early vs rot
+getSmallvsLargePTypeLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    
+    smalldat <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_sml_vsALigned.csv', ptype))
+    largedat <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_lrg_vsALigned.csv', ptype))
+    
+    row_idx <- smalldat$idx
+    timepts <- smalldat$timepts
+    n <- length(smalldat) - 2
+    diffdata <- largedat[,1:n] - smalldat[,1:n]
+    diffdata$idx <- row_idx
+    diffdata$timepts <- timepts
+    write.csv(diffdata, file=sprintf('data/Blocked_LRP_DF_SmallvsLarge_%s.csv', ptype), row.names = F) 
+    
+  }
+}
+
+getSmallvsLargePTypeLRPDiffWavesCI <- function(perturbs = c('rot', 'rdm', 'mir'), type = 'b'){
+  for (ptype in perturbs){
+    data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallvsLarge_%s.csv', ptype))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Blocked_LRP_DF_SmallvsLarge_%s_CI.csv', ptype), row.names = F) 
+      
+    }
+  }
+}
+
+
 #then we want to get the average LRP (uV) for every participant, around 300 ms to 0 s
 getAverageSmallLargeLRP <- function(group){
   

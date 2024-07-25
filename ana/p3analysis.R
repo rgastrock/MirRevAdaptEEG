@@ -869,6 +869,124 @@ plotSmallLargeP3 <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline',
   }
 }
 
+#need difference waves between each condition and aligned, as well as early vs rot
+getSmallLargevsALignedP3DiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    if (ptype == 'rot'){
+      groups = c('rot_sml', 'rot_lrg')
+    } else if (ptype == 'mir'){
+      groups = c('mir_sml', 'mir_lrg')
+    } else if (ptype == 'rdm'){
+      groups = c('rdm_sml', 'rdm_lrg')
+    }
+    
+    for (group in groups){
+      adata <- read.csv(file='data/Evoked_DF_SmallLarge_aln_P3.csv')
+      pdata <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_P3.csv', group))
+      row_idx <- adata[,1]
+      timepts <- adata$time
+      n <- length(adata) - 1
+      diffdata <- pdata[,2:n] - adata[,2:n]
+      diffdata$idx <- row_idx
+      diffdata$timepts <- timepts
+      write.csv(diffdata, file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_P3.csv', group), row.names = F) 
+    }
+  }
+}
+
+getSmallLargevsALignedP3DiffWavesCI <- function(groups = c('rot_sml', 'rot_lrg', 'rdm_sml', 'rdm_lrg', 'mir_sml', 'mir_lrg'), type = 'b'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_P3.csv', group))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_P3_CI.csv', group), row.names = F) 
+      
+    }
+  }
+}
+
+getSmallvsLargePTypeP3DiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')) {
+  
+  for(ptype in perturbs){
+    
+    smalldat <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_sml_P3.csv', ptype))
+    largedat <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_lrg_P3.csv', ptype))
+    
+    row_idx <- smalldat$idx
+    timepts <- smalldat$timepts
+    n <- length(smalldat) - 2
+    diffdata <- largedat[,1:n] - smalldat[,1:n]
+    diffdata$idx <- row_idx
+    diffdata$timepts <- timepts
+    write.csv(diffdata, file=sprintf('data/Evoked_DF_SmallvsLarge_%s_P3.csv', ptype), row.names = F) 
+    
+  }
+}
+
+getSmallvsLargePTypeP3DiffWavesCI <- function(perturbs = c('rot', 'rdm', 'mir'), type = 'b'){
+  for (ptype in perturbs){
+    data <- read.csv(file=sprintf('data/Evoked_DF_SmallvsLarge_%s_P3.csv', ptype))
+    timepts <- data$timepts
+    n <- length(data) - 2 #remove idx and timepts cols
+    data <- data[,1:n]
+    data$time <- timepts
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/Evoked_DF_SmallvsLarge_%s_P3_CI.csv', ptype), row.names = F) 
+      
+    }
+  }
+}
+
+
+
 #plot P3 across learning----
 getAverageBLockedP3<- function(component, group){
   #cannot detect specific time point we want
