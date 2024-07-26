@@ -1,0 +1,168 @@
+---
+title: "Permutation Statistics Analyses"
+author: "Raphael Q. Gastrock"
+date: "2024-07-26"
+output: 
+  html_document:
+    toc: true
+    toc_depth: '4'
+    toc_float: true
+---
+
+This document contains permutation tests conducted for both ERP and TFR analyses
+
+```{r, warning=FALSE, message=FALSE}
+source('ana/shared.R')
+source('ana/learningRates.R')
+source('ana/errorSizesERP.R')
+source('ana/directionMoves.R')
+source('ana/p3analysis.R')
+source('ana/permutationTtest.R')
+```
+
+
+# ERP Analyses
+
+## Early vs Late conditions
+
+### Feedback-related Negativity (FRN)
+
+This is time-locked to feedback onset. Analyses includes 10 fronto-central-parietal electrodes:
+
+FCz, F3, Fz, F4, C3, Cz, C4, P3, Pz, P4
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestEarlyLateERPs()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestEarlyLateDiffWaves()
+```
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeEarlyLateDiffWaves()
+```
+
+### P3 component
+
+This is also time-locked to feedback onset, but only considers electrodes along the midline:
+
+FCz, Fz, Cz, Pz
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestEarlyLateP3()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestEarlyLateDiffWavesP3()
+```
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeEarlyLateDiffWavesP3()
+```
+
+### Lateralized Readiness Potential (LRP)
+
+This is time-locked to the go signal onset, which is 1 second after target onset. Analyses includes C3 and C4 electrodes, and considers only reaches to the left or right side of the workspace.
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestEarlyLateLRPs()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestEarlyLateLRPDiffWaves()
+```
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeEarlyLateLRPDiffWaves()
+```
+
+## Small vs Large conditions
+
+### Feedback-related Negativity (FRN)
+
+This is time-locked to feedback onset. Analyses includes 10 fronto-central-parietal electrodes:
+
+FCz, F3, Fz, F4, C3, Cz, C4, P3, Pz, P4
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestSmallLargeERPs()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestSmallLargeDiffWaves()
+```
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeSmallLargeDiffWaves()
+```
+
+### P3 component
+
+This is also time-locked to feedback onset, but only considers electrodes along the midline:
+
+FCz, Fz, Cz, Pz
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestSmallLargeP3()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestSmallLargeDiffWavesP3()
+```
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeSmallLargeDiffWavesP3()
+```
+
+### Lateralized Readiness Potential (LRP)
+
+This is time-locked to the go signal onset, which is 1 second after target onset. Analyses includes C3 and C4 electrodes, and considers only reaches to the left or right side of the workspace.
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestSmallLargeLRPs()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestSmallLargeLRPDiffWaves()
+```
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeSmallLargeLRPDiffWaves()
+```
