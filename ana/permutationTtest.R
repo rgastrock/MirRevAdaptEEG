@@ -2989,12 +2989,642 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
   
 }
 
+# TFR confidence intervals for group data----
+getEarlyLateTFRCI <- function(groups = c('earlylate_aligned', 'earlyrot', 'laterot', 'earlyrdm', 'laterdm', 'earlymir', 'latemir'), type = 'b', erps = 'frn', freqs = 'alpha', roi = 'frontal'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/TFR_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/TFR_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps), row.names = F) 
+      
+    }
+  }
+}
 
+getDiffWavesEarlyLateTFRCI <- function(groups = c('earlyrot', 'laterot', 'earlyrdm', 'laterdm', 'earlymir', 'latemir'), type = 'b', erps = 'frn', freqs = 'alpha', roi = 'frontal'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, group, erps))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/TFR_DiffWaves_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps), row.names = F) 
+      
+    }
+  }
+}
 
+getPTypeDiffWavesEarlyLateTFRCI <- function(groups = c('rot', 'rdm', 'mir'), type = 'b', erps = 'frn', freqs = 'alpha', roi = 'frontal'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_%s_%s_%s.csv', roi, freqs, group, erps))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/TFR_%s_DiffWaves_EvL_CI_%s_%s_%s.csv', roi, freqs, group, erps), row.names = F) 
+      
+    }
+  }
+}
 
+# TFR Permutation tests (Early vs Late)----
+plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'earlyrdm', 'laterdm', 'earlymir', 'latemir'), target='inline', erps = 'frn', freqs, roi = 'frontal') {
 
+  for(ptype in perturbs){
+    #but we can save plot as svg file
+    if (target=='svg' & freqs=='alpha') {
+      svglite(file=sprintf('doc/fig/Fig16A_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs=='beta') {
+      svglite(file=sprintf('doc/fig/Fig16B_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    if(ptype == 'earlyrot'){
+      groups <- c('earlylate_aligned', 'earlyrot')
+    } else if (ptype == 'laterot'){
+      groups <- c('earlylate_aligned', 'laterot')
+    } else if (ptype == 'earlyrdm'){
+      groups <- c('earlylate_aligned', 'earlyrdm')
+    } else if (ptype == 'laterdm'){
+      groups <- c('earlylate_aligned', 'laterdm')
+    } else if (ptype == 'earlymir'){
+      groups <- c('earlylate_aligned', 'earlymir')
+    } else if (ptype == 'latemir'){
+      groups <- c('earlylate_aligned', 'latemir')
+    }
+    
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-0.12,0.12), 
+         xlab = "Time (s)", ylab = "Power", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s power time-locked to feedback onset: %s", roi, freqs, ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(2, at = c(-0.10, -0.05, -0.025, 0, 0.025, 0.05, 0.10), las=2) #tick marks for y axis
+    
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/TFR_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      # full_timepts <- data$time
+      # timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- data$time
+      
+      #read in CI files created
+      groupconfidence <- read.csv(file=sprintf('data/TFR_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      
+      if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+        err <- 'early'
+      } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+        err <- 'late'
+      } else if (group == 'earlylate_aligned'){
+        err <- 'aligned'
+      }
+      
+      
+      colourscheme <- getTrainingColourScheme(err = err)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[err]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+      
+    }
+    
+    for (group in groups) {
+      if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+        err <- 'early'
+      } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+        err <- 'late'
+      } else if (group == 'earlylate_aligned'){
+        err <- 'aligned'
+      }
+      # plot mean reaches for each group
+      col <- colourscheme[[err]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+    }
+    
+    #add movement onset 
+    if (erps == 'frn'){
+      if(ptype == 'earlyrot'){
+        mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+        mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+        
+        col <- colourscheme[['aligned']][['T']]
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['aligned']][['S']]
+        points(x = mo_aln[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+        
+        col <- colourscheme[['early']][['T']]
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(0.09,0.09), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['early']][['S']]
+        points(x = mo_rot[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'laterot'){
+        mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+        mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+        
+        col <- colourscheme[['aligned']][['T']]
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['aligned']][['S']]
+        points(x = mo_aln[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(0.09,0.09), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_rot[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'earlyrdm'){
+        mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+        mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+        
+        col <- colourscheme[['aligned']][['T']]
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['aligned']][['S']]
+        points(x = mo_aln[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+        
+        col <- colourscheme[['early']][['T']]
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(0.09,0.09), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['early']][['S']]
+        points(x = mo_rdm[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'laterdm'){
+        mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+        mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+        
+        col <- colourscheme[['aligned']][['T']]
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['aligned']][['S']]
+        points(x = mo_aln[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(0.09,0.09), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_rdm[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'earlymir'){
+        mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+        mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+        
+        col <- colourscheme[['aligned']][['T']]
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['aligned']][['S']]
+        points(x = mo_aln[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+        
+        col <- colourscheme[['early']][['T']]
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(0.09,0.09), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['early']][['S']]
+        points(x = mo_mir[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'latemir'){
+        mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
+        mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+        
+        col <- colourscheme[['aligned']][['T']]
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['aligned']][['S']]
+        points(x = mo_aln[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(0.09,0.09), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_mir[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+      }
+    }
+    
+    #add in permutation clusters and any significant results
+    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_vsAligned_%s.csv', erps))
+    cond <- sprintf('%s_%s', freqs, ptype)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05 & ptype == 'earlyrot'){
+          col <- colourscheme[['early']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'earlyrot') {
+          col <- colourscheme[['early']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'laterot'){
+          col <- colourscheme[['late']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'laterot') {
+          col <- colourscheme[['late']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'earlyrdm'){
+          col <- colourscheme[['early']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'earlyrdm') {
+          col <- colourscheme[['early']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'laterdm'){
+          col <- colourscheme[['late']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'laterdm') {
+          col <- colourscheme[['late']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'earlymir'){
+          col <- colourscheme[['early']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'earlymir') {
+          col <- colourscheme[['early']][['S']]
+        } else if(p_clust >= 0.05 & ptype == 'latemir'){
+          col <- colourscheme[['late']][['T']]
+        } else if (p_clust < 0.05 & ptype == 'latemir') {
+          col <- colourscheme[['late']][['S']]
+        }
+        lines(x = c(permtime), y = c(rep(-0.12, length(permtime))), col = col, lty = 1, lwd = 8)
+      }
+    }
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(0.8,0.12,legend=c('Aligned','Early ROT'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'laterot'){
+      #add legend
+      legend(0.8,0.12,legend=c('Aligned','Late ROT'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'earlyrdm'){
+      #add legend
+      legend(0.8,0.12,legend=c('Aligned','Early RDM'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'laterdm'){
+      #add legend
+      legend(0.8,0.12,legend=c('Aligned','Late RDM'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'earlymir'){
+      #add legend
+      legend(0.8,0.12,legend=c('Aligned','Early MIR'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'latemir'){
+      #add legend
+      legend(0.8,0.12,legend=c('Aligned','Late MIR'),
+             col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    }
+    
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
 
+plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'frn', freqs, roi='frontal') {
+  
+  for(ptype in perturbs){
+    #but we can save plot as svg file
+    if (target=='svg' & freqs == 'alpha') {
+      svglite(file=sprintf('doc/fig/Fig17A_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'beta') {
+      svglite(file=sprintf('doc/fig/Fig17B_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    if(ptype == 'rot'){
+      groups = c('earlyrot', 'laterot')
+    } else if (ptype == 'rdm'){
+      groups = c('earlyrdm', 'laterdm')
+    } else if (ptype == 'mir'){
+      groups = c('earlymir', 'latemir')
+    }
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-0.12, 0.12), 
+         xlab = "Time (s)", ylab = "Power", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to feedback onset: %s", roi, freqs, ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(2, at = c(-0.10, -0.05, -0.025, 0, 0.025, 0.05, 0.10), las=2) #tick marks for y axis
+    
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, group, erps))
+      timepts <- data$time
+      
+      groupconfidence <- read.csv(file=sprintf('data/TFR_DiffWaves_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      
+      if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+        err <- 'early'
+      } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+        err <- 'late'
+      }
+      
+      colourscheme <- getTrainingColourScheme(err = err)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[err]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+    }
+    
+    for (group in groups) {
+      if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
+        err <- 'early'
+      } else if (group == 'laterot'|group == 'laterdm'|group == 'latemir'){
+        err <- 'late'
+      }
+      # plot mean reaches for each group
+      col <- colourscheme[[err]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+    }
+    
+    #add movement onset 
+    if(erps=='frn'){
+      if(ptype == 'rot'){
+        mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_rot[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'rdm'){
+        mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_rdm[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+      } else if (ptype == 'mir'){
+        mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+        
+        col <- colourscheme[['late']][['T']]
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+        col <- colourscheme[['late']][['S']]
+        points(x = mo_mir[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+      }
+    }
+    
+    #add in permutation clusters and any significant results
+    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s.csv', erps))
+    cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['late']][['T']]
+        } else {
+          col <- colourscheme[['late']][['S']]
+        }
+        lines(x = c(permtime), y = c(rep(-0.12, length(permtime))), col = col, lty = 1, lwd = 8)
+      }
+    }
+    
+    if(ptype == 'rot'){
+      #add legend
+      legend(0.8,0.12,legend=c('Early ROT - Aligned', 'Late ROT - Aligned'),
+             col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'rdm'){
+      #add legend
+      legend(0.8,0.12,legend=c('Early RDM - Aligned', 'Late RDM - Aligned'),
+             col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if (ptype == 'mir'){
+      #add legend
+      legend(0.8,0.12,legend=c('Early MIR - Aligned', 'Late MIR - Aligned'),
+             col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    }
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
 
+plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mir'), perturbs = c('rotvmir', 'rotvrdm', 'mirvrdm'), target='inline', erps = 'frn', freqs, roi='frontal') {
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'alpha') {
+    svglite(file=sprintf('doc/fig/Fig18A_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s.svg', freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig18B_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s.svg', freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  if(erps == 'frn'){
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-0.12, 0.12), 
+         xlab = "Time (s)", ylab = "Power", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to feedback onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  }
+  
+  abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+  axis(2, at = c(-0.10, -0.05, -0.025, 0, 0.025, 0.05, 0.10), las=2) #tick marks for y axis
+  
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_%s_%s_%s.csv', roi, freqs, group, erps))
+    timepts <- data$time
+    
+    groupconfidence <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_CI_%s_%s_%s.csv', roi, freqs, group, erps))
+    
+    colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[group]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    meanGroupReaches[[group]] <- mid #use mean to fill in empty list for each group
+  }
+  
+  for (group in groups) {
+    # plot mean reaches for each group
+    col <- colourscheme[[group]][['S']]
+    #lines(x = timepts, y = mid, col=col)
+    lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+  }
+  
+  #add movement onset 
+  if(erps=='frn'){
+    mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
+    mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
+    mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+    
+    col <- colourscheme[['rot']][['T']]
+    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(0.10, 0.10), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['rot']][['S']]
+    points(x = mo_rot[,2], y = 0.10, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['rdm']][['T']]
+    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(0.09, 0.09), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['rdm']][['S']]
+    points(x = mo_rdm[,2], y = 0.09, pch = 20, cex = 1.5, col=col)
+    
+    col <- colourscheme[['mir']][['T']]
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(0.08, 0.08), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[['mir']][['S']]
+    points(x = mo_mir[,2], y = 0.08, pch = 20, cex = 1.5, col=col)
+    
+  }
+  
+  #add legend
+  legend(1.11,0.12,legend=c('Rot', 'Rdm', 'Mir'),
+         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #add in permutation clusters and any significant results
+  for(ptype in perturbs){
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_PerturbTypeComp_%s.csv', erps))
+    cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05 & ptype == 'rotvmir'){
+          col <- colourscheme[['T']]
+          lines(x = c(permtime), y = c(rep(-0.12, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
+          col <- colourscheme[['T']]
+          lines(x = c(permtime), y = c(rep(-0.11, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
+          col <- colourscheme[['T']]
+          lines(x = c(permtime), y = c(rep(-0.10, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust < 0.05 & ptype == 'rotvmir') {
+          col <- colourscheme[['S']]
+          lines(x = c(permtime), y = c(rep(-0.12, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
+          col <- colourscheme[['S']]
+          lines(x = c(permtime), y = c(rep(-0.11, length(permtime))), col = col, lty = 1, lwd = 8)
+        } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
+          col <- colourscheme[['S']]
+          lines(x = c(permtime), y = c(rep(-0.10, length(permtime))), col = col, lty = 1, lwd = 8)
+        }
+      }
+    }
+  }
+  
+  #add permutation results labels
+  col <- colourscheme[['S']]
+  text(1.25, -0.12, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1.25, -0.11, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1.25, -0.10, 'Mir vs Rdm', col = col, adj=c(0,0))
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
 
 
 #example using permutation tests
