@@ -3267,7 +3267,7 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
     }
     
     #add in permutation clusters and any significant results
-    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_vsAligned_%s.csv', erps))
+    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_vsAligned_%s_%s.csv', erps, roi))
     cond <- sprintf('%s_%s', freqs, ptype)
     subdat <- permdat[which(permdat$condition == cond),]
     for(i in c(1:nrow(subdat))){
@@ -3448,7 +3448,7 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
     }
     
     #add in permutation clusters and any significant results
-    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s.csv', erps))
+    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
     cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
     subdat <- permdat[which(permdat$condition == cond),]
     for(i in c(1:nrow(subdat))){
@@ -3498,9 +3498,9 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #but we can save plot as svg file
   if (target=='svg' & freqs == 'alpha') {
-    svglite(file=sprintf('doc/fig/Fig18A_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s.svg', freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file=sprintf('doc/fig/Fig18A_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   } else if (target=='svg' & freqs == 'beta') {
-    svglite(file=sprintf('doc/fig/Fig18B_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s.svg', freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    svglite(file=sprintf('doc/fig/Fig18B_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   # create plot
@@ -3577,7 +3577,7 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   #add in permutation clusters and any significant results
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
-    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_PerturbTypeComp_%s.csv', erps))
+    permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_PerturbTypeComp_%s_%s.csv', erps, roi))
     cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
     subdat <- permdat[which(permdat$condition == cond),]
     for(i in c(1:nrow(subdat))){
