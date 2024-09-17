@@ -2993,7 +2993,7 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
 
 #roi = 'medfro' or 'latcen'
 #erps = 'frn' or 'lrp'
-getAllEarlyLateTFRCIs <- function(frequencies = c('alpha', 'beta'), roi, erps){
+getAllEarlyLateTFRCIs <- function(frequencies = c('theta', 'alpha', 'beta'), roi, erps){
   for (freqs in frequencies){
     getEarlyLateTFRCI(freqs=freqs, roi=roi, erps=erps)
     getDiffWavesEarlyLateTFRCI(freqs=freqs, roi=roi, erps=erps)
@@ -3111,6 +3111,8 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
     yval <- 200
   } else if (freqs == 'beta'){
     yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 200
   }
   
   for(ptype in perturbs){
@@ -3119,6 +3121,8 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
       svglite(file=sprintf('doc/fig/Fig16A_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     } else if (target=='svg' & freqs=='beta') {
       svglite(file=sprintf('doc/fig/Fig16B_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs=='theta') {
+      svglite(file=sprintf('doc/fig/Fig16C_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     }
     
     if(ptype == 'earlyrot'){
@@ -3154,6 +3158,8 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
       axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     } else if (freqs == 'beta'){
       axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     }
     
     for (group in groups){
@@ -3375,6 +3381,8 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
     yval <- 200
   } else if (freqs == 'beta'){
     yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 200
   }
   
   for(ptype in perturbs){
@@ -3383,6 +3391,8 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
       svglite(file=sprintf('doc/fig/Fig17A_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     } else if (target=='svg' & freqs == 'beta') {
       svglite(file=sprintf('doc/fig/Fig17B_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'theta') {
+      svglite(file=sprintf('doc/fig/Fig17C_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     }
     
     if(ptype == 'rot'){
@@ -3409,6 +3419,8 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
       axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     } else if (freqs == 'beta'){
       axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     }
     
     for (group in groups){
@@ -3531,12 +3543,16 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
     svglite(file=sprintf('doc/fig/Fig18A_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   } else if (target=='svg' & freqs == 'beta') {
     svglite(file=sprintf('doc/fig/Fig18B_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'theta') {
+    svglite(file=sprintf('doc/fig/Fig18C_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   if (freqs == 'alpha'){
     yval <- 200
   } else if (freqs == 'beta'){
     yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 200
   }
   
   # create plot
@@ -3555,6 +3571,8 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
     axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
   } else if (freqs == 'beta'){
     axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+  } else if (freqs == 'theta'){
+    axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
   }
   
   for (group in groups){
@@ -3665,7 +3683,7 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
 }
 
-plotAllEarlyLateTFRs <- function(frequencies = c('alpha', 'beta'), roi='medfro'){
+plotAllEarlyLateTFRs <- function(frequencies = c('theta', 'alpha', 'beta'), roi='medfro'){
   for (freqs in frequencies){
     plotPermTestEarlyLateTFRs(target = 'svg', freqs = freqs, roi = roi)
     plotPermTestEarlyLateDiffWavesTFRs(target = 'svg', freqs = freqs, roi = roi)
@@ -3680,6 +3698,8 @@ plotGoOnsetPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot',
     yval <- 200
   } else if (freqs == 'beta'){
     yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 200
   }
   
   for(ptype in perturbs){
@@ -3688,6 +3708,8 @@ plotGoOnsetPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot',
       svglite(file=sprintf('doc/fig/Fig19A_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     } else if (target=='svg' & freqs=='beta') {
       svglite(file=sprintf('doc/fig/Fig19B_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs=='theta') {
+      svglite(file=sprintf('doc/fig/Fig19C_TFR_EarlyLate_PermTest_%s_%s_%s.svg', roi, freqs, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     }
     
     if(ptype == 'earlyrot'){
@@ -3723,6 +3745,8 @@ plotGoOnsetPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot',
       axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     } else if (freqs == 'beta'){
       axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     }
     
     for (group in groups){
@@ -3862,6 +3886,8 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
     yval <- 200
   } else if (freqs == 'beta'){
     yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 200
   }
   
   for(ptype in perturbs){
@@ -3870,6 +3896,8 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
       svglite(file=sprintf('doc/fig/Fig20A_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     } else if (target=='svg' & freqs == 'beta') {
       svglite(file=sprintf('doc/fig/Fig20B_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'theta') {
+      svglite(file=sprintf('doc/fig/Fig20C_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, ptype), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
     }
     
     if(ptype == 'rot'){
@@ -3896,6 +3924,8 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
       axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     } else if (freqs == 'beta'){
       axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
     }
     
     for (group in groups){
@@ -3992,12 +4022,16 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
     svglite(file=sprintf('doc/fig/Fig21A_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   } else if (target=='svg' & freqs == 'beta') {
     svglite(file=sprintf('doc/fig/Fig21B_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'theta') {
+    svglite(file=sprintf('doc/fig/Fig21C_TFR_DiffWaves_EarlyLate_PermTest_PTypeDiff_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
   }
   
   if (freqs == 'alpha'){
     yval <- 200
   } else if (freqs == 'beta'){
     yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 200
   }
   
   # create plot
@@ -4016,6 +4050,8 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
     axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
   } else if (freqs == 'beta'){
     axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+  } else if (freqs == 'theta'){
+    axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
   }
   
   for (group in groups){
@@ -4104,7 +4140,7 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   
 }
 
-plotGoOnsetAllEarlyLateTFRs <- function(frequencies = c('alpha', 'beta'), roi='medfro'){
+plotGoOnsetAllEarlyLateTFRs <- function(frequencies = c('theta', 'alpha', 'beta'), roi='medfro'){
   for (freqs in frequencies){
     plotGoOnsetPermTestEarlyLateTFRs(target = 'svg', freqs = freqs, roi = roi)
     plotGoOnsetPermTestEarlyLateDiffWavesTFRs(target = 'svg', freqs = freqs, roi = roi)
