@@ -1,0 +1,71 @@
+---
+title: "TFR analyses for mirror and rotation adaptation"
+author: "Raphael Q. Gastrock"
+date: "2024-04-19"
+output:
+  # pdf_document:
+  #   toc: true
+  #   toc_depth: '2'
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+This document shows plots and  time-frequency analyses related to feedback error processing and movement preparation for different perturbation types: fixed rotation, mirror reversal, random rotation.
+
+```{r, warning=FALSE, message=FALSE}
+source('ana/shared.R')
+source('ana/permutationTtest.R')
+```
+
+# Feedback error processing
+
+We transform the signals across epochs into time-frequency representations (TFRs) using Morlet wavelet (6 cycles) convolution. The frequencies we include are log-spaced values that range from 6 to 35 Hz. First, we show plots time-locked to feedback onset. We include 250 ms before the feedback onset, to show TFRs around the movement onset, given that we observed some ERPs during these timepoints. However, we shift our focus to analyzing the second that follows feedback onset. 
+
+## Early vs. Late training
+
+To focus better on differences between early and late training within each perturbation type, we only analyze the first two blocks of trials during early training (first 12 training trials) and the last two blocks of trials during late training (last 12 training trials). We then generate TFRs for each of the conditions (early vs. late for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
+
+### Medial frontal areas
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+### Lateral central areas
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+### Frequency bands
+
+For each ROI, we calculate the mean power (µV²) within each participant of the following frequency bands: theta (6-8 Hz), alpha (9-13 Hz), and beta (13-25 Hz). We then compare these mean frequencies between early and late training for the different perturbation types. 
+
+First, we compare each early or late condition to the aligned baseline condition. For statistical analyses, we implemented a cluster-based permutation t-test. Clusters of time points that exceed the t-value threshold (determined by a t-distribution, given a p-value of 0.05 and sample size of 32) will be shown in light orange or red colors, while clusters of time points that significantly differ from chance after 1000 permutations will be shown in dark orange or red colors.
+
+#### Theta band
+
+```{r}
+plotPermTestEarlyLateTFRs(freqs = 'theta', roi = 'medfro')
+plotPermTestEarlyLateTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+For the medial frontal areas, we observe significant clusters for the early random and mirror conditions around 250ms post-feedback onset. This is less evident for late random and mirror conditions. We do not find significant clusters for both rotation conditions.
+
+For the lateral central areas, we find the same pattern of results, where the first 250 ms post-feedback onset show significant clusters when compared to aligned reaches, but there are no significant clusters for the fixed rotation condition.
