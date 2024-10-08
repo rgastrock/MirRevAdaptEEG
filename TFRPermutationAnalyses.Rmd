@@ -8,7 +8,7 @@ output:
   #   toc_depth: '2'
   html_document:
     toc: true
-    toc_depth: 2
+    toc_depth: 5
     toc_float: true
 ---
 
@@ -27,7 +27,9 @@ We transform the signals across epochs into time-frequency representations (TFRs
 
 To focus better on differences between early and late training within each perturbation type, we only analyze the first two blocks of trials during early training (first 12 training trials) and the last two blocks of trials during late training (last 12 training trials). We then generate TFRs for each of the conditions (early vs. late for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
 
-### Medial frontal areas
+### Time-Frequency Representations
+
+#### Medial frontal areas
 ```{r, echo=FALSE}
 erps = 'frn'
 roi = 'medfro'
@@ -40,7 +42,7 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_power-tfr.svg', erps, ro
 image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
 ```
 
-### Lateral central areas
+#### Lateral central areas
 ```{r, echo=FALSE}
 erps = 'frn'
 roi = 'latcen'
@@ -53,13 +55,13 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_power-tfr.svg', erps, ro
 image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
 ```
 
-### Frequency bands
+#### Frequency bands compared to aligned baseline
 
 For each ROI, we calculate the mean power (µV²) within each participant of the following frequency bands: theta (6-8 Hz), alpha (9-13 Hz), and beta (13-25 Hz). We then compare these mean frequencies between early and late training for the different perturbation types. 
 
 First, we compare each early or late condition to the aligned baseline condition. For statistical analyses, we implemented a cluster-based permutation t-test. Clusters of time points that exceed the t-value threshold (determined by a t-distribution, given a p-value of 0.05 and sample size of 32) will be shown in light orange or red colors, while clusters of time points that significantly differ from chance after 1000 permutations will be shown in dark orange or red colors.
 
-#### Theta band
+##### Theta band
 
 ```{r}
 plotPermTestEarlyLateTFRs(freqs = 'theta', roi = 'medfro')
@@ -69,3 +71,155 @@ plotPermTestEarlyLateTFRs(freqs = 'theta', roi = 'latcen')
 For the medial frontal areas, we observe significant clusters for the early random and mirror conditions around 250ms post-feedback onset. This is less evident for late random and mirror conditions. We do not find significant clusters for both rotation conditions.
 
 For the lateral central areas, we find the same pattern of results, where the first 250 ms post-feedback onset show significant clusters when compared to aligned reaches, but there are no significant clusters for the fixed rotation condition.
+
+##### Alpha band
+
+```{r}
+plotPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'medfro')
+plotPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+Note that we only consider time points from feedback onset until 1 second post-feedback.
+
+For the medial frontal areas, we do not observe any clusters for the early and late fixed rotation during the time points we consider. Although the early fixed rotation condition showed a significant cluster, this may likely be due to movements performed on the way back to the start position. We observe a significant cluster between 0.5 sec to 1.0 sec during early training in the random rotation condition, which is not observed during late training. Finally, we observe clusters for both early and late mirror training, suggesting that mirror training produced a decrease in alpha power compared to the aligned condition. However, none reached statistical significance.
+
+For the lateral central areas, we find significant clusters only during early and late mirror training, where the decrease in alpha power seems to occur earlier on (around movement onset) during late training.
+
+##### Beta band
+
+```{r}
+plotPermTestEarlyLateTFRs(freqs = 'beta', roi = 'medfro')
+plotPermTestEarlyLateTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+For the medial frontal areas, we observe significant clusters during early training with the random rotation (around 250 ms to 800 ms) but not during late training. We also observe significant clusters during early and late mirror training.
+
+For the lateral central areas, we find significant clusters only during early training with the random rotation, just prior to 500 ms after feedback onset.
+
+### Time-Frequency Representations (Early vs. Late Difference Waves)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Frequency bands comparing difference waves between early and late training
+
+Next, we subtract the aligned condition from each early and late condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
+
+##### Theta band
+
+```{r}
+plotPermTestEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotPermTestEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+For the medial frontal areas, although we observe some clusters for the fixed and random rotation conditions, none of these are significant.
+
+For the lateral central areas, we observe a similar pattern of results, where we do not find any significant clusters when comparing early and late training.
+
+##### Alpha band
+
+```{r}
+plotPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+For the medial frontal areas, we do not find any significant clusters.
+
+For the lateral central areas, we observe some clusters areound feedback onset for mirror training, but none are significant.
+
+##### Beta band
+
+```{r}
+plotPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+For the medial frontal areas, we only find significant clusters for random rotation training, with late training having increased beta power for almost the full second post-feedback. 
+
+For the lateral central areas, we observe some clusters for each perturbation, but none are significant.
+
+### Time-Frequency Representations (Perturbation type comparisons)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Frequency bands comparing across perturbation types
+
+Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
+
+##### Theta band
+
+```{r}
+plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We do not observe any significant clusters for both regions of interest.
+
+##### Alpha band
+
+```{r}
+plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+We do not observe any significant clusters for both regions of interest.
+
+##### Beta band
+
+```{r}
+plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+We observe a significant cluster when comparing mirror and random perturbations, around 250 ms post-feedback.
+
+
+
+
+
+
+

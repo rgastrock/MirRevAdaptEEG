@@ -5311,17 +5311,17 @@ plotGoOnsetAllSmallLargeTFRs <- function(frequencies = c('theta', 'alpha', 'beta
 
 # functions to read in TFR plots-----
 
-getTFRplots <- function(roi = 'medfro', erps = 'frn'){
-  
-  img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi))
-  print(img)
-  img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi))
-  print(img)
-  img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi))
-  print(img)
-   
-  
-}
+# getTFRplots <- function(roi = 'medfro', erps = 'frn'){
+#   
+#   img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi))
+#   print(img)
+#   img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi))
+#   print(img)
+#   img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi))
+#   print(img)
+#    
+#   
+# }
 
 
 
