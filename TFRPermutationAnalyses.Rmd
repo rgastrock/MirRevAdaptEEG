@@ -112,7 +112,7 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', 
 ```
 
 
-#### Latercal central areas
+#### Lateral central areas
 
 ```{r, echo=FALSE}
 erps = 'frn'
@@ -216,6 +216,572 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
 We observe a significant cluster when comparing mirror and random perturbations, around 250 ms post-feedback.
+
+## Small vs. Large errors
+
+We then identify trials where participants either committed small or large errors. We defined small errors as the lowest 40% of error magnitudes across all perturbed trials, while large errors were the highest 40%. We then generate TFRs for each of the conditions (small vs. large for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
+
+### Time-Frequency Representations
+
+#### Medial frontal areas
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_small_large_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Lateral central areas
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_small_large_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Frequency bands compared to aligned baseline
+
+For each ROI, we calculate the mean power (µV²) within each participant of the following frequency bands: theta (6-8 Hz), alpha (9-13 Hz), and beta (13-25 Hz). We then compare these mean frequencies between small and large error conditions for the different perturbation types. 
+
+First, we compare each small or large condition to the aligned baseline condition. For statistical analyses, we implemented a cluster-based permutation t-test. Clusters of time points that exceed the t-value threshold (determined by a t-distribution, given a p-value of 0.05 and sample size of 32) will be shown in light orange or red colors, while clusters of time points that significantly differ from chance after 1000 permutations will be shown in dark orange or red colors.
+
+##### Theta band
+
+```{r}
+plotPermTestSmallLargeTFRs(freqs = 'theta', roi = 'medfro')
+plotPermTestSmallLargeTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+For the medial frontal areas, we find significant clusters for the large random rotation, as well as small and large mirror conditions. Theta power was increased around the time after feedback onset and lasted until around 500 ms post-feedback. Theta power was increased until after more than 500 ms post-feedback for large errors in the mirror condition.
+
+For the lateral central areas, although we observe significant clusters in the other conditions, these clusters occur near 1 sec post-feedback, which could be related to moving back to the home position. Thus, we only consider the large error condition during mirror training to have a significant cluster around feedback onset up to after more than 500 ms post-feedback.
+
+##### Alpha band
+
+```{r}
+plotPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'medfro')
+plotPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+For the medial frontal areas, we find significant clusters for the large fixed rotation, occurring around movement onset until around 350 ms post-feedback. We also find a significant cluster for the small random rotation, which seems to be generally lower compared to aligned from around after 250 ms post-feedback, until the end of the trial.
+
+For the lateral central areas, we observe significant clusters during large fixed rotation, small random rotation, and small mirror conditions. 
+
+##### Beta band
+
+```{r}
+plotPermTestSmallLargeTFRs(freqs = 'beta', roi = 'medfro')
+plotPermTestSmallLargeTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+For medial frontal areas, we observe lower beta power post-feedback for only the small mirror condition.
+
+For the lateral central areas, we do not find any significant clusters.
+
+### Time-Frequency Representations (Small vs. Large Difference Waves)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Frequency bands comparing difference waves between small and large errors
+
+Next, we subtract the aligned condition from each small and large condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
+
+##### Theta band
+
+```{r}
+plotPermTestSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotPermTestSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+For both regions of interest, we do not find any significant clusters.
+
+##### Alpha band
+
+```{r}
+plotPermTestSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotPermTestSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+For both regions of interest, we do not find any significant clusters.
+
+##### Beta band
+
+```{r}
+plotPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+We only find a significant cluster for the lateral central ROI, during random rotation training. This occurs around movement onset until a few ms post-feedback, where beta power is decreased for large errors compared to small errors.
+
+### Time-Frequency Representations (Perturbation Type Comparisons)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'frn'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Frequency bands comparing across perturbation types
+
+Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
+
+##### Theta band
+
+```{r}
+plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We do not find any significant clusters.
+
+##### Alpha band
+
+```{r}
+plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+We do not find any significant clusters.
+
+##### Beta band
+
+```{r}
+plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+We find a significant cluster when comparing mirror and random perturbation types.
+
+
+# Movement preparation
+
+Next, we show TFR plots time-locked to the go signal onset. We include time points from -1.5 sec to zero, but focus our analyses on the second prior to the go signal. That is, once the target is cued until they are allowed to move towards the target.
+
+## Early vs. Late training
+
+We split the data into the different conditions, in a similar manner as above.
+
+### Time-Frequency Representations
+
+#### Medial frontal areas
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Lateral central areas
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Frequency bands compared to aligned baseline
+
+For each ROI, we calculate the mean power (µV²) within each participant of the following frequency bands: theta (6-8 Hz), alpha (9-13 Hz), and beta (13-25 Hz). We then compare these mean frequencies between early and late training for the different perturbation types. 
+
+First, we compare each early or late condition to the aligned baseline condition. For statistical analyses, we implemented a cluster-based permutation t-test. Clusters of time points that exceed the t-value threshold (determined by a t-distribution, given a p-value of 0.05 and sample size of 32) will be shown in light orange or red colors, while clusters of time points that significantly differ from chance after 1000 permutations will be shown in dark orange or red colors.
+
+##### Theta band
+
+```{r}
+plotGoOnsetPermTestEarlyLateTFRs(freqs = 'theta', roi = 'medfro')
+plotGoOnsetPermTestEarlyLateTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We only find a significant cluster for the lateral central area during late random rotation training. 
+
+##### Alpha band
+
+```{r}
+plotGoOnsetPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'medfro')
+plotGoOnsetPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+For the medial frontal area, we find higher alpha power prior to the go signal onset during early random rotation training. We also find lower alpha power just before the go signal onset during late mirror training.
+
+For the lateral central area, we do not find any significant clusters.
+
+##### Beta band
+
+```{r}
+plotGoOnsetPermTestEarlyLateTFRs(freqs = 'beta', roi = 'medfro')
+plotGoOnsetPermTestEarlyLateTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+For the medial frontal region, we find lower beta power during both early fixed rotation training and late random rotation training, prior to the go signal. Clusters were identified for both early and late mirror training, but these were not significant. 
+
+We do not observe significant clusters for the lateral central area.
+
+### Time-Frequency Representations (Early vs. Late Difference Waves)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Frequency bands comparing difference waves between early and late training
+
+Next, we subtract the aligned condition from each early and late condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
+
+##### Theta band
+
+```{r}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We do not find significant clusters.
+
+##### Alpha band
+
+```{r}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+We only find a significant cluster in the medial frontal area, when comparing early and late random rotation training. Alpha was decreased later on in training for the random condition.
+
+##### Beta band
+
+```{r}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+We do not find significant clusters.
+
+### Time-Frequency Representations (Perturbation type comparisons)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Lateral central areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Frequency bands comparing across perturbation types
+
+Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
+
+##### Theta band
+
+```{r}
+plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We do not observe any significant clusters for both regions of interest.
+
+##### Alpha band
+
+```{r}
+plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+We do not observe any significant clusters for both regions of interest.
+
+##### Beta band
+
+```{r}
+plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+We do not observe any significant clusters for both regions of interest.
+
+## Small vs. Large errors
+
+We then identify trials where participants either committed small or large errors. We defined small errors as the lowest 40% of error magnitudes across all perturbed trials, while large errors were the highest 40%. We then generate TFRs for each of the conditions (small vs. large for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
+
+### Time-Frequency Representations
+
+#### Medial frontal areas
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_small_large_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Lateral central areas
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_small_large_aligned_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+#### Frequency bands compared to aligned baseline
+
+For each ROI, we calculate the mean power (µV²) within each participant of the following frequency bands: theta (6-8 Hz), alpha (9-13 Hz), and beta (13-25 Hz). We then compare these mean frequencies between small and large error conditions for the different perturbation types. 
+
+First, we compare each small or large condition to the aligned baseline condition. For statistical analyses, we implemented a cluster-based permutation t-test. Clusters of time points that exceed the t-value threshold (determined by a t-distribution, given a p-value of 0.05 and sample size of 32) will be shown in light orange or red colors, while clusters of time points that significantly differ from chance after 1000 permutations will be shown in dark orange or red colors.
+
+##### Theta band
+
+```{r}
+plotGoOnsetPermTestSmallLargeTFRs(freqs = 'theta', roi = 'medfro')
+plotGoOnsetPermTestSmallLargeTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We do not find any significant clusters.
+
+##### Alpha band
+
+```{r}
+plotGoOnsetPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'medfro')
+plotGoOnsetPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+For the medial frontal areas, we find significant clusters for the small and large mirror conditions.
+
+For the lateral central areas, we observe significant clusters during small random rotation, and large mirror conditions. 
+
+##### Beta band
+
+```{r}
+plotGoOnsetPermTestSmallLargeTFRs(freqs = 'beta', roi = 'medfro')
+plotGoOnsetPermTestSmallLargeTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+For medial frontal areas, we observe significant clusters for the large rotation condition, occurring a few ms after target onset. We also observe significant clusters for small random and small mirror conditions, just prior to go signal onset.
+
+For the lateral central areas, we find significant clusters for small random and small mirror conditions.
+
+### Time-Frequency Representations (Small vs. Large Difference Waves)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rot_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_mir_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_smlerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_contrast_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Frequency bands comparing difference waves between small and large errors
+
+Next, we subtract the aligned condition from each small and large condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
+
+##### Theta band
+
+```{r}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+For both regions of interest, we do not find any significant clusters.
+
+##### Alpha band
+
+```{r}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+We find a significant cluster for random condition in lateral central areas.
+
+##### Beta band
+
+```{r}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+We do not find significant clusters for both regions of interest.
+
+### Time-Frequency Representations (Perturbation Type Comparisons)
+
+#### Medial frontal areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'medfro'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Latercal central areas
+
+```{r, echo=FALSE}
+erps = 'lrp'
+roi = 'latcen'
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rot_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_mir_power-tfr.svg', erps, roi), width = 1000, height = 800)
+image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rdm_power-tfr.svg', erps, roi), width = 1000, height = 800)
+```
+
+
+#### Frequency bands comparing across perturbation types
+
+Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
+
+##### Theta band
+
+```{r}
+plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+```
+
+We do not find any significant clusters.
+
+##### Alpha band
+
+```{r}
+plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+```
+
+For the lateral central area, we find a difference between mirror and random perturbation, where mirror alpha power is decreased compared to random, just prior to the go signal onset.
+
+##### Beta band
+
+```{r}
+plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+For the lateral central area, we find a significant cluster when comparing mirror and fixed rotation, occurring just after target onset. Beta power for the fixed rotation is lower compared to mirror.
+
+
+
+
+
 
 
 
