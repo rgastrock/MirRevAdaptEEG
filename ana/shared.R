@@ -14,6 +14,7 @@ library(BayesFactor)
 library(dplyr)
 library(EnvStats)
 library(coin)
+library(magick)
 
 #Generic Functions----
 

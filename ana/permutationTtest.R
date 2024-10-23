@@ -31,24 +31,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:701,] #grab timepts we need
+      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -276,26 +276,26 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
     #NA to create empty plot
     # could maybe use plot.new() ?
     if(erps == 'frn'){
-      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     } else if (erps == 'ern'){
-      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     }
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:701,] #grab timepts we need
+      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -419,22 +419,22 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   #NA to create empty plot
   # could maybe use plot.new() ?
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
-  axis(1, at = c(-0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+  axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
   axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_EvL_%s_diff_%s.csv', group, erps))
     full_timepts <- data$time
-    timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
+    timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
     
     groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_EvL_CI_%s_diff_%s.csv', group, erps))
-    groupconfidence <- groupconfidence[351:701,] #grab timepts we need
+    groupconfidence <- groupconfidence[351:601,] #grab timepts we need
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -483,7 +483,7 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   }
   
   #add legend
-  legend(1.11,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  legend(0.95,-5,legend=c('Rot', 'Rdm', 'Mir'),
          col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
@@ -527,9 +527,9 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.25, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1.25, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1.25, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -553,9 +553,9 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
     } else if (ptype == 'laterot'){
       groups <- c('alnrot', 'rot_b1')
     } else if (ptype == 'earlyrdm'){
-      groups <- c('aln', 'rdm_b0')
+      groups <- c('alnearlyrdm', 'rdm_b0')
     } else if (ptype == 'laterdm'){
-      groups <- c('aln', 'rdm_b1')
+      groups <- c('alnlaterdm', 'rdm_b1')
     } else if (ptype == 'earlymir'){
       groups <- c('alnmir', 'mir_b0')
     } else if (ptype == 'latemir'){
@@ -569,29 +569,29 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-    axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
       full_timepts <- data$time
-      timepts <- full_timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/EarlyLate_LRP_CI_%s.csv', group))
-      groupconfidence <- groupconfidence[101:401,] #grab timepts we need
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
       
       if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
         err <- 'early'
       } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
         err <- 'late'
-      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
+      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir' | group == 'alnearlyrdm' | group == 'alnlaterdm'){
         err <- 'aligned'
       }
       
@@ -618,7 +618,7 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         err <- 'early'
       } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
         err <- 'late'
-      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
+      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir' | group == 'alnearlyrdm' | group == 'alnlaterdm'){
         err <- 'aligned'
       }
       # plot mean reaches for each group
@@ -627,10 +627,56 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
     }
     
+    #add movement onset
+    if(ptype == 'earlyrot' | ptype == 'laterot'){
+      mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+      mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+      
+      col <- colourscheme[['aligned']][['T']]
+      lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['aligned']][['S']]
+      points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+      
+      col <- colourscheme[['late']][['T']]
+      lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['late']][['S']]
+      points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    } else if (ptype == 'earlymir' | ptype == 'latemir'){
+      mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+      mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+      
+      col <- colourscheme[['aligned']][['T']]
+      lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['aligned']][['S']]
+      points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+      
+      col <- colourscheme[['late']][['T']]
+      lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['late']][['S']]
+      points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    } else if (ptype == 'earlyrdm' | ptype == 'laterdm'){
+      mo_aln <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+      mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+      
+      col <- colourscheme[['aligned']][['T']]
+      lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['aligned']][['S']]
+      points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+      
+      col <- colourscheme[['late']][['T']]
+      lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['late']][['S']]
+      points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    }
+    
+    
     #add in permutation clusters and any significant results
     permdat <- read.csv(file=sprintf('data/Permutation_test_vsAligned_%s.csv', erps))
     subdat <- permdat[which(permdat$condition == ptype),]
     for(i in c(1:nrow(subdat))){
+      if(nrow(subdat) == 0){
+        break
+      }
       start <- subdat$clust_idx_start[i] + 1
       end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
       
@@ -671,32 +717,32 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
     
     if(ptype == 'earlyrot'){
       #add legend
-      legend(-1.5,-5,legend=c('Aligned','Early ROT'),
+      legend(-1,-5,legend=c('Aligned','Early ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'laterot'){
       #add legend
-      legend(-1.5,-5,legend=c('Aligned','Late ROT'),
+      legend(-1,-5,legend=c('Aligned','Late ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'earlyrdm'){
       #add legend
-      legend(-1.5,-5,legend=c('Aligned','Early RDM'),
+      legend(-1,-5,legend=c('Aligned','Early RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'laterdm'){
       #add legend
-      legend(-1.5,-5,legend=c('Aligned','Late RDM'),
+      legend(-1,-5,legend=c('Aligned','Late RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'earlymir'){
       #add legend
-      legend(-1.5,-5,legend=c('Aligned','Early MIR'),
+      legend(-1,-5,legend=c('Aligned','Early MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'latemir'){
       #add legend
-      legend(-1.5,-5,legend=c('Aligned','Late MIR'),
+      legend(-1,-5,legend=c('Aligned','Late MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }
@@ -729,29 +775,29 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 8), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-    axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
+    axis(1, at = c( -1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned.csv', group))
       full_timepts <- data$timepts
-      timepts <- full_timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned_CI.csv', group))
-      groupconfidence <- groupconfidence[101:401,] #grab timepts we need
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
       
       if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
         err <- 'early'
       } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
         err <- 'late'
-      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
+      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'| group == 'alnearlyrdm' | group == 'alnlaterdm'){
         err <- 'aligned'
       }
       
@@ -778,13 +824,37 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
         err <- 'early'
       } else if (group == 'rot_b1'|group == 'rdm_b1'|group == 'mir_b1'){
         err <- 'late'
-      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'){
+      } else if (group == 'aln' | group == 'alnrot' | group == 'alnmir'| group == 'alnearlyrdm' | group == 'alnlaterdm'){
         err <- 'aligned'
       }
       # plot mean reaches for each group
       col <- colourscheme[[err]][['S']]
       #lines(x = timepts, y = mid, col=col)
       lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
+    }
+    
+    #add movement onset
+    if(ptype == 'rot'){
+      mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+
+      col <- colourscheme[['late']][['T']]
+      lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['late']][['S']]
+      points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    } else if (ptype == 'mir'){
+      mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+      
+      col <- colourscheme[['late']][['T']]
+      lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['late']][['S']]
+      points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    } else if (ptype == 'rdm'){
+      mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+      
+      col <- colourscheme[['late']][['T']]
+      lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+      col <- colourscheme[['late']][['S']]
+      points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
     }
     
     #add in permutation clusters and any significant results
@@ -810,17 +880,17 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
     }
     if(ptype == 'rot'){
       #add legend
-      legend(-1.5,-5,legend=c('Early ROT - Aligned','Late ROT - Aligned'),
+      legend(-1,-5,legend=c('Early ROT - Aligned','Late ROT - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'rdm'){
       #add legend
-      legend(-1.5,-5,legend=c('Early RDM - Aligned','Late RDM - Aligned'),
+      legend(-1,-5,legend=c('Early RDM - Aligned','Late RDM - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'mir'){
       #add legend
-      legend(-1.5,-5,legend=c('Early MIR - Aligned','Late MIR - Aligned'),
+      legend(-1,-5,legend=c('Early MIR - Aligned','Late MIR - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }
@@ -842,22 +912,22 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.6, 0.10), ylim = c(-16, 6), 
+  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
        main = "LRP difference waves time-locked to go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  axis(1, at = c(-1.5, -1, -0.5, -0.25, 0)) #tick marks for x axis
+  axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
   axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyvsLate_%s.csv', group))
     full_timepts <- data$time
-    timepts <- full_timepts[101:401] #remove .5 seconds before and after -1.5 and 1.5
+    timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
     
     groupconfidence <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyvsLate_%s_CI.csv', group))
-    groupconfidence <- groupconfidence[101:401,] #grab timepts we need
+    groupconfidence <- groupconfidence[201:501,] #grab timepts we need
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -882,31 +952,29 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
-  #add movement onset 
-  if(erps=='frn'){
-    mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
-    mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
-    mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
-    
-    col <- colourscheme[['rot']][['T']]
-    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5.5, 5.5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['rot']][['S']]
-    points(x = mo_rot[,2], y = 5.5, pch = 20, cex = 1.5, col=col)
-    
-    col <- colourscheme[['rdm']][['T']]
-    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['rdm']][['S']]
-    points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
-    
-    col <- colourscheme[['mir']][['T']]
-    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
-    col <- colourscheme[['mir']][['S']]
-    points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
-    
-  }
+  #add movement onset
+  mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+  mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+  mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+  
+  col <- colourscheme[['rot']][['T']]
+  lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(10, 10), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['rot']][['S']]
+  points(x = mo_rot[,2], y = 10, pch = 20, cex = 1.5, col=col)
+  
+  col <- colourscheme[['rdm']][['T']]
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(9.5, 9.5), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['rdm']][['S']]
+  points(x = mo_rdm[,2], y = 9.5, pch = 20, cex = 1.5, col=col)
+  
+  col <- colourscheme[['mir']][['T']]
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(9, 9), col = col, lty = 1, lwd = 8)
+  col <- colourscheme[['mir']][['S']]
+  points(x = mo_mir[,2], y = 9, pch = 20, cex = 1.5, col=col)
+  
   
   #add legend
-  legend(-1.5,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  legend(0.25,-5,legend=c('Rot', 'Rdm', 'Mir'),
          col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
@@ -950,9 +1018,9 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(-1.5, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(-1.5, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(-1.5, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.25, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(.25, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(.25, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {

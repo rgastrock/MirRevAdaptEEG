@@ -323,28 +323,28 @@ plotSmallLargeERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      # abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s.csv', group, erps))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_SmallLarge_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:601,] #grab timepts we need
         
         if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
           err <- 'sml'
@@ -415,28 +415,28 @@ plotSmallLargeERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      # abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s.csv', group, erps))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_SmallLarge_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:601,] #grab timepts we need
         
         if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
           err <- 'sml'
@@ -508,28 +508,28 @@ plotSmallLargeERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      # abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s.csv', group, erps))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
         
         #read in CI files created
         groupconfidence <- read.csv(file=sprintf('data/ERP_SmallLarge_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:601,] #grab timepts we need
         
         if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
           err <- 'sml'
@@ -653,26 +653,26 @@ plotSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='i
       #NA to create empty plot
       # could maybe use plot.new() ?
       if(erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      axis(1, at = c( -0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', group, erps))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
         
         groupconfidence <- read.csv(file=sprintf('data/DiffWaves_SmallLarge_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:601,] #grab timepts we need
         
         if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
           err <- 'sml'
@@ -736,26 +736,26 @@ plotSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='i
       #NA to create empty plot
       # could maybe use plot.new() ?
       if(erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', group, erps))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
         
         groupconfidence <- read.csv(file=sprintf('data/DiffWaves_SmallLarge_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:601,] #grab timepts we need
         
         if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
           err <- 'sml'
@@ -818,26 +818,26 @@ plotSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='i
       #NA to create empty plot
       # could maybe use plot.new() ?
       if(erps == 'frn'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
-        plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       }
       
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-      axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+      axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
       axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', group, erps))
         timepts <- data$time
-        timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+        timepts <- timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
         
         groupconfidence <- read.csv(file=sprintf('data/DiffWaves_SmallLarge_CI_%s_%s.csv', group, erps))
-        groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+        groupconfidence <- groupconfidence[351:601,] #grab timepts we need
         
         if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
           err <- 'sml'
@@ -984,23 +984,23 @@ plotSmallLargeLRPs <- function(groups = c('aln','smallrot', 'largerot', 'smallrd
   for (group in groups){
     #NA to create empty plot
     # could maybe use plot.new() ?
-    plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-1.1, 1.6), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to go signal onset, %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
     text(-1, 6, 'target onset', cex = 0.85)
     text(0, 6, 'go signal', cex = 0.85)
-    axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (channel in channels){
       data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s_%s.csv', group, erps, channel))
       timepts <- data$time
-      timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- timepts[201:701] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in files created by getGroupConfidenceInterval in filehandling.R
       groupconfidence <- read.csv(file=sprintf('data/ERP_SmallLarge_CI_%s_%s_%s.csv', group, erps, channel))
-      groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+      groupconfidence <- groupconfidence[201:701,] #grab timepts we need
       
       colourscheme <- getLRPColourScheme(channels = channel)
       #take only first, last and middle columns of file
@@ -1108,24 +1108,24 @@ plotLRPDiffWavesSmallLarge <- function(groups = c('smallrot', 'largerot', 'small
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s_C3.csv', group, erps))
     timepts <- data$time
-    timepts <- timepts[101:701] #remove .5 seconds before and after -1.5 and 1.5
+    timepts <- timepts[201:701] #remove .5 seconds before and after -1.5 and 1.5
   }
   
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.6, 1.6), ylim = c(-16, 6), 
+  plot(NA, NA, xlim = c(-1.1, 1.6), ylim = c(-16, 6), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
        main = "C3 Difference Waves time-locked to go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   text(-1, 6, 'target onset', cex = 0.85)
   text(0, 6, 'go signal', cex = 0.85)
-  axis(1, at = c(-1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
+  axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5)) #tick marks for x axis
   axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
   
   for(group in groups){
     #read in files created by getGroupConfidenceInterval in filehandling.R
     groupconfidence <- read.csv(file=sprintf('data/DiffWaves_SmallLarge_CI_%s_%s_C3.csv', group, erps))
-    groupconfidence <- groupconfidence[101:701,] #grab timepts we need
+    groupconfidence <- groupconfidence[201:701,] #grab timepts we need
     
     colourscheme <- getSmallLargeERPColourScheme(groups = group)
     #take only first, last and middle columns of file
