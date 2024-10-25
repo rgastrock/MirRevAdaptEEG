@@ -5613,6 +5613,107 @@ plotGoOnsetAllSmallLargeTFRs <- function(frequencies = c('theta', 'alpha', 'beta
   }
 }
 
+# functions to check data----
+getOutlierSignal <- function(target= 'inline', groups = c('rot'), roi = 'latcen', freqs = 'beta', erps='lrp'){
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig28_TFR_SmallLarge_GoSignal_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  yval <- 2000
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  
+  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-yval - 10, yval + 10), 
+       xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+       main = sprintf("Mean %s %s time-locked to go signal onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  
+  
+  abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+  axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2) #tick marks for y axis
+  
+  
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_%s_%s_%s.csv', roi, freqs, group, erps))
+    timepts <- data$time
+    subdata <- as.matrix(data[,2:(dim(data)[2]-1)])
+    for (i in c(1:ncol(subdata))){
+      colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      if(i == 18){ #participant ID 17
+        col <- colourscheme[[group]][['S']]
+      }
+      lines(x = timepts, y = subdata[,i], col = col, lty = 1, lwd = 2)
+    }
+    col <- colourscheme[[group]][['S']]
+    text(.05, -yval, 'Outlier Participant ID# 17', col = col, adj=c(0,0))
+    
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+  
+}
+
+getOutlierTrialSignal<- function(target= 'inline', groups = c('smallrot'), roi = 'latcen', freqs = 'beta', erps='lrp'){
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig28A_TFR_SmallLarge_GoSignal_TrialPower_%s_%s.svg', roi, freqs), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  yval <- 2000
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  
+  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-yval - 10, yval + 10), 
+       xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+       main = sprintf("Mean %s %s time-locked to go signal onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  
+  
+  abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+  axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2) #tick marks for y axis
+  
+  
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/TFR_trialpower_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+    timepts <- data$time
+    subdata <- as.matrix(data[,2:(dim(data)[2]-1)])
+    for (i in c(1:ncol(subdata))){
+      err <- 'sml'
+      colourscheme <- getErrSizeColourScheme(err=err)
+      col <- colourscheme[[err]][['T']] #use colour scheme according to group
+      if(i == 3){ #trial number 2
+        col <- colourscheme[['lrg']][['S']]
+      }
+      lines(x = timepts, y = subdata[,i], col = col, lty = 1, lwd = 2)
+    }
+    col <- colourscheme[['lrg']][['S']]
+    text(.25, -yval, 'Outlier Trial # 2', col = col, adj=c(0,0))
+    
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+  
+}
+
+
 # functions to read in TFR plots-----
 
 # getTFRplots <- function(roi = 'medfro', erps = 'frn'){
