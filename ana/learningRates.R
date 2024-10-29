@@ -3465,8 +3465,8 @@ getMIRGroupLCALL <- function(maxppid=31, location='feedback') { # add angle?
       dataoutput <- cbind(dataoutput, reaches)
     }
   }
-  write.csv(dataoutput, file='data/MIR_learningcurve_degrees.csv', row.names = F) 
-  #return(dataoutput)
+  #write.csv(dataoutput, file='data/MIR_learningcurve_degrees.csv', row.names = F) 
+  return(dataoutput)
   
 }
 
@@ -3618,6 +3618,447 @@ plotMIRLearningCurves <- function(angles = c(15,30,45), target='inline') {
   
 }
 
+# Learning curves FIRST RANDOM ROTATION BLOCK----
+getBlock1RDMParticipantLearningCurve <- function(id, location) {
+  
+  #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
+  #rotation should show percentage of compensation (not angular deviation of hand)
+  #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
+  #measure where hand should be minus where it is: if this is spot on then percentage is 0%
+  
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  #regardless of ID, we want the first random block
+  rotatedTraining <- getParticipantTaskData(id, taskno = 3, task = 'random0')
+  
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=47, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  #include rotation values, because they differ
+  rotation <- c()
+  for (trialno in c(0: dim(RT)[1] - 1)){
+    rotsize <- unique(rotatedTraining$rotation[which(rotatedTraining$trial == trialno)])
+    rotation <- c(rotation, rotsize)
+  }
+  
+  RT$rotation <- rotation
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  
+  
+  negvals <- c(-15, -25, -35)
+  posvals <- c(15, 25, 35)
+  
+  for (t in RT$trial){
+    rot <- RT$rotation[which(RT$trial == t)]
+    if (rot %in% posvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)])*-1)
+    } else if (rot %in% negvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)]))
+    }
+  }
+  
+  
+  
+  
+  return(RT)
+}
+
+getBlock1RDMGroupLCALL <- function(maxppid, location) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    #print(participant)
+    ppangles <- getBlock1RDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    #rdat <- dat$reaches
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+    
+  }
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/RDMROT_FirstBlock_learningcurve_degrees.csv', row.names = F) 
+}
+
+getBlock1RDMGroupLearningCurves <- function(maxppid, location, angles = c(15, 25, 35)) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  for (angle in angles){
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      ppangles <- getBlock1RDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+      ppangles$rotation <- abs(ppangles$rotation)
+      for (irow in c(1:nrow(ppangles))){
+        subdat <- ppangles[irow,]
+        if (subdat$rotation != angle){
+          subdat$reachdev <- NA
+          ppangles[irow,] <- subdat
+        }
+      }
+      
+      reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+      
+    }
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/RDMROT_FirstBlock_learningcurve_degrees_%02d.csv', angle), row.names = F) 
+  }
+}
+
+getBlock1RDMGroupConfidenceInterval <- function(maxppid = 31, location = 'feedback', type = 'b'){
+  #for (group in groups){
+  # get the confidence intervals for each trial of each group
+  data <- getBlock1RDMGroupLCALL(maxppid = maxppid, location = location)
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data1 <- as.matrix(data[,2:dim(data)[2]])
+  
+  confidence <- data.frame()
+  
+  
+  for (trial in trialno){
+    cireaches <- data1[which(data$trial == trial), ]
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+    
+    write.csv(confidence, file='data/RDMROT_CI_FirstBlock_learningcurve.csv', row.names = F) 
+    
+    
+  }
+  #}
+}
+
+plotBlock1RDMLearningCurves <- function(target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/FigX_ROT_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,48), ylim = c(-10,36), 
+       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reach Learning over Time: First block RDM", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 10, 20, 30, 40, 48)) #tick marks for x axis
+  axis(2, at = c(-10, 0, 10, 20, 30, 35)) #tick marks for y axis
+  
+  
+  #read in files created by getGroupConfidenceInterval in filehandling.R
+  groupconfidence <- read.csv(file='data/RDMROT_CI_FirstBlock_learningcurve.csv')
+  
+  colourscheme <- list('S'='#e51636ff', #vivid/york red
+                       'T'='#e516362f')
+  
+  #colourscheme <- getColourScheme(groups = group)
+  #take only first, last and middle columns of file
+  lower <- groupconfidence[,1]
+  upper <- groupconfidence[,3]
+  mid <- groupconfidence[,2]
+  
+  col <- colourscheme[['T']] #use colour scheme according to group
+  
+  #upper and lower bounds create a polygon
+  #polygon creates it from low left to low right, then up right to up left -> use rev
+  #x is just trial nnumber, y depends on values of bounds
+  polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+  
+  meanGroupReaches <- mid #use mean to fill in empty list for each group
+  
+  
+  
+  
+  # plot mean reaches for each group
+  col <- colourscheme[['S']]
+  lines(meanGroupReaches,col=col,lty=1)
+  
+  
+  #add legend
+  # legend(70,-100,legend=c('Non-Instructed','Instructed'),
+  #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+# Learning curves SECOND RANDOM ROTATION BLOCK----
+getBlock2RDMParticipantLearningCurve <- function(id, location) {
+  
+  #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
+  #rotation should show percentage of compensation (not angular deviation of hand)
+  #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
+  #measure where hand should be minus where it is: if this is spot on then percentage is 0%
+  
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  #regardless of ID, we want the first random block
+  rotatedTraining <- getParticipantTaskData(id, taskno = 9, task = 'random1')
+  
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=47, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  #include rotation values, because they differ
+  rotation <- c()
+  for (trialno in c(0: dim(RT)[1] - 1)){
+    rotsize <- unique(rotatedTraining$rotation[which(rotatedTraining$trial == trialno)])
+    rotation <- c(rotation, rotsize)
+  }
+  
+  RT$rotation <- rotation
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  
+  
+  negvals <- c(-15, -25, -35)
+  posvals <- c(15, 25, 35)
+  
+  for (t in RT$trial){
+    rot <- RT$rotation[which(RT$trial == t)]
+    if (rot %in% posvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)])*-1)
+    } else if (rot %in% negvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)]))
+    }
+  }
+  
+  
+  
+  
+  return(RT)
+}
+
+getBlock2RDMGroupLCALL <- function(maxppid, location) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    #print(participant)
+    ppangles <- getBlock2RDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    #rdat <- dat$reaches
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+    
+  }
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/RDMROT_FirstBlock_learningcurve_degrees.csv', row.names = F) 
+}
+
+getBlock2RDMGroupLearningCurves <- function(maxppid, location, angles = c(15, 25, 35)) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  for (angle in angles){
+    dataoutput<- data.frame() #create place holder
+    #go through each participant in this group
+    for (participant in participants) {
+      #print(participant)
+      ppangles <- getBlock2RDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+      ppangles$rotation <- abs(ppangles$rotation)
+      for (irow in c(1:nrow(ppangles))){
+        subdat <- ppangles[irow,]
+        if (subdat$rotation != angle){
+          subdat$reachdev <- NA
+          ppangles[irow,] <- subdat
+        }
+      }
+      
+      reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+      trial <- c(1:length(reaches)) #sets up trial column
+      dat <- cbind(trial, reaches)
+      
+      
+      if (prod(dim(dataoutput)) == 0){
+        dataoutput <- dat
+      } else {
+        dataoutput <- cbind(dataoutput, reaches)
+      }
+      
+    }
+    #return(dataoutput)
+    write.csv(dataoutput, file=sprintf('data/RDMROT_SecondBlock_learningcurve_degrees_%02d.csv', angle), row.names = F) 
+  }
+}
+
+getBlock2RDMGroupConfidenceInterval <- function(maxppid = 31, location = 'feedback', type = 'b'){
+  #for (group in groups){
+  # get the confidence intervals for each trial of each group
+  data <- getBlock2RDMGroupLCALL(maxppid = maxppid, location = location)
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data1 <- as.matrix(data[,2:dim(data)[2]])
+  
+  confidence <- data.frame()
+  
+  
+  for (trial in trialno){
+    cireaches <- data1[which(data$trial == trial), ]
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+    
+    write.csv(confidence, file='data/RDMROT_CI_SecondBlock_learningcurve.csv', row.names = F) 
+    
+    
+  }
+  #}
+}
+
+plotBlock2RDMLearningCurves <- function(target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/FigX_ROT_learningcurve.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,48), ylim = c(-10,36), 
+       xlab = "Trial", ylab = "Angular deviation of hand (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reach Learning over Time: Second block RDM", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 10, 20, 30, 40, 48)) #tick marks for x axis
+  axis(2, at = c(-10, 0, 10, 20, 30, 35)) #tick marks for y axis
+  
+  
+  #read in files created by getGroupConfidenceInterval in filehandling.R
+  groupconfidence <- read.csv(file='data/RDMROT_CI_SecondBlock_learningcurve.csv')
+  
+  colourscheme <- list('S'='#e51636ff', #vivid/york red
+                       'T'='#e516362f')
+  
+  #colourscheme <- getColourScheme(groups = group)
+  #take only first, last and middle columns of file
+  lower <- groupconfidence[,1]
+  upper <- groupconfidence[,3]
+  mid <- groupconfidence[,2]
+  
+  col <- colourscheme[['T']] #use colour scheme according to group
+  
+  #upper and lower bounds create a polygon
+  #polygon creates it from low left to low right, then up right to up left -> use rev
+  #x is just trial nnumber, y depends on values of bounds
+  polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+  
+  meanGroupReaches <- mid #use mean to fill in empty list for each group
+  
+  
+  
+  
+  # plot mean reaches for each group
+  col <- colourscheme[['S']]
+  lines(meanGroupReaches,col=col,lty=1)
+  
+  
+  #add legend
+  # legend(70,-100,legend=c('Non-Instructed','Instructed'),
+  #        col=c(colourscheme[['noninstructed']][['S']],colourscheme[['instructed']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
 
 #plot aligned and learning curves for rot and random----
 plotROTRDMLearningCurves <- function(tasks = c('aln', 'rot', 'rdm'), target='inline') {
@@ -3737,11 +4178,11 @@ plotExperimentLearningCurves <- function(tasks = c('aln', 'rdmrot', 'rot', 'rdmm
     if(task == 'rot'){
       groupconfidence <- read.csv(file='data/ROT_CI_learningcurve.csv')
     } else if(task == 'rdmrot'){
-      groupconfidence <- read.csv(file='data/RDMROT_CI_learningcurve.csv')
+      groupconfidence <- read.csv(file='data/RDMROT_CI_FirstBlock_learningcurve.csv')
     } else if(task == 'aln'){
       groupconfidence <- read.csv(file='data/ALN_CI_learningcurve.csv')
     } else if(task == 'rdmmir'){
-      groupconfidence <- read.csv(file='data/RDMMIR_CI_learningcurve.csv')
+      groupconfidence <- read.csv(file='data/RDMROT_CI_SecondBlock_learningcurve.csv') #replaced with first and second block of rdm
     } else if(task == 'mir15'){
       groupconfidence <- read.csv(file='data/MIR_CI_learningcurve_15.csv')
     } else if(task == 'mir30'){
@@ -3839,4 +4280,790 @@ getDists <- function(maxppid = 31, location = 'feedback'){
     hist(data$reachdev, xlim = c(-180, 180), ylim = c(0,15), breaks = 90,
          main = sprintf('Participant %s', participant), xlab = 'Degrees')
   }
+}
+
+# Learning Curves using Amount of Compensation----
+getPercCompROTParticipantLearningCurve <- function(id, location) {
+  
+  #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
+  #rotation should show percentage of compensation (not angular deviation of hand)
+  #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
+  #measure where hand should be minus where it is: if this is spot on then percentage is 0%
+  
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  if (id%%2 == 1){
+    #mirror then rotation if odd id
+    rotatedTraining <- getParticipantTaskData(id, taskno = 11, task = 'rotation')
+  } else if (id%%2 == 0){
+    #if pp id is even
+    #rotation first then mirror
+    rotatedTraining <- getParticipantTaskData(id, taskno = 5, task = 'rotation')
+  }
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=89, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  #rotation was not counterbalanced for this experiment, therefore we multiply everything by -1
+  #since rotation was always CCW
+  
+  alltargetsbef <- c(67.5, 75, 82.5,
+                     157.5, 165, 172.5,
+                     247.5, 255, 262.5,
+                     337.5, 345, 352.5) #should compensate for 30 degrees
+  alltargetsaft <- c(7.5, 15, 22.5,
+                     97.5, 105, 112.5,
+                     187.5, 195, 202.5,
+                     277.5, 285, 292.5) #compensate 30 degrees
+  
+  angles <- unique(RT$targetangle)
+  #RT['compensate'] <- NA
+  
+  for (target in angles){
+    if (target %in% alltargetsbef){
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/30)*100
+      #RT$compensate[which(RT$targetangle == target)] <- 30
+    } else if (target %in% alltargetsaft){
+      #multiply by negative 1 bec targets after axis will have negative values
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/30)*100 #need to multiply by neg 1, rotation always in same direction
+      #RT$compensate[which(RT$targetangle == target)] <- 30
+    }
+  }
+  
+  
+  return(RT)
+}
+
+getPercCompROTGroupLearningCurves <- function(maxppid, location) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  participants <- seq(0,maxppid,1)
+  
+  
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    ppangles <- getPercCompROTParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    #rdat <- dat$reaches
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+    
+  }
+  return(dataoutput)
+}
+
+getPercCompMIRParticipantLearningCurve <- function(id, location){
+  #same as rotation, for now we keep measures to degrees for eeg matching
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  if (id%%2 == 1){
+    #mirror then rotation if odd id
+    rotatedTraining <- getParticipantTaskData(id, taskno = 5, task = 'mirror')
+  } else if (id%%2 == 0){
+    #if pp id is even
+    #rotation first then mirror
+    rotatedTraining <- getParticipantTaskData(id, taskno = 11, task = 'mirror')
+  }
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=89, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+    
+  }
+  #after baseline correction, we need to assign specific targets to corresponding magnitudes to compensate
+  #we have 24 possible targets, but they differ depending on which side of mirror axis they are (before or after mirror)
+  #this will affect calculations later on (due to negative values)
+  #so we separate them by amount of compensation, and whether they are before or after mirror axis
+  alltargets15bef <- c(82.5, 172.5, 262.5, 352.5) #should compensate for 15 degrees
+  alltargets15aft <- c(7.5, 97.5, 187.5, 277.5)
+  alltargets30bef <- c(75, 165, 255, 345) #30 degrees
+  alltargets30aft <- c(15, 105, 195, 285)
+  alltargets45bef <- c(67.5, 157.5, 247.5, 337.5) #45 degrees
+  alltargets45aft <- c(22.5, 112.5, 202.5, 292.5)
+  
+  angles <- unique(RT$targetangle)
+  RT['compensate'] <- NA
+  
+  #we want degrees for now, not percentages
+  #we multily by -1 so that getting positive values mean that the hand went to the correct direction
+  #percentage: above 100 values would mean an overcompensation, 0 is going directly to target, negative values are undercompensation
+  for (target in angles){
+    if (target %in% alltargets15bef){
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])/15)*100
+      RT$compensate[which(RT$targetangle == target)] <- 15
+    } else if (target %in% alltargets15aft){
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/15)*100
+      RT$compensate[which(RT$targetangle == target)] <- 15
+    } else if (target %in% alltargets30bef){
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])/30)*100
+      RT$compensate[which(RT$targetangle == target)] <- 30
+    } else if (target %in% alltargets30aft){
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/30)*100
+      RT$compensate[which(RT$targetangle == target)] <- 30
+    } else if (target %in% alltargets45bef){
+      RT$reachdev[which(RT$targetangle == target)] <- ((RT$reachdev[which(RT$targetangle == target)])/45)*100
+      RT$compensate[which(RT$targetangle == target)] <- 45
+    } else if (target %in% alltargets45aft){
+      RT$reachdev[which(RT$targetangle == target)] <- (((RT$reachdev[which(RT$targetangle == target)])*-1)/45)*100
+      RT$compensate[which(RT$targetangle == target)] <- 45
+    }
+  }
+  #write.csv(RT, file='data/PPLCmir.csv', row.names = F)
+  return(RT)  
+}
+
+#grab reachdevs across all targets for EEG data
+getPercCompMIRGroupLCALL <- function(maxppid=31, location='feedback') { # add angle?
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  participants <- seq(0,maxppid,1)
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    ppangles <- getPercCompMIRParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+  }
+  #write.csv(dataoutput, file='data/MIR_learningcurve_degrees.csv', row.names = F) 
+  return(dataoutput)
+  
+}
+
+getPercCompBlock1RDMParticipantLearningCurve <- function(id, location) {
+  
+  #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
+  #rotation should show percentage of compensation (not angular deviation of hand)
+  #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
+  #measure where hand should be minus where it is: if this is spot on then percentage is 0%
+  
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  #regardless of ID, we want the first random block
+  rotatedTraining <- getParticipantTaskData(id, taskno = 3, task = 'random0')
+  
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=47, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  #include rotation values, because they differ
+  rotation <- c()
+  for (trialno in c(0: dim(RT)[1] - 1)){
+    rotsize <- unique(rotatedTraining$rotation[which(rotatedTraining$trial == trialno)])
+    rotation <- c(rotation, rotsize)
+  }
+  
+  RT$rotation <- rotation
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  
+  
+  negvals <- c(-15, -25, -35)
+  posvals <- c(15, 25, 35)
+  
+  for (t in RT$trial){
+    rot <- RT$rotation[which(RT$trial == t)]
+    rotsize <- abs(rot)
+    if (rot %in% posvals){
+      RT$reachdev[which(RT$trial == t)] <- (((RT$reachdev[which(RT$trial == t)])*-1)/rotsize)*100
+    } else if (rot %in% negvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)])/rotsize)*100
+    }
+  }
+  
+  
+  
+  
+  return(RT)
+}
+
+getPercCompBlock1RDMGroupLCALL <- function(maxppid, location) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    #print(participant)
+    ppangles <- getPercCompBlock1RDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    #rdat <- dat$reaches
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+    
+  }
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/RDMROT_FirstBlock_learningcurve_degrees.csv', row.names = F) 
+}
+
+getPercCompBlock2RDMParticipantLearningCurve <- function(id, location) {
+  
+  #take learnive curve for both aligned and perturbed (rot, mir, rand) sessions
+  #rotation should show percentage of compensation (not angular deviation of hand)
+  #because this makes it comparable to mirror reversal where angular deviation will differ depending on location of target relative to mirror
+  #measure where hand should be minus where it is: if this is spot on then percentage is 0%
+  
+  alignedTraining <- getParticipantTaskData(id, taskno = 1, task = 'aligned') #these values will change if need nocursor or localization
+  
+  #regardless of ID, we want the first random block
+  rotatedTraining <- getParticipantTaskData(id, taskno = 9, task = 'random1')
+  
+  
+  biases <- getAlignedTrainingBiases(alignedTraining, location = location) #use function to get biases
+  #AT<- getReachAngles(alignedTraining, starttrial = 1, endtrial = 45) #aligned is first 45 trials
+  RT<- getReachAngles(rotatedTraining, starttrial=0, endtrial=47, location = location) #rotated is 90 trials; appended to end of aligned
+  
+  #include rotation values, because they differ
+  rotation <- c()
+  for (trialno in c(0: dim(RT)[1] - 1)){
+    rotsize <- unique(rotatedTraining$rotation[which(rotatedTraining$trial == trialno)])
+    rotation <- c(rotation, rotsize)
+  }
+  
+  RT$rotation <- rotation
+  
+  for (biasno in c(1: dim(biases)[1])){ #from 1 to however many biases there are in data
+    
+    target<- biases[biasno, 'targetangle'] #get corresponding target angle
+    bias<- biases[biasno, 'reachdev'] #get corresponding reachdev or bias
+    
+    #subtract bias from reach deviation for rotated session only
+    RT$reachdev[which(RT$targetangle == target)] <- RT$reachdev[which(RT$targetangle == target)] - bias
+  }
+  
+  
+  
+  negvals <- c(-15, -25, -35)
+  posvals <- c(15, 25, 35)
+  
+  for (t in RT$trial){
+    rot <- RT$rotation[which(RT$trial == t)]
+    rotsize <- abs(rot)
+    if (rot %in% posvals){
+      RT$reachdev[which(RT$trial == t)] <- (((RT$reachdev[which(RT$trial == t)])*-1)/rotsize)*100
+    } else if (rot %in% negvals){
+      RT$reachdev[which(RT$trial == t)] <- ((RT$reachdev[which(RT$trial == t)])/rotsize)*100
+    }
+  }
+  
+  
+  
+  
+  return(RT)
+}
+
+getPercCompBlock2RDMGroupLCALL <- function(maxppid, location) {
+  #participants <- getGroupParticipants(group) #the function that gives all participant ID's for a specified group
+  
+  #a consequence of adding the groups late led me to fix it in the manner below
+  participants <- seq(0,maxppid,1)
+  
+  
+  
+  dataoutput<- data.frame() #create place holder
+  #go through each participant in this group
+  for (participant in participants) {
+    #print(participant)
+    ppangles <- getPercCompBlock2RDMParticipantLearningCurve(id=participant, location = location) #for every participant, get learning curve data
+    
+    reaches <- ppangles$reachdev #get reach deviations column from learning curve data
+    trial <- c(1:length(reaches)) #sets up trial column
+    dat <- cbind(trial, reaches)
+    #rdat <- dat$reaches
+    
+    if (prod(dim(dataoutput)) == 0){
+      dataoutput <- dat
+    } else {
+      dataoutput <- cbind(dataoutput, reaches)
+    }
+    
+  }
+  return(dataoutput)
+  #write.csv(dataoutput, file='data/RDMROT_FirstBlock_learningcurve_degrees.csv', row.names = F) 
+}
+
+# Learning Curves Blocked and INDIVIDUAL Data----
+
+#first split 90 trials into sets of 6 trials each
+#then in each set, plot individual data as lines
+
+getBlockedIndividualLearningCurves <- function(maxppid = 31, location = 'feedback', targetno = 6, perturb){
+  
+  if (perturb == 'ROT'){
+    data <- getPercCompROTGroupLearningCurves(maxppid = maxppid, location = location)
+  } else if (perturb == 'MIR'){
+    data <- getPercCompMIRGroupLCALL(maxppid = maxppid, location = location)
+  } else if (perturb == 'RDM0'){
+    data <- getPercCompBlock1RDMGroupLCALL(maxppid = maxppid, location = location)
+  } else if (perturb == 'RDM1'){
+    data <- getPercCompBlock2RDMGroupLCALL(maxppid = maxppid, location = location)
+  }
+  
+  #we want to get the mean for every 6 trials (they go through each of 6 possible targets)
+  n <- targetno;
+  ndat <- aggregate(data, list(rep(1:(nrow(data)%/%n+1),each=n,len=nrow(data))), mean, na.rm = T)[-1];
+  ndat$trial <- c(1:length(ndat$trial))
+  
+  #but data is in wide format, we would want it in long format
+  #this requires library(tidyr)
+  ndat_long <- gather(ndat, participant, reachdev, reaches:length(ndat))
+  ndat_long$participant <- as.character(ndat_long$participant)
+  
+  participants <- unique(ndat_long$participant)
+  
+  
+  PPindex <- 0
+  
+  for (pp in participants) {
+    row.idx <- which(ndat_long$participant == pp)
+    ndat_long$participant[row.idx] <- sprintf('pp%d', PPindex)
+    
+    PPindex <- PPindex + 1
+  }
+  
+  return(ndat_long)
+}
+
+
+plotBlockedIndLC <- function(maxppid = 31, location = 'feedback', targetno = 6, perturb, target='inline'){
+  
+  if (perturb == 'ROT'){
+    
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file='doc/fig/pilot/Fig29A_ROT_BlockedIndLearningCurve.svg', width=12, height=7, pointsize=16, system_fonts=list(sans="Arial"))
+    }
+    
+    data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
+    
+    plot(NA, NA, xlim = c(0,16), ylim = c(-200,210), 
+         xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
+         main = "Visuomotor rotation", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    abline(h = 0, col = '#000000', lty = 2)
+    axis(1, at=c(1, 5, 10, 15))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
+    axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+    
+    
+    participants <- unique(data$participant)
+    
+    colourscheme <- getBehaviorColourScheme(perturb = perturb)
+    
+    for (pp in participants){
+      row.idx <- which(data$participant == pp)
+      col <- colourscheme[[perturb]][['T']]
+      #lines(data$trial[row.idx],data$reachdev[row.idx], lwd = 2, lty = 1, col = col)
+      points(data$trial[row.idx],data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      
+      #linetypeidx <- linetypeidx + 1
+      #colidx <- colidx +1
+    }
+    
+    blockno <- unique(data$trial)
+    allmeans <- data.frame()
+    for(block in blockno){
+      dat <- data[which(data$trial == block),]
+      meandist <- getConfidenceInterval(data=dat$reachdev, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      blockmean <- mean(dat$reachdev)
+      col <- colourscheme[[perturb]][['S']]
+      lines(x=rep(block,2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=block,y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      
+      
+      if (prod(dim(allmeans)) == 0){
+        allmeans <- blockmean
+      } else {
+        allmeans <- rbind(allmeans, blockmean)
+      }
+    }
+    
+    lines(x=c(1:length(blockno)),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+    
+  } else if (perturb == 'MIR'){
+    
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file='doc/fig/pilot/Fig29A_MIR_BlockedIndLearningCurve.svg', width=12, height=7, pointsize=16, system_fonts=list(sans="Arial"))
+    }
+    
+    data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
+    #remove pp004 because they anti-learned
+    #data <- subset(data, participant != 'pp4')
+    # data <- subset(data, participant != 'pp0')
+    # data <- subset(data, participant != 'pp1')
+    
+    plot(NA, NA, xlim = c(0,16), ylim = c(-200,210), 
+         xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
+         main = "Mirror reversal", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    abline(h = 0, col = '#000000', lty = 2)
+    axis(1, at=c(1, 5, 10, 15))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
+    axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+    
+    
+    participants <- unique(data$participant)
+
+    colourscheme <- getBehaviorColourScheme(perturb = perturb)
+    
+    for (pp in participants){
+      row.idx <- which(data$participant == pp)
+      col <- colourscheme[[perturb]][['T']]
+      #lines(data$trial[row.idx],data$reachdev[row.idx], lwd = 2, lty = 1, col = col)
+      points(data$trial[row.idx],data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      
+    }
+    
+    #then create a mean for all, according to trial number
+    blockno <- unique(data$trial)
+    allmeans <- data.frame()
+    for(block in blockno){
+      dat <- data[which(data$trial == block),]
+      meandist <- getConfidenceInterval(data=dat$reachdev, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      blockmean <- mean(dat$reachdev)
+      col <- colourscheme[[perturb]][['S']]
+      lines(x=rep(block,2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=block,y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      
+      
+      if (prod(dim(allmeans)) == 0){
+        allmeans <- blockmean
+      } else {
+        allmeans <- rbind(allmeans, blockmean)
+      }
+    }
+    
+    lines(x=c(1:length(blockno)),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+  } else if (perturb == 'RDM0'){
+    
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file='doc/fig/pilot/Fig29A_RDM0_BlockedIndLearningCurve.svg', width=12, height=7, pointsize=16, system_fonts=list(sans="Arial"))
+    }
+    
+    data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
+    #remove pp004 because they anti-learned
+    #data <- subset(data, participant != 'pp4')
+    # data <- subset(data, participant != 'pp0')
+    # data <- subset(data, participant != 'pp1')
+    
+    plot(NA, NA, xlim = c(0,9), ylim = c(-200,210), 
+         xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
+         main = "Random Rotation Block 1", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    abline(h = 0, col = '#000000', lty = 2)
+    axis(1, at=c(1, 3, 5, 8))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
+    axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+    
+    
+    participants <- unique(data$participant)
+    
+    colourscheme <- getBehaviorColourScheme(perturb = perturb)
+    
+    for (pp in participants){
+      row.idx <- which(data$participant == pp)
+      col <- colourscheme[[perturb]][['T']]
+      #lines(data$trial[row.idx],data$reachdev[row.idx], lwd = 2, lty = 1, col = col)
+      points(data$trial[row.idx],data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      
+    }
+    
+    #then create a mean for all, according to trial number
+    blockno <- unique(data$trial)
+    allmeans <- data.frame()
+    for(block in blockno){
+      dat <- data[which(data$trial == block),]
+      meandist <- getConfidenceInterval(data=dat$reachdev, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      blockmean <- mean(dat$reachdev)
+      col <- colourscheme[[perturb]][['S']]
+      lines(x=rep(block,2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=block,y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      
+      
+      if (prod(dim(allmeans)) == 0){
+        allmeans <- blockmean
+      } else {
+        allmeans <- rbind(allmeans, blockmean)
+      }
+    }
+    
+    lines(x=c(1:length(blockno)),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+  } else if (perturb == 'RDM1'){
+    
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file='doc/fig/pilot/Fig29A_RDM1_BlockedIndLearningCurve.svg', width=12, height=7, pointsize=16, system_fonts=list(sans="Arial"))
+    }
+    
+    data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
+    #remove pp004 because they anti-learned
+    #data <- subset(data, participant != 'pp4')
+    # data <- subset(data, participant != 'pp0')
+    # data <- subset(data, participant != 'pp1')
+    
+    plot(NA, NA, xlim = c(0,9), ylim = c(-200,210), 
+         xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
+         main = "Random Rotation Block 1", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    abline(h = 0, col = '#000000', lty = 2)
+    axis(1, at=c(1, 3, 5, 8))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
+    axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+    
+    
+    participants <- unique(data$participant)
+    
+    colourscheme <- getBehaviorColourScheme(perturb = perturb)
+    
+    for (pp in participants){
+      row.idx <- which(data$participant == pp)
+      col <- colourscheme[[perturb]][['T']]
+      #lines(data$trial[row.idx],data$reachdev[row.idx], lwd = 2, lty = 1, col = col)
+      points(data$trial[row.idx],data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      
+    }
+    
+    #then create a mean for all, according to trial number
+    blockno <- unique(data$trial)
+    allmeans <- data.frame()
+    for(block in blockno){
+      dat <- data[which(data$trial == block),]
+      meandist <- getConfidenceInterval(data=dat$reachdev, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      blockmean <- mean(dat$reachdev)
+      col <- colourscheme[[perturb]][['S']]
+      lines(x=rep(block,2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+      #print(meandist$CI95)
+      points(x=block,y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      
+      
+      if (prod(dim(allmeans)) == 0){
+        allmeans <- blockmean
+      } else {
+        allmeans <- rbind(allmeans, blockmean)
+      }
+    }
+    
+    lines(x=c(1:length(blockno)),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+  }
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+plotCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', targetno=6, perturbtypes=c('ROT','MIR'), target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig29_ROTMIRBlockedIndLearningCurve.svg', width=11.5, height=10.5, pointsize=16, system_fonts=list(sans="Arial"))
+  }
+  
+  plot(NA, NA, xlim = c(1,15), ylim = c(-200,250), 
+       xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  abline(h = 0, col = '#000000', lty = 2)
+  axis(1, at=c(1, 5, 10, 15))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
+  axis(2, at = c(-200, -100, 0, 100, 200), las=2) #tick marks for y axis
+  
+  for(perturb in perturbtypes){
+    data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
+    
+    participants <- unique(data$participant)
+    
+    colourscheme <- getBehaviorColourScheme(perturb = perturb)
+    
+    for (pp in participants){
+      row.idx <- which(data$participant == pp)
+      col <- colourscheme[[perturb]][['T']]
+      #lines(data$trial[row.idx],data$reachdev[row.idx], lwd = 2, lty = 1, col = col)
+      if(perturb == 'ROT'){
+        points(data$trial[row.idx]-(1/6),data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      } else if (perturb == 'MIR'){
+        points(data$trial[row.idx]+(1/6),data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      }
+      
+    }
+    
+    blockno <- unique(data$trial)
+    allmeans <- data.frame()
+    for(block in blockno){
+      dat <- data[which(data$trial == block),]
+      meandist <- getConfidenceInterval(data=dat$reachdev, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      blockmean <- mean(dat$reachdev)
+      col <- colourscheme[[perturb]][['S']]
+      if(perturb == 'ROT'){
+        lines(x=rep((block-(1/6)),2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+        points(x=(block-(1/6)),y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      } else if(perturb == 'MIR'){
+        lines(x=rep((block+(1/6)),2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+        points(x=(block+(1/6)),y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      }
+      
+      
+      
+      if (prod(dim(allmeans)) == 0){
+        allmeans <- blockmean
+      } else {
+        allmeans <- rbind(allmeans, blockmean)
+      }
+      
+    }
+    
+    if(perturb == 'ROT'){
+      lines(x=c((1-(1/6)):(length(blockno)-(1/6))),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+    } else if(perturb == 'MIR'){
+      lines(x=c((1+(1/6)):(length(blockno)+(1/6))),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+    }
+    
+  }
+  
+  #add legend
+  legend(12,-90,legend=c('ROT','MIR'),
+         col=c(colourscheme[['ROT']][['S']],colourscheme[['MIR']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+plotRDMCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', targetno=6, perturbtypes=c('RDM0','RDM1'), target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig30_RDMBlockedIndLearningCurve.svg', width=11.5, height=10.5, pointsize=16, system_fonts=list(sans="Arial"))
+  }
+  
+  plot(NA, NA, xlim = c(1,9), ylim = c(-200,250), 
+       xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  abline(h = 0, col = '#000000', lty = 2)
+  axis(1, at=c(1, 3, 5, 8))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
+  axis(2, at = c(-200, -100, 0, 100, 200), las=2) #tick marks for y axis
+  
+  for(perturb in perturbtypes){
+    data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
+    
+    participants <- unique(data$participant)
+    
+    colourscheme <- getBehaviorColourScheme(perturb = perturb)
+    
+    for (pp in participants){
+      row.idx <- which(data$participant == pp)
+      col <- colourscheme[[perturb]][['T']]
+      #lines(data$trial[row.idx],data$reachdev[row.idx], lwd = 2, lty = 1, col = col)
+      if(perturb == 'RDM0'){
+        points(data$trial[row.idx]-(1/6),data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      } else if (perturb == 'RDM1'){
+        points(data$trial[row.idx]+(1/6),data$reachdev[row.idx], pch = 16, cex=1.5, col = alpha(col, .15))
+      }
+      
+    }
+    
+    blockno <- unique(data$trial)
+    allmeans <- data.frame()
+    for(block in blockno){
+      dat <- data[which(data$trial == block),]
+      meandist <- getConfidenceInterval(data=dat$reachdev, method='bootstrap', resamples=5000, FUN=mean, returndist=TRUE)
+      blockmean <- mean(dat$reachdev)
+      col <- colourscheme[[perturb]][['S']]
+      if(perturb == 'RDM0'){
+        lines(x=rep((block-(1/6)),2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+        points(x=(block-(1/6)),y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      } else if(perturb == 'RDM1'){
+        lines(x=rep((block+(1/6)),2),y=meandist$CI95,col=col) #as.character(styles$color_solid[groupno]))
+        points(x=(block+(1/6)),y=blockmean,pch=16,cex=1.5,col=col) #as.character(styles$color_solid[groupno]))
+      }
+      
+      
+      
+      if (prod(dim(allmeans)) == 0){
+        allmeans <- blockmean
+      } else {
+        allmeans <- rbind(allmeans, blockmean)
+      }
+      
+    }
+    
+    if(perturb == 'RDM0'){
+      lines(x=c((1-(1/6)):(length(blockno)-(1/6))),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+    } else if(perturb == 'RDM1'){
+      lines(x=c((1+(1/6)):(length(blockno)+(1/6))),y=allmeans[,1], lwd = 2, lty = 1, col = col)
+    }
+    
+  }
+  
+  legend(5,-90,legend=c('RDM: 1st block','RDM: 2nd block'),
+         col=c(colourscheme[['RDM0']][['S']],colourscheme[['RDM1']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
 }
