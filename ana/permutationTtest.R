@@ -419,9 +419,9 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   #NA to create empty plot
   # could maybe use plot.new() ?
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-16, 10), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-         main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = "Late-Early difference: feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -466,24 +466,24 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
     mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
     
     col <- colourscheme[['rot']][['T']]
-    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5.5, 5.5), col = col, lty = 1, lwd = 8)
+    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(10, 10), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['rot']][['S']]
-    points(x = mo_rot[,2], y = 5.5, pch = 20, cex = 1.5, col=col)
+    points(x = mo_rot[,2], y = 10, pch = 20, cex = 1.5, col=col)
     
     col <- colourscheme[['rdm']][['T']]
-    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(9.5, 9.5), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['rdm']][['S']]
-    points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    points(x = mo_rdm[,2], y = 9.5, pch = 20, cex = 1.5, col=col)
     
     col <- colourscheme[['mir']][['T']]
-    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(9, 9), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['mir']][['S']]
-    points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    points(x = mo_mir[,2], y = 9, pch = 20, cex = 1.5, col=col)
     
   }
   
   #add legend
-  legend(0.95,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  legend(0.95,10,legend=c('Rot', 'Rdm', 'Mir'),
          col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
@@ -527,9 +527,9 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1.05, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -912,9 +912,9 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 10), 
+  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-       main = "LRP difference waves time-locked to go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = "Late-Early LRP difference: go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
@@ -973,10 +973,10 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   points(x = mo_mir[,2], y = 9, pch = 20, cex = 1.5, col=col)
   
   
-  #add legend
-  legend(0.25,-5,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  # #add legend
+  # legend(0.25,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
   
   #add in permutation clusters and any significant results
   for(ptype in perturbs){
@@ -1018,9 +1018,9 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.25, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.25, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.25, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(.55, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(.55, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -1982,9 +1982,9 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   #NA to create empty plot
   # could maybe use plot.new() ?
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-16, 10), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-         main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = "Large-Small difference: feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -2029,26 +2029,26 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
     mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
     
     col <- colourscheme[['rot']][['T']]
-    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5.5, 5.5), col = col, lty = 1, lwd = 8)
+    lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(10, 10), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['rot']][['S']]
-    points(x = mo_rot[,2], y = 5.5, pch = 20, cex = 1.5, col=col)
+    points(x = mo_rot[,2], y = 10, pch = 20, cex = 1.5, col=col)
     
     col <- colourscheme[['rdm']][['T']]
-    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+    lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(9.5, 9.5), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['rdm']][['S']]
-    points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
+    points(x = mo_rdm[,2], y = 9.5, pch = 20, cex = 1.5, col=col)
     
     col <- colourscheme[['mir']][['T']]
-    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+    lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(9, 9), col = col, lty = 1, lwd = 8)
     col <- colourscheme[['mir']][['S']]
-    points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+    points(x = mo_mir[,2], y = 9, pch = 20, cex = 1.5, col=col)
     
   }
   
-  #add legend
-  legend(.8,-5,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  # #add legend
+  # legend(.8,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
   
   #add in permutation clusters and any significant results
   for(ptype in perturbs){
@@ -2090,9 +2090,9 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1.05, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -2469,9 +2469,9 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 6), 
+  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-       main = "LRP difference waves time-locked to go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = "Large-Small LRP difference: go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
@@ -2529,10 +2529,10 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   col <- colourscheme[['mir']][['S']]
   points(x = mo_mir[,2], y = 9, pch = 20, cex = 1.5, col=col)
   
-  #add legend
-  legend(.25,-5,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  # #add legend
+  # legend(.25,-5,legend=c('Rot', 'Rdm', 'Mir'),
+  #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
   
   #add in permutation clusters and any significant results
   for(ptype in perturbs){
@@ -2574,9 +2574,9 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.25, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.25, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.25, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -15, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(.55, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(.55, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -3691,10 +3691,15 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
+  if(roi == 'medfro'){
+    reg <- 'Medial frontal'
+  } else if (roi == 'latcen'){
+    reg <- 'Lateral central'
+  }
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-yval - 10, yval + 10), 
+    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-yval - 10, yval + 10), 
          xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
-         main = sprintf("Mean %s %s time-locked to feedback onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = sprintf("%s %s\nLate-Early difference: feedback onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -3740,6 +3745,18 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
+  
+  if (freqs == 'alpha'){
+    scal <- yval - 20
+    scal2 <- yval - 40
+  } else if (freqs == 'beta'){
+    scal <- yval - 10
+    scal2 <- yval - 20
+  } else if (freqs == 'theta'){
+    scal <- yval - 40
+    scal2 <- yval - 80
+  }
+  
     
   col <- colourscheme[['rot']][['T']]
   lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(yval, yval), col = col, lty = 1, lwd = 8)
@@ -3747,23 +3764,37 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   points(x = mo_rot[,2], y = yval, pch = 20, cex = 1.5, col=col)
     
   col <- colourscheme[['rdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(yval - 20, yval - 20), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(scal, scal), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['rdm']][['S']]
-  points(x = mo_rdm[,2], y = yval - 20, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rdm[,2], y = scal, pch = 20, cex = 1.5, col=col)
     
   col <- colourscheme[['mir']][['T']]
-  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(yval - 40, yval - 40), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(scal2, scal2), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['mir']][['S']]
-  points(x = mo_mir[,2], y = yval - 40, pch = 20, cex = 1.5, col=col)
+  points(x = mo_mir[,2], y = scal2, pch = 20, cex = 1.5, col=col)
     
   
   
   #add legend
-  legend(.8,yval,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  if(roi == 'medfro'){
+    legend(.95,yval,legend=c('Rot', 'Rdm', 'Mir'),
+           col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+  }
+  
   
   #add in permutation clusters and any significant results
+  if (freqs == 'alpha'){
+    scal <- -yval + 40
+    scal2 <- -yval + 80
+  } else if (freqs == 'beta'){
+    scal <- -yval + 30
+    scal2 <- -yval + 60
+  } else if (freqs == 'theta'){
+    scal <- -yval + 50
+    scal2 <- -yval + 100
+  }
+  
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
     permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_PerturbTypeComp_%s_%s.csv', erps, roi))
@@ -3784,19 +3815,19 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         }
       }
     }
@@ -3804,9 +3835,9 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1, -yval + 25, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1, -yval + 50, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1.05, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1.05, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -4237,10 +4268,14 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
-  
-  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-yval - 10, yval + 10), 
+  if(roi == 'medfro'){
+    reg <- 'Medial frontal'
+  } else if (roi == 'latcen'){
+    reg <- 'Lateral central'
+  }
+  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-yval - 10, yval + 10), 
        xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
-       main = sprintf("Mean %s %s time-locked to go signal onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = sprintf("%s %s\nLate-Early difference: go signal onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -4282,15 +4317,26 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
-  #add legend
-  legend(-1,yval,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  # #add legend
+  # legend(-1,yval,legend=c('Rot', 'Rdm', 'Mir'),
+  #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
   
   #add movement onset
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+  
+  if (freqs == 'alpha'){
+    scal <- yval - 20
+    scal2 <- yval - 40
+  } else if (freqs == 'beta'){
+    scal <- yval - 10
+    scal2 <- yval - 20
+  } else if (freqs == 'theta'){
+    scal <- yval - 40
+    scal2 <- yval - 80
+  }
   
   col <- colourscheme[['rot']][['T']]
   lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(yval, yval), col = col, lty = 1, lwd = 8)
@@ -4298,16 +4344,26 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   points(x = mo_rot[,2], y = yval, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['rdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(yval-20, yval-20), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(scal, scal), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['rdm']][['S']]
-  points(x = mo_rdm[,2], y = yval-20, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rdm[,2], y = scal, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['mir']][['T']]
-  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(yval-40, yval-40), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(scal2, scal2), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['mir']][['S']]
-  points(x = mo_mir[,2], y = yval-40, pch = 20, cex = 1.5, col=col)
+  points(x = mo_mir[,2], y = scal2, pch = 20, cex = 1.5, col=col)
   
   #add in permutation clusters and any significant results
+  if (freqs == 'alpha'){
+    scal <- -yval + 40
+    scal2 <- -yval + 80
+  } else if (freqs == 'beta'){
+    scal <- -yval + 30
+    scal2 <- -yval + 60
+  } else if (freqs == 'theta'){
+    scal <- -yval + 50
+    scal2 <- -yval + 100
+  }
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
     permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_PerturbTypeComp_%s_%s.csv', erps, roi))
@@ -4328,19 +4384,19 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         }
       }
     }
@@ -4348,9 +4404,9 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.25, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.25, -yval + 25, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.25, -yval + 50, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(.55, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(.55, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -4938,10 +4994,15 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
+  if(roi == 'medfro'){
+    reg <- 'Medial frontal'
+  } else if (roi == 'latcen'){
+    reg <- 'Lateral central'
+  }
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-yval - 10, yval + 10), 
+    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-yval - 10, yval + 10), 
          xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
-         main = sprintf("Mean %s %s time-locked to feedback onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = sprintf("%s %s\nLarge-Small difference: feedback onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -4988,29 +5049,52 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
   
+  if (freqs == 'alpha'){
+    scal <- yval - 20
+    scal2 <- yval - 40
+  } else if (freqs == 'beta'){
+    scal <- yval - 10
+    scal2 <- yval - 20
+  } else if (freqs == 'theta'){
+    scal <- yval - 40
+    scal2 <- yval - 80
+  }
+  
+  
   col <- colourscheme[['rot']][['T']]
   lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(yval, yval), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['rot']][['S']]
   points(x = mo_rot[,2], y = yval, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['rdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(yval - 20, yval - 20), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(scal, scal), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['rdm']][['S']]
-  points(x = mo_rdm[,2], y = yval - 20, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rdm[,2], y = scal, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['mir']][['T']]
-  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(yval - 40, yval - 40), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(scal2, scal2), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['mir']][['S']]
-  points(x = mo_mir[,2], y = yval - 40, pch = 20, cex = 1.5, col=col)
+  points(x = mo_mir[,2], y = scal2, pch = 20, cex = 1.5, col=col)
   
   
   
-  #add legend
-  legend(.8,yval,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  # #add legend
+  # legend(.8,yval,legend=c('Rot', 'Rdm', 'Mir'),
+  #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
   
   #add in permutation clusters and any significant results
+  if (freqs == 'alpha'){
+    scal <- -yval + 40
+    scal2 <- -yval + 80
+  } else if (freqs == 'beta'){
+    scal <- -yval + 30
+    scal2 <- -yval + 60
+  } else if (freqs == 'theta'){
+    scal <- -yval + 50
+    scal2 <- -yval + 100
+  }
+  
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
     permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_ErrorSize_PerturbTypeComp_%s_%s.csv', erps, roi))
@@ -5031,19 +5115,19 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         }
       }
     }
@@ -5051,9 +5135,9 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1, -yval + 25, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1, -yval + 50, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(1.05, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(1.05, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -5483,10 +5567,15 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
+  if(roi == 'medfro'){
+    reg <- 'Medial frontal'
+  } else if (roi == 'latcen'){
+    reg <- 'Lateral central'
+  }
   
-  plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-yval - 10, yval + 10), 
+  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-yval - 10, yval + 10), 
        xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
-       main = sprintf("Mean %s %s time-locked to go signal onset", roi, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = sprintf("%s %s\nLarge-Small difference: go signal onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -5528,15 +5617,27 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
-  #add legend
-  legend(-1,yval,legend=c('Rot', 'Rdm', 'Mir'),
-         col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
-         lty=1,bty='n',cex=1,lwd=2)
+  # #add legend
+  # legend(-1,yval,legend=c('Rot', 'Rdm', 'Mir'),
+  #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+  #        lty=1,bty='n',cex=1,lwd=2)
   
   #add movement onset 
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+  
+  if (freqs == 'alpha'){
+    scal <- yval - 20
+    scal2 <- yval - 40
+  } else if (freqs == 'beta'){
+    scal <- yval - 10
+    scal2 <- yval - 20
+  } else if (freqs == 'theta'){
+    scal <- yval - 40
+    scal2 <- yval - 80
+  }
+  
   
   col <- colourscheme[['rot']][['T']]
   lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(yval, yval), col = col, lty = 1, lwd = 8)
@@ -5544,16 +5645,27 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   points(x = mo_rot[,2], y = yval, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['rdm']][['T']]
-  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(yval - 20, yval - 20), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(scal, scal), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['rdm']][['S']]
-  points(x = mo_rdm[,2], y = yval - 20, pch = 20, cex = 1.5, col=col)
+  points(x = mo_rdm[,2], y = scal, pch = 20, cex = 1.5, col=col)
   
   col <- colourscheme[['mir']][['T']]
-  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(yval - 40, yval - 40), col = col, lty = 1, lwd = 8)
+  lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(scal2, scal2), col = col, lty = 1, lwd = 8)
   col <- colourscheme[['mir']][['S']]
-  points(x = mo_mir[,2], y = yval - 40, pch = 20, cex = 1.5, col=col)
+  points(x = mo_mir[,2], y = scal2, pch = 20, cex = 1.5, col=col)
   
   #add in permutation clusters and any significant results
+  if (freqs == 'alpha'){
+    scal <- -yval + 40
+    scal2 <- -yval + 80
+  } else if (freqs == 'beta'){
+    scal <- -yval + 30
+    scal2 <- -yval + 60
+  } else if (freqs == 'theta'){
+    scal <- -yval + 50
+    scal2 <- -yval + 100
+  }
+  
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
     permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_ErrorSize_PerturbTypeComp_%s_%s.csv', erps, roi))
@@ -5574,19 +5686,19 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
           lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 25, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval + 50, length(permtime))), col = col, lty = 1, lwd = 8)
+          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
         }
       }
     }
@@ -5594,9 +5706,9 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.25, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.25, -yval + 15, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.25, -yval + 30, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
+  text(.55, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
+  text(.55, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -5710,6 +5822,252 @@ getOutlierTrialSignal<- function(target= 'inline', groups = c('smallrot'), roi =
     dev.off()
   }
   
+  
+}
+
+#Plotting summary plots----
+plotERPResults <- function(target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig35_ERP_Results.svg', width=10, height=8, pointsize=16, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,1,2,2,3,3,4,4), 2, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1,1))
+  
+  # # # # # # # # # #
+  # panel A: PTYPE DIFFWAVES LRP - Early vs Late
+  plotPermTestPTypeEarlyLateLRPDiffWaves()
+  mtext('a', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel B: PTYPE DIFFWAVES FRN - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWaves()
+  mtext('b', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  
+  # # # # # # # # # #
+  # panel C: PTYPE DIFFWAVES LRP - Small vs Large
+  plotPermTestPTypeSmallLargeLRPDiffWaves()
+  mtext('c', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel D: PTYPE DIFFWAVES FRN - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWaves()
+  mtext('d', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+plotTFRThetaResults <- function(target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig36_TFR_Theta_Results.svg', width=10, height=11, pointsize=16, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,1,2,2,
+                  3,3,4,4,
+                  5,5,6,6,
+                  7,7,8,8),
+                4, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+  
+  # # # # # # # # # #
+  # panel A: TFR Go onset, theta, medfro - Early vs Late
+  plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+  mtext('a', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel B: TFR feedback onset, theta, medfro - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+  mtext('b', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel C: TFR Go onset, theta, latcen - Early vs Late
+  plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+  mtext('c', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel D: TFR feedback onset, theta, latcen - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+  mtext('d', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel E: TFR Go onset, theta, medfro - Small vs Large
+  plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+  mtext('e', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel F: TFR feedback onset, theta, medfro - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
+  mtext('f', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel G: TFR Go onset, theta, latcen - Small vs Large
+  plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+  mtext('g', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel H: TFR feedback onset, theta, latcen - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
+  mtext('h', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+plotTFRAlphaResults <- function(target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig37_TFR_Alpha_Results.svg', width=10, height=11, pointsize=16, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,1,2,2,
+                  3,3,4,4,
+                  5,5,6,6,
+                  7,7,8,8),
+                4, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+  
+  # # # # # # # # # #
+  # panel A: TFR Go onset, alpha, medfro - Early vs Late
+  plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+  mtext('a', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel B: TFR feedback onset, alpha, medfro - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+  mtext('b', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel C: TFR Go onset, alpha, latcen - Early vs Late
+  plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+  mtext('c', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel D: TFR feedback onset, alpha, latcen - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+  mtext('d', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel E: TFR Go onset, alpha, medfro - Small vs Large
+  plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+  mtext('e', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel F: TFR feedback onset, alpha, medfro - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
+  mtext('f', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel G: TFR Go onset, alpha, latcen - Small vs Large
+  plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+  mtext('g', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel H: TFR feedback onset, alpha, latcen - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
+  mtext('h', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+plotTFRBetaResults <- function(target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig38_TFR_Beta_Results.svg', width=10, height=11, pointsize=16, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,1,2,2,
+                  3,3,4,4,
+                  5,5,6,6,
+                  7,7,8,8),
+                4, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+  
+  # # # # # # # # # #
+  # panel A: TFR Go onset, beta, medfro - Early vs Late
+  plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+  mtext('a', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel B: TFR feedback onset, beta, medfro - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+  mtext('b', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel C: TFR Go onset, beta, latcen - Early vs Late
+  plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+  mtext('c', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel D: TFR feedback onset, beta, latcen - Early vs Late
+  plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+  mtext('d', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel E: TFR Go onset, beta, medfro - Small vs Large
+  plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+  mtext('e', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel F: TFR feedback onset, beta, medfro - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
+  mtext('f', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel G: TFR Go onset, beta, latcen - Small vs Large
+  plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+  mtext('g', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  # # # # # # # # # #
+  # panel H: TFR feedback onset, beta, latcen - Small vs Large
+  plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
+  mtext('h', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
+  
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
   
 }
 

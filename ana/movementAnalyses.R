@@ -851,8 +851,8 @@ plotBlockedRT <- function(target='inline'){
   YUp <- as.numeric(dat$X97.5.)
   
   plot(c(1:length(Y)), Y, type = 'n', axes = FALSE,
-       xlab = 'Blocks', ylab = 'Reaction time (ms)', main = '',
-       xlim = c(0,51), ylim = c(199,801))
+       xlab = 'Block', ylab = 'Reaction time (ms)', main = '',
+       xlim = c(0,51), ylim = c(199,800))
   
   #labs <- c('1:AL','9:ROT','24:WASH','32:MIR','47:WASH','54')
   #axis(side=1, at=c(1,9,24,32,47,54), labels=labs)
@@ -877,10 +877,10 @@ plotBlockedRT <- function(target='inline'){
   
   
   
-  #add legend
-  legend(5,800,legend=c('Aligned','RDM: Block 1','ROT', 'RDM: Block 2', 'MIR'),
-         col=c("#000000", '#ff8200ff', "#e51636ff", '#c400c4ff', "#005de4ff"),
-         lty=1,bty='n',cex=0.8,lwd=2)
+  # #add legend
+  # legend(5,800,legend=c('Aligned','RDM: Block 1','ROT', 'RDM: Block 2', 'MIR'),
+  #        col=c("#000000", '#ff8200ff', "#e51636ff", '#c400c4ff', "#005de4ff"),
+  #        lty=1,bty='n',cex=0.8,lwd=2)
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -1731,8 +1731,8 @@ plotBlockedMT <- function(target='inline'){
   YUp <- as.numeric(dat$X97.5.)
   
   plot(c(1:length(Y)), Y, type = 'n', axes = FALSE,
-       xlab = 'Blocks', ylab = 'Movement time (ms)', main = '',
-       xlim = c(0,51), ylim = c(50,201))
+       xlab = 'Block', ylab = 'Movement time (ms)', main = '',
+       xlim = c(0,51), ylim = c(50,200))
   
   #labs <- c('1:AL','9:ROT','24:WASH','32:MIR','47:WASH','54')
   #axis(side=1, at=c(1,9,24,32,47,54), labels=labs)
@@ -1757,10 +1757,10 @@ plotBlockedMT <- function(target='inline'){
   
   
   
-  #add legend
-  legend(5,200,legend=c('Aligned','RDM: Block 1','ROT', 'RDM: Block 2', 'MIR'),
-         col=c("#000000", '#ff8200ff', "#e51636ff", '#c400c4ff', "#005de4ff"),
-         lty=1,bty='n',cex=0.8,lwd=2)
+  # #add legend
+  # legend(5,200,legend=c('Aligned','RDM: Block 1','ROT', 'RDM: Block 2', 'MIR'),
+  #        col=c("#000000", '#ff8200ff', "#e51636ff", '#c400c4ff', "#005de4ff"),
+  #        lty=1,bty='n',cex=0.8,lwd=2)
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -2349,8 +2349,8 @@ plotBlockedPL <- function(target='inline'){
   YUp <- as.numeric(dat$X97.5.)
   
   plot(c(1:length(Y)), Y, type = 'n', axes = FALSE,
-       xlab = 'Blocks', ylab = 'Path length (cm)', main = '',
-       xlim = c(0,51), ylim = c(3.9,5.6))
+       xlab = 'Block', ylab = 'Path length (cm)', main = '',
+       xlim = c(0,51), ylim = c(4.0,5.5))
   
   #labs <- c('1:AL','9:ROT','24:WASH','32:MIR','47:WASH','54')
   #axis(side=1, at=c(1,9,24,32,47,54), labels=labs)
@@ -2359,7 +2359,7 @@ plotBlockedPL <- function(target='inline'){
   axis(side=2, at=c(4, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5),las=2)
   
   #abline(h = c(400,700), col = 'black', lty = 2)
-  abline(v = c(4.5,12.5,27.5,35.5), col = 8, lty = 2)
+  abline(v = c(4.5,12.5,27.5,35.5), h = c(4.08), col = 8, lty = 2)
   #abline(h = c(9), col = 8, lty = 2)
   
   polygon(x = c(X1, rev(X1)), y = c(YLow[1:4], rev(YUp[1:4])), border=NA, col="#A9A9A9ff")
@@ -2377,7 +2377,7 @@ plotBlockedPL <- function(target='inline'){
   
   
   #add legend
-  legend(5,5.6,legend=c('Aligned','RDM: Block 1','ROT', 'RDM: Block 2', 'MIR'),
+  legend(5,5.6,legend=c('Aligned','RDM: Early','ROT', 'RDM: Late', 'MIR'),
          col=c("#000000", '#ff8200ff', "#e51636ff", '#c400c4ff', "#005de4ff"),
          lty=1,bty='n',cex=0.8,lwd=2)
   
@@ -2389,75 +2389,45 @@ plotBlockedPL <- function(target='inline'){
 }
 
 #Plotting behavioral data----
-plotTabletLearningRAE <- function(target='inline'){
+plotBehaviorLearning <- function(target='inline'){
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig_manuscripts/Fig2_Tablet_LCandRAE.svg', width=8, height=12, pointsize=16, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig34_Behavior_Learning.svg', width=10, height=8, pointsize=16, system_fonts=list(sans="Arial"))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
   par(mar=c(4,4,2,0.1))
   
   #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
-  layout(matrix(c(1,1,2,3,3,4), 2, 3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,1,2,3,4,5), 2, 3, byrow = TRUE), widths=c(2.8,2.8,2.8), heights=c(1.5,1))
   
   # # # # # # # # # #
-  # panel A: Learning Curves across blocks
+  # panel A: Learning Curves across blocks for ROT and MIR
   plotCollapsedBlockedIndLC()
-  mtext('a', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
+  mtext('a', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
   
   # # # # # # # # # #
-  # panel B: RAE across blocks
-  plotCollapsedBlockedIndRAE()
-  mtext('b', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
+  # panel B: Learning Curves across blocks for RDM
+  plotRDMCollapsedBlockedIndLC()
+  mtext('b', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
+  
   
   # # # # # # # # # #
-  # panel C: Learning Curves across blocks - instructed
-  plotCollapsedBlockedIndLC(group='instructed', maxppid=31)
-  mtext('c', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
+  # panel C: RT
+  plotBlockedRT()
+  mtext('c', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
   
   # # # # # # # # # #
-  # panel D: RAE across blocks - instructed
-  plotCollapsedBlockedIndRAE(group='instructed', maxppid=31)
-  mtext('d', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
-  
-  
-  
-  #close everything if you saved plot as svg
-  if (target=='svg') {
-    dev.off()
-  }
-  
-}
-
-plotTabletMovementMeasures <- function(target='inline'){
-  
-  #but we can save plot as svg file
-  if (target=='svg') {
-    svglite(file='doc/fig_manuscripts/Fig3_Tablet_RTMTPL.svg', width=11.5, height=5, pointsize=16, system_fonts=list(sans="Arial"))
-  }
-  
-  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
-  par(mar=c(4,4,2,0.1))
-  
-  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
-  layout(matrix(c(1,2,3), 1, 3, byrow = TRUE), widths=c(2,2,2), heights=c(1))
+  # panel D: MT
+  plotBlockedMT()
+  mtext('d', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
   
   # # # # # # # # # #
-  # panel A: Learning Curves across blocks
-  plotNIBlockedRT()
-  mtext('a', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
+  # panel E: PL
+  plotBlockedPL()
+  mtext('e', side=3, outer=F, line=-1, adj=0, padj=1, font=2)
   
-  # # # # # # # # # #
-  # panel B: RAE across blocks
-  plotNIBlockedMT()
-  mtext('b', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
-  
-  # # # # # # # # # #
-  # panel C: Learning Curves across blocks - instructed
-  plotNIBlockedPL()
-  mtext('c', side=3, outer=FALSE, line=-1, adj=0, padj=1, font=2)
   
   
   #close everything if you saved plot as svg

@@ -4921,8 +4921,8 @@ plotCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', targetno=
   plot(NA, NA, xlim = c(1,15), ylim = c(-200,250), 
        xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
-  abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  abline(h = 0, col = '#000000', lty = 2)
+  abline(h = 100, col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  abline(h = 0, col = 8, lty = 2)
   axis(1, at=c(1, 5, 10, 15))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
   axis(2, at = c(-200, -100, 0, 100, 200), las=2) #tick marks for y axis
   
@@ -5000,8 +5000,8 @@ plotRDMCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', target
   plot(NA, NA, xlim = c(1,9), ylim = c(-200,250), 
        xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
-  abline(h = 100, col = '#000000', lty = 2) #creates horizontal dashed lines through y =  0 and 30
-  abline(h = 0, col = '#000000', lty = 2)
+  abline(h = 100, col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  abline(h = 0, col = 8, lty = 2)
   axis(1, at=c(1, 3, 5, 8))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
   axis(2, at = c(-200, -100, 0, 100, 200), las=2) #tick marks for y axis
   
@@ -5057,7 +5057,7 @@ plotRDMCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', target
     
   }
   
-  legend(5,-90,legend=c('RDM: 1st block','RDM: 2nd block'),
+  legend(3,-90,legend=c('RDM: Early','RDM: Late'),
          col=c(colourscheme[['RDM0']][['S']],colourscheme[['RDM1']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   

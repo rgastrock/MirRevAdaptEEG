@@ -632,13 +632,13 @@ getPTypeDiffWavesColourScheme <- function(groups = c('rot', 'mir', 'rdm')){
   for (group in groups){
     colourscheme <- list()
     
-    colourscheme[['mir']] <- list('S'='#e51636ff', #vivid/york red
+    colourscheme[['rot']] <- list('S'='#e51636ff', #vivid/york red
                                   'T'='#e516362f')
     
-    colourscheme[['rdm']] <-   list('S'='#005de4ff', #pure blue
+    colourscheme[['mir']] <-   list('S'='#005de4ff', #pure blue
                                     'T'='#005de42f')
     
-    colourscheme[['rot']] <-   list('S'='#ff8200ff', #orange
+    colourscheme[['rdm']] <-   list('S'='#ff8200ff', #orange
                                     'T'='#ff82002f')
     
   }
