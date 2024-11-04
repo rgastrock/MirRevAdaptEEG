@@ -5067,3 +5067,81 @@ plotRDMCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', target
   }
   
 }
+
+# Blocked Learning Curves Statistics----
+
+getLCBlockedtTests <- function(maxppid = 31, location = 'feedback', targetno = 6){
+  
+  ROTdat <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = 'ROT')
+  ROTdat$ptype <- 'ROT'
+  MIRdat <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = 'MIR')
+  MIRdat$ptype <- 'MIR'
+  LC4test <- rbind(ROTdat, MIRdat)
+  
+  #compare first block
+  ROTdat <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'ROT'),]
+  MIRdat <-LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'MIR'),]
+  
+  cat('Rotation (first block) compared to Mirror (first block):\n')
+  print(t.test(ROTdat$reachdev, MIRdat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(ROTdat$reachdev, MIRdat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Rotation (first block) compared to Mirror (first block):\n')
+  print(ttestBF(ROTdat$reachdev, MIRdat$reachdev, paired = TRUE))
+  
+  #compare second block
+  ROTdat <- LC4test[which(LC4test$trial == 2 & LC4test$ptype == 'ROT'),]
+  MIRdat <-LC4test[which(LC4test$trial == 2 & LC4test$ptype == 'MIR'),]
+  
+  cat('Rotation (second block) compared to Mirror (second block):\n')
+  print(t.test(ROTdat$reachdev, MIRdat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(ROTdat$reachdev, MIRdat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Rotation (second block) compared to Mirror (second block):\n')
+  print(ttestBF(ROTdat$reachdev, MIRdat$reachdev, paired = TRUE))
+  
+  #compare last block
+  ROTdat <- LC4test[which(LC4test$trial == 15 & LC4test$ptype == 'ROT'),]
+  MIRdat <-LC4test[which(LC4test$trial == 15 & LC4test$ptype == 'MIR'),]
+  
+  cat('Rotation (last block) compared to Mirror (last block):\n')
+  print(t.test(ROTdat$reachdev, MIRdat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(ROTdat$reachdev, MIRdat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Rotation (last block) compared to Mirror (last block):\n')
+  print(ttestBF(ROTdat$reachdev, MIRdat$reachdev, paired = TRUE))
+  
+  #compare rot first and last block
+  ROTdat1 <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'ROT'),]
+  ROTdatlast <-LC4test[which(LC4test$trial == 15 & LC4test$ptype == 'ROT'),]
+  
+  cat('Rotation (first block) compared to Rotation (last block):\n')
+  print(t.test(ROTdat1$reachdev, ROTdatlast$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(ROTdat1$reachdev, ROTdatlast$reachdev, method = 'paired'))
+  cat('Bayesian t-test Rotation (first block) compared to Rotation (last block):\n')
+  print(ttestBF(ROTdat1$reachdev, ROTdatlast$reachdev, paired = TRUE))
+  
+  #compare mir first and last block
+  MIRdat1 <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'MIR'),]
+  MIRdatlast <-LC4test[which(LC4test$trial == 15 & LC4test$ptype == 'MIR'),]
+  
+  cat('Mirror (first block) compared to Mirror (last block):\n')
+  print(t.test(MIRdat1$reachdev, MIRdatlast$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(MIRdat1$reachdev, MIRdatlast$reachdev, method = 'paired'))
+  cat('Bayesian t-test Mirror (first block) compared to Mirror (last block):\n')
+  print(ttestBF(MIRdat1$reachdev, MIRdatlast$reachdev, paired = TRUE))
+  
+  #compare mir second and last block
+  MIRdat2 <- LC4test[which(LC4test$trial == 2 & LC4test$ptype == 'MIR'),]
+  MIRdatlast <-LC4test[which(LC4test$trial == 15 & LC4test$ptype == 'MIR'),]
+  
+  cat('Mirror (second block) compared to Mirror (last block):\n')
+  print(t.test(MIRdat2$reachdev, MIRdatlast$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(MIRdat2$reachdev, MIRdatlast$reachdev, method = 'paired'))
+  cat('Bayesian t-test Mirror (second block) compared to Mirror (last block):\n')
+  print(ttestBF(MIRdat2$reachdev, MIRdatlast$reachdev, paired = TRUE))
+  
+}
