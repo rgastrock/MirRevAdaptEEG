@@ -5077,6 +5077,9 @@ getLCBlockedtTests <- function(maxppid = 31, location = 'feedback', targetno = 6
   MIRdat <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = 'MIR')
   MIRdat$ptype <- 'MIR'
   LC4test <- rbind(ROTdat, MIRdat)
+  LC4test$ptype <- as.factor(LC4test$ptype)
+  LC4test$trial <- as.factor(LC4test$trial)
+  LC4test$participant <- as.factor(LC4test$participant)
   
   #compare first block
   ROTdat <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'ROT'),]
