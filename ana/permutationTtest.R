@@ -211,7 +211,10 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         } else if (p_clust < 0.05 & ptype == 'latemir') {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -379,7 +382,10 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
         } else {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -419,7 +425,7 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   #NA to create empty plot
   # could maybe use plot.new() ?
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-16, 10), 
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 10), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = "Late-Early difference: feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
@@ -459,6 +465,11 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+  
   #add movement onset 
   if(erps=='frn'){
     mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
@@ -483,7 +494,7 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   }
   
   #add legend
-  legend(0.95,10,legend=c('Rot', 'Rdm', 'Mir'),
+  legend(0.95,10,legend=c('Fixed rotation', 'Random rotation', 'Mirror reversal'),
          col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
@@ -504,22 +515,40 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          # lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          # lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -527,9 +556,9 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1.05, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1.05, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -15, 'Fixed rotation vs Mirror Reversal', col = col, adj=c(0,0))
+  text(1.05, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -711,7 +740,10 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
         } else if (p_clust < 0.05 & ptype == 'latemir') {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -875,7 +907,10 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
         } else {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     if(ptype == 'rot'){
@@ -912,7 +947,7 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-16, 10), 
+  plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
        main = "Late-Early LRP difference: go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
@@ -951,6 +986,11 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
+  
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
   
   #add movement onset
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
@@ -995,22 +1035,40 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -1018,9 +1076,9 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.55, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.55, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(.55, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(.55, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -1239,7 +1297,10 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
         } else if (p_clust < 0.05 & ptype == 'latemir') {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -1404,7 +1465,10 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
         } else {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -1444,7 +1508,7 @@ plotPermTestPTypeEarlyLateDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir'
   #NA to create empty plot
   # could maybe use plot.new() ?
   
-  plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+  plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
        main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
@@ -1484,6 +1548,11 @@ plotPermTestPTypeEarlyLateDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir'
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
+  
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
   
   #add movement onset 
   if(erps=='P3'){
@@ -1530,22 +1599,40 @@ plotPermTestPTypeEarlyLateDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir'
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -1553,9 +1640,9 @@ plotPermTestPTypeEarlyLateDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir'
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(1, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(1, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -1774,7 +1861,10 @@ plotPermTestSmallLargeERPs <- function(perturbs = c('smallrot', 'largerot', 'sma
         } else if (p_clust < 0.05 & ptype == 'largemir') {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -1942,7 +2032,10 @@ plotPermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), t
         } else {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -1982,7 +2075,7 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   #NA to create empty plot
   # could maybe use plot.new() ?
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-16, 10), 
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 10), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = "Large-Small difference: feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
@@ -2021,6 +2114,11 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
+  
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
   
   #add movement onset 
   if(erps=='frn'){
@@ -2067,22 +2165,40 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -2090,9 +2206,9 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1.05, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1.05, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(1.05, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -2269,7 +2385,10 @@ plotPermTestSmallLargeLRPs <- function(perturbs = c('smallrot', 'largerot', 'sma
         } else if (p_clust < 0.05 & ptype == 'largemir') {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -2432,7 +2551,10 @@ plotPermTestSmallLargeLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')
         } else {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     if(ptype == 'rot'){
@@ -2469,7 +2591,7 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   meanGroupReaches <- list() #empty list so that it plots the means last
   #NA to create empty plot
   # could maybe use plot.new() ?
-  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-16, 10), 
+  plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
        main = "Large-Small LRP difference: go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
@@ -2508,6 +2630,11 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
+  
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
   
   #add movement onset
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
@@ -2551,22 +2678,40 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -2574,9 +2719,9 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.55, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.55, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(.55, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(.55, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -2795,7 +2940,10 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
         } else if (p_clust < 0.05 & ptype == 'largemir') {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -2960,7 +3108,10 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
         } else {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-15, length(permtime)))
+        upper <- c(rep(-14, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -3000,7 +3151,7 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
   #NA to create empty plot
   # could maybe use plot.new() ?
   
-  plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+  plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 6), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
        main = "Difference Waves time-locked to feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
@@ -3040,6 +3191,11 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
     #lines(x = timepts, y = mid, col=col)
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
+  
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
   
   #add movement onset 
   if(erps=='P3'){
@@ -3086,22 +3242,40 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-15, length(permtime)))
+          upper <- c(rep(-14, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-13, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-13, length(permtime)))
+          upper <- c(rep(-12, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-11, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-11, length(permtime)))
+          upper <- c(rep(-10, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -3109,9 +3283,9 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1, -15, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1, -13, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1, -11, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(1, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(1, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -3463,7 +3637,11 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
         } else if (p_clust < 0.05 & ptype == 'latemir') {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -3640,7 +3818,11 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
         } else {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -3697,7 +3879,7 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
     reg <- 'Lateral central'
   }
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-yval - 10, yval + 10), 
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-yval - 10, yval + 10), 
          xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("%s %s\nLate-Early difference: feedback onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
@@ -3741,22 +3923,20 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+  
   #add movement onset 
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
   
-  if (freqs == 'alpha'){
-    scal <- yval - 20
-    scal2 <- yval - 40
-  } else if (freqs == 'beta'){
-    scal <- yval - 10
-    scal2 <- yval - 20
-  } else if (freqs == 'theta'){
-    scal <- yval - 40
-    scal2 <- yval - 80
-  }
-  
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- yval - (.13*yval)
+  scal2 <- yval - (.26*yval)
+
     
   col <- colourscheme[['rot']][['T']]
   lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(yval, yval), col = col, lty = 1, lwd = 8)
@@ -3777,23 +3957,17 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #add legend
   if(roi == 'medfro'){
-    legend(.95,yval,legend=c('Rot', 'Rdm', 'Mir'),
+    legend(.95,yval,legend=c('Fixed rotation', 'Random rotation', 'Mirror reversal'),
            col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
            lty=1,bty='n',cex=1,lwd=2)
   }
   
   
   #add in permutation clusters and any significant results
-  if (freqs == 'alpha'){
-    scal <- -yval + 40
-    scal2 <- -yval + 80
-  } else if (freqs == 'beta'){
-    scal <- -yval + 30
-    scal2 <- -yval + 60
-  } else if (freqs == 'theta'){
-    scal <- -yval + 50
-    scal2 <- -yval + 100
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- 0.13*yval
+  scal2 <- 0.26*yval
+  mult <- 0.05 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -3812,22 +3986,40 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -3835,9 +4027,9 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1.05, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1.05, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(1.05, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -4043,7 +4235,11 @@ plotGoOnsetPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot',
         } else if (p_clust < 0.05 & ptype == 'latemir') {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -4217,7 +4413,11 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
         } else {
           col <- colourscheme[['late']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -4273,7 +4473,7 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   } else if (roi == 'latcen'){
     reg <- 'Lateral central'
   }
-  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-yval - 10, yval + 10), 
+  plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-yval - 10, yval + 10), 
        xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
        main = sprintf("%s %s\nLate-Early difference: go signal onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
@@ -4317,6 +4517,11 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+  
   # #add legend
   # legend(-1,yval,legend=c('Rot', 'Rdm', 'Mir'),
   #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
@@ -4327,16 +4532,9 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
   
-  if (freqs == 'alpha'){
-    scal <- yval - 20
-    scal2 <- yval - 40
-  } else if (freqs == 'beta'){
-    scal <- yval - 10
-    scal2 <- yval - 20
-  } else if (freqs == 'theta'){
-    scal <- yval - 40
-    scal2 <- yval - 80
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- yval - (.13*yval)
+  scal2 <- yval - (.26*yval)
   
   col <- colourscheme[['rot']][['T']]
   lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(yval, yval), col = col, lty = 1, lwd = 8)
@@ -4354,16 +4552,11 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   points(x = mo_mir[,2], y = scal2, pch = 20, cex = 1.5, col=col)
   
   #add in permutation clusters and any significant results
-  if (freqs == 'alpha'){
-    scal <- -yval + 40
-    scal2 <- -yval + 80
-  } else if (freqs == 'beta'){
-    scal <- -yval + 30
-    scal2 <- -yval + 60
-  } else if (freqs == 'theta'){
-    scal <- -yval + 50
-    scal2 <- -yval + 100
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- 0.13*yval
+  scal2 <- 0.26*yval
+  mult <- 0.05 #multiplier to keep size consistent
+  
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
     permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_PerturbTypeComp_%s_%s.csv', erps, roi))
@@ -4381,22 +4574,40 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -4404,9 +4615,9 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.55, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.55, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(.55, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(.55, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -4766,7 +4977,11 @@ plotPermTestSmallLargeTFRs <- function(perturbs = c('smallrot', 'largerot', 'sma
         } else if (p_clust < 0.05 & ptype == 'largemir') {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -4943,7 +5158,11 @@ plotPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir'
         } else {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -5000,7 +5219,7 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
     reg <- 'Lateral central'
   }
   if(erps == 'frn'){
-    plot(NA, NA, xlim = c(-0.35, 1.35), ylim = c(-yval - 10, yval + 10), 
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-yval - 10, yval + 10), 
          xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("%s %s\nLarge-Small difference: feedback onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
@@ -5044,21 +5263,19 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+  
   #add movement onset 
   mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
   
-  if (freqs == 'alpha'){
-    scal <- yval - 20
-    scal2 <- yval - 40
-  } else if (freqs == 'beta'){
-    scal <- yval - 10
-    scal2 <- yval - 20
-  } else if (freqs == 'theta'){
-    scal <- yval - 40
-    scal2 <- yval - 80
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- yval - (.13*yval)
+  scal2 <- yval - (.26*yval)
   
   
   col <- colourscheme[['rot']][['T']]
@@ -5084,16 +5301,10 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   #        lty=1,bty='n',cex=1,lwd=2)
   
   #add in permutation clusters and any significant results
-  if (freqs == 'alpha'){
-    scal <- -yval + 40
-    scal2 <- -yval + 80
-  } else if (freqs == 'beta'){
-    scal <- -yval + 30
-    scal2 <- -yval + 60
-  } else if (freqs == 'theta'){
-    scal <- -yval + 50
-    scal2 <- -yval + 100
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- 0.13*yval
+  scal2 <- 0.26*yval
+  mult <- 0.05 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -5112,22 +5323,40 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -5135,9 +5364,9 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(1.05, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(1.05, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(1.05, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(1.05, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -5342,7 +5571,11 @@ plotGoOnsetPermTestSmallLargeTFRs <- function(perturbs = c('smallrot', 'largerot
         } else if (p_clust < 0.05 & ptype == 'largemir') {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -5516,7 +5749,11 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm'
         } else {
           col <- colourscheme[['lrg']][['S']]
         }
-        lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
@@ -5573,7 +5810,7 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
     reg <- 'Lateral central'
   }
   
-  plot(NA, NA, xlim = c(-1.1, 0.85), ylim = c(-yval - 10, yval + 10), 
+  plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-yval - 10, yval + 10), 
        xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
        main = sprintf("%s %s\nLarge-Small difference: go signal onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
@@ -5617,6 +5854,11 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
     lines(x = timepts, y = meanGroupReaches[[group]], col = col, lty = 1, lwd = 2)
   }
   
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+  
   # #add legend
   # legend(-1,yval,legend=c('Rot', 'Rdm', 'Mir'),
   #        col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
@@ -5627,16 +5869,9 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
   mo_mir <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
   
-  if (freqs == 'alpha'){
-    scal <- yval - 20
-    scal2 <- yval - 40
-  } else if (freqs == 'beta'){
-    scal <- yval - 10
-    scal2 <- yval - 20
-  } else if (freqs == 'theta'){
-    scal <- yval - 40
-    scal2 <- yval - 80
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- yval - (.13*yval)
+  scal2 <- yval - (.26*yval)
   
   
   col <- colourscheme[['rot']][['T']]
@@ -5655,16 +5890,10 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   points(x = mo_mir[,2], y = scal2, pch = 20, cex = 1.5, col=col)
   
   #add in permutation clusters and any significant results
-  if (freqs == 'alpha'){
-    scal <- -yval + 40
-    scal2 <- -yval + 80
-  } else if (freqs == 'beta'){
-    scal <- -yval + 30
-    scal2 <- -yval + 60
-  } else if (freqs == 'theta'){
-    scal <- -yval + 50
-    scal2 <- -yval + 100
-  }
+  #scal is 13% of yval, scal2 is 26% of yval
+  scal <- 0.13*yval
+  scal2 <- 0.26*yval
+  mult <- 0.05 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -5683,22 +5912,40 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
         p_clust <- subdat$p_values[i]
         if(p_clust >= 0.05 & ptype == 'rotvmir'){
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust >= 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['T']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvmir') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval, length(permtime)))
+          upper <- c(rep(-yval + (yval*mult), length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'rotvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         } else if(p_clust < 0.05 & ptype == 'mirvrdm') {
           col <- colourscheme[['S']]
-          lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          #lines(x = c(permtime), y = c(rep(scal2, length(permtime))), col = col, lty = 1, lwd = 8)
+          lower <- c(rep(-yval + scal2, length(permtime)))
+          upper <- c(rep((-yval + (yval*mult)) + scal2, length(permtime)))
+          polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
         }
       }
     }
@@ -5706,9 +5953,9 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -yval, 'Rot vs Mir', col = col, adj=c(0,0))
-  text(.55, scal, 'Rot vs Rdm', col = col, adj=c(0,0))
-  text(.55, scal2, 'Mir vs Rdm', col = col, adj=c(0,0))
+  text(.55, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
+  text(.55, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
+  text(.55, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {

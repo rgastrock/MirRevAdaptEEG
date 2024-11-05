@@ -2377,7 +2377,7 @@ plotBlockedPL <- function(target='inline'){
   
   
   #add legend
-  legend(5,5.6,legend=c('Aligned','RDM: Early','ROT', 'RDM: Late', 'MIR'),
+  legend(1,5.6,legend=c('Aligned','Random rotation: Early','Fixed rotation', 'Random rotation: Late', 'Mirror reversal'),
          col=c("#000000", '#ff8200ff', "#e51636ff", '#c400c4ff', "#005de4ff"),
          lty=1,bty='n',cex=0.8,lwd=2)
   

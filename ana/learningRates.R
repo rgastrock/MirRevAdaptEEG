@@ -4979,7 +4979,7 @@ plotCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', targetno=
   }
   
   #add legend
-  legend(12,-90,legend=c('ROT','MIR'),
+  legend(10,-90,legend=c('Fixed rotation','Mirror reversal'),
          col=c(colourscheme[['ROT']][['S']],colourscheme[['MIR']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
@@ -5057,7 +5057,7 @@ plotRDMCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', target
     
   }
   
-  legend(3,-90,legend=c('RDM: Early','RDM: Late'),
+  legend(1,-90,legend=c('Random rotation: Early','Random rotation: Late'),
          col=c(colourscheme[['RDM0']][['S']],colourscheme[['RDM1']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
