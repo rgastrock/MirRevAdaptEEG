@@ -183,6 +183,8 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -374,6 +376,8 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -494,7 +498,7 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   }
   
   #add legend
-  legend(0.95,10,legend=c('Fixed rotation', 'Random rotation', 'Mirror reversal'),
+  legend(0.85,10,legend=c('Fixed rotation', 'Random rotation', 'Mirror reversal'),
          col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   
@@ -510,6 +514,8 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -556,9 +562,9 @@ plotPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'),
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -15, 'Fixed rotation vs Mirror Reversal', col = col, adj=c(0,0))
-  text(1.05, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(1.05, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -15, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(1.05, -13, 'rotation vs random', col = col, adj=c(0,0))
+  text(1.05, -11, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -712,6 +718,8 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -899,6 +907,8 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -1030,6 +1040,8 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -1076,9 +1088,9 @@ plotPermTestPTypeEarlyLateLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(.55, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(.55, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(0.55, -15, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(0.55, -13, 'rotation vs random', col = col, adj=c(0,0))
+  text(0.55, -11, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -1269,6 +1281,8 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -1457,6 +1471,8 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -1594,6 +1610,8 @@ plotPermTestPTypeEarlyLateDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir'
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -1833,6 +1851,8 @@ plotPermTestSmallLargeERPs <- function(perturbs = c('smallrot', 'largerot', 'sma
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -2024,6 +2044,8 @@ plotPermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), t
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -2160,6 +2182,8 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -2206,9 +2230,9 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(1.05, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(1.05, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -15, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(1.05, -13, 'rotation vs random', col = col, adj=c(0,0))
+  text(1.05, -11, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -2357,6 +2381,8 @@ plotPermTestSmallLargeLRPs <- function(perturbs = c('smallrot', 'largerot', 'sma
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -2543,6 +2569,8 @@ plotPermTestSmallLargeLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -2673,6 +2701,8 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -2719,9 +2749,9 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -15, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(.55, -13, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(.55, -11, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(0.55, -15, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(0.55, -13, 'rotation vs random', col = col, adj=c(0,0))
+  text(0.55, -11, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -2912,6 +2942,8 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -3100,6 +3132,8 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -3237,6 +3271,8 @@ plotPermTestPTypeSmallLargeDiffWavesP3 <- function(groups = c('rot', 'rdm', 'mir
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
