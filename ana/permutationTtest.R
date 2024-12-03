@@ -3505,12 +3505,12 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_%s_%s_%s.csv', roi, freqs, group, erps))
-      # full_timepts <- data$time
-      # timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/TFR_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[351:601,]
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -3645,6 +3645,8 @@ plotPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot', 'early
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -3771,9 +3773,11 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, group, erps))
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
       
       groupconfidence <- read.csv(file=sprintf('data/TFR_DiffWaves_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[351:601,]
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -3846,6 +3850,8 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -3932,9 +3938,11 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_%s_%s_%s.csv', roi, freqs, group, erps))
-    timepts <- data$time
+    full_timepts <- data$time
+    timepts <- full_timepts[351:601]
     
     groupconfidence <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_CI_%s_%s_%s.csv', roi, freqs, group, erps))
+    groupconfidence <- groupconfidence[351:601,]
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -4017,6 +4025,8 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -4063,9 +4073,9 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(1.05, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(1.05, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -yval, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(1.05, -yval + scal, 'rotation vs random', col = col, adj=c(0,0))
+  text(1.05, -yval + scal2, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -4142,12 +4152,12 @@ plotGoOnsetPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot',
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_%s_%s_%s.csv', roi, freqs, group, erps))
-      # full_timepts <- data$time
-      # timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/TFR_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[201:501,]
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -4243,6 +4253,8 @@ plotGoOnsetPermTestEarlyLateTFRs <- function(perturbs = c('earlyrot', 'laterot',
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -4368,9 +4380,11 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, group, erps))
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
       
       groupconfidence <- read.csv(file=sprintf('data/TFR_DiffWaves_EarlyLate_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[201:501,]
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -4441,6 +4455,8 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -4526,9 +4542,11 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_%s_%s_%s.csv', roi, freqs, group, erps))
-    timepts <- data$time
+    full_timepts <- data$time
+    timepts <- full_timepts[201:501]
     
     groupconfidence <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_CI_%s_%s_%s.csv', roi, freqs, group, erps))
+    groupconfidence <- groupconfidence[201:501,]
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -4605,6 +4623,8 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -4651,9 +4671,9 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(.55, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(.55, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(.55, -yval, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(.55, -yval + scal, 'rotation vs random', col = col, adj=c(0,0))
+  text(.55, -yval + scal2, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -4845,12 +4865,12 @@ plotPermTestSmallLargeTFRs <- function(perturbs = c('smallrot', 'largerot', 'sma
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_%s_%s_%s.csv', roi, freqs, group, erps))
-      # full_timepts <- data$time
-      # timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/TFR_SmallLarge_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[351:601,]
       
       if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
         err <- 'sml'
@@ -4985,6 +5005,8 @@ plotPermTestSmallLargeTFRs <- function(perturbs = c('smallrot', 'largerot', 'sma
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -5111,9 +5133,11 @@ plotPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir'
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, group, erps))
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
       
       groupconfidence <- read.csv(file=sprintf('data/TFR_DiffWaves_SmallLarge_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[351:601,]
       
       if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
         err <- 'sml'
@@ -5186,6 +5210,8 @@ plotPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir'
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -5272,9 +5298,11 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_%s_%s_%s.csv', roi, freqs, group, erps))
-    timepts <- data$time
+    full_timepts <- data$time
+    timepts <- full_timepts[351:601]
     
     groupconfidence <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_CI_%s_%s_%s.csv', roi, freqs, group, erps))
+    groupconfidence <- groupconfidence[351:601,]
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -5354,6 +5382,8 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -5400,9 +5430,9 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(1.05, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(1.05, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(1.05, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(1.05, -yval, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(1.05, -yval + scal, 'rotation vs random', col = col, adj=c(0,0))
+  text(1.05, -yval + scal2, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
@@ -5479,12 +5509,12 @@ plotGoOnsetPermTestSmallLargeTFRs <- function(perturbs = c('smallrot', 'largerot
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_%s_%s_%s.csv', roi, freqs, group, erps))
-      # full_timepts <- data$time
-      # timepts <- full_timepts[351:701] #remove .5 seconds before and after -1.5 and 1.5
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/TFR_SmallLarge_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[201:501,]
       
       if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
         err <- 'sml'
@@ -5579,6 +5609,8 @@ plotGoOnsetPermTestSmallLargeTFRs <- function(perturbs = c('smallrot', 'largerot
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -5704,9 +5736,11 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm'
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, group, erps))
-      timepts <- data$time
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
       
       groupconfidence <- read.csv(file=sprintf('data/TFR_DiffWaves_SmallLarge_CI_%s_%s_%s_%s.csv', roi, freqs, group, erps))
+      groupconfidence <- groupconfidence[201:501,]
       
       if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
         err <- 'sml'
@@ -5777,6 +5811,8 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm'
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -5863,9 +5899,11 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   
   for (group in groups){
     data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_%s_%s_%s.csv', roi, freqs, group, erps))
-    timepts <- data$time
+    full_timepts <- data$time
+    timepts <- full_timepts[201:501]
     
     groupconfidence <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_CI_%s_%s_%s.csv', roi, freqs, group, erps))
+    groupconfidence <- groupconfidence[201:501,]
     
     colourscheme <- getPTypeDiffWavesColourScheme(groups = group)
     #take only first, last and middle columns of file
@@ -5943,6 +5981,8 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
       if(is.na(start) & is.na(end)){
         next
       } else {
+        #redefine timepts
+        timepts <- full_timepts[201:401]
         permtime <- timepts[start:end]
         
         p_clust <- subdat$p_values[i]
@@ -5989,9 +6029,9 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   
   #add permutation results labels
   col <- colourscheme[['S']]
-  text(.55, -yval, 'Fixed rotation vs Mirror reversal', col = col, adj=c(0,0))
-  text(.55, -yval + scal, 'Fixed rotation vs Random rotation', col = col, adj=c(0,0))
-  text(.55, -yval + scal2, 'Mirror reversal vs Random rotation', col = col, adj=c(0,0))
+  text(.55, -yval, 'rotation vs mirror', col = col, adj=c(0,0))
+  text(.55, -yval + scal, 'rotation vs random', col = col, adj=c(0,0))
+  text(.55, -yval + scal2, 'mirror vs random', col = col, adj=c(0,0))
   
   #close everything if you saved plot as svg
   if (target=='svg') {
