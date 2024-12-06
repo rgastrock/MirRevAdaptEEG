@@ -4001,7 +4001,7 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #add legend
   if(roi == 'medfro'){
-    legend(.95,yval,legend=c('Fixed rotation', 'Random rotation', 'Mirror reversal'),
+    legend(.85,yval,legend=c('Fixed rotation', 'Random rotation', 'Mirror reversal'),
            col=c(colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
            lty=1,bty='n',cex=1,lwd=2)
   }
@@ -4009,9 +4009,12 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mi
   
   #add in permutation clusters and any significant results
   #scal is 13% of yval, scal2 is 26% of yval
-  scal <- 0.13*yval
-  scal2 <- 0.26*yval
-  mult <- 0.05 #multiplier to keep size consistent
+  # scal <- 0.13*yval
+  # scal2 <- 0.26*yval
+  # mult <- 0.05 #multiplier to keep size consistent
+  scal <- 0.25*yval
+  scal2 <- 0.50*yval
+  mult <- 0.12 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -4607,9 +4610,9 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rd
   
   #add in permutation clusters and any significant results
   #scal is 13% of yval, scal2 is 26% of yval
-  scal <- 0.13*yval
-  scal2 <- 0.26*yval
-  mult <- 0.05 #multiplier to keep size consistent
+  scal <- 0.25*yval
+  scal2 <- 0.50*yval
+  mult <- 0.12 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -5366,9 +5369,9 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   
   #add in permutation clusters and any significant results
   #scal is 13% of yval, scal2 is 26% of yval
-  scal <- 0.13*yval
-  scal2 <- 0.26*yval
-  mult <- 0.05 #multiplier to keep size consistent
+  scal <- 0.25*yval
+  scal2 <- 0.50*yval
+  mult <- 0.12 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -5965,9 +5968,9 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   
   #add in permutation clusters and any significant results
   #scal is 13% of yval, scal2 is 26% of yval
-  scal <- 0.13*yval
-  scal2 <- 0.26*yval
-  mult <- 0.05 #multiplier to keep size consistent
+  scal <- 0.25*yval
+  scal2 <- 0.50*yval
+  mult <- 0.12 #multiplier to keep size consistent
   
   for(ptype in perturbs){
     colourscheme <- getPermTestColourScheme()
@@ -6197,7 +6200,7 @@ plotTFRThetaResults <- function(target='inline'){
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig36_TFR_Theta_Results.svg', width=10, height=11, pointsize=16, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig36_TFR_Theta_Results.svg', width=11, height=12, pointsize=16, system_fonts=list(sans="Arial"))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
@@ -6264,7 +6267,7 @@ plotTFRAlphaResults <- function(target='inline'){
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig37_TFR_Alpha_Results.svg', width=10, height=11, pointsize=16, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig37_TFR_Alpha_Results.svg', width=11, height=12, pointsize=16, system_fonts=list(sans="Arial"))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
@@ -6331,7 +6334,7 @@ plotTFRBetaResults <- function(target='inline'){
   
   #but we can save plot as svg file
   if (target=='svg') {
-    svglite(file='doc/fig/Fig38_TFR_Beta_Results.svg', width=10, height=11, pointsize=16, system_fonts=list(sans="Arial"))
+    svglite(file='doc/fig/Fig38_TFR_Beta_Results.svg', width=11, height=12, pointsize=16, system_fonts=list(sans="Arial"))
   }
   
   #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
@@ -6395,12 +6398,204 @@ plotTFRBetaResults <- function(target='inline'){
 }
 
 
+# Plotting sorted error sizes----
+
+plotROTParticipantErrorDistributions <- function(){
+  
+  data <- read.csv(file='data/ROT_learningcurve_degrees.csv')
+  
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  
+  #par(mar=c(4,4,2,0.1))
+  par(mfrow = c(2,2))
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  # layout(matrix(c(1,2,3,4),
+  #               16, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+  
+  for(pp in c(1:ncol(data2))){
+    
+    subdat2 <- data2[,pp]
+    errs2 <- abs(subdat2)
+    errs2 <- abs(errs2 - 30) #perturbation size
+    suberrs2 <- sort(errs2)
+    
+    plot(suberrs2, xlim = c(0, 91), ylim = c(0, max(suberrs2)+1), 
+         xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Participant %d", pp), xaxt = 'n')
+    
+    abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(1, 20, 36, 55, 70, 90)) #tick marks for x axis
+    #axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2)
+    hist(suberrs2, breaks = length(suberrs2), xlab = "Angular error (°)", ylab = "Frequency",
+         main = sprintf("Histogram of errors, Participant %d", pp), xlim = c(0, max(suberrs2)+1))
+  
+  }
+}
+
+plotROTGroupErrorDistributions <- function(type = 'b'){
+  
+  data <- read.csv(file='data/ROT_learningcurve_degrees.csv')
+  
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  
+  confidence <- data.frame()
+  
+  for (trial in trialno){
+    cireaches <- data2[which(data$trial == trial), ]
+    cireaches <- abs(cireaches)
+    cireaches <- abs(cireaches - 30) #perturbation size
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+  }
+  
+  suberrs2 <- confidence[,2]
+  suberrs2 <- as.numeric(sort(suberrs2))
+  
+  par(mfrow = c(1,2))
+  
+  plot(suberrs2, xlim = c(0, 91), ylim = c(0, max(suberrs2)+1),
+       xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Fixed rotation", xaxt = 'n')
+  
+  abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 36, 55, 70, 90)) #tick marks for x axis
+  #axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2)
+  hist(suberrs2, breaks = length(suberrs2), xlab = "Angular error (°)", ylab = "Frequency",
+       main = 'Histogram of errors, Fixed rotation', xlim = c(0, max(suberrs2)+1))
+  
+  
+}
+
+plotMIRParticipantErrorDistributions <- function(angles = c(15,30,45)){
+  
+  for(angle in angles){
+    data <- read.csv(sprintf('data/MIR_learningcurve_degrees_%02d.csv', angle))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data2 <- as.matrix(data[,2:dim(data)[2]])
+    
+    #par(mar=c(4,4,2,0.1))
+    par(mfrow = c(2,2))
+    #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+    # layout(matrix(c(1,2,3,4),
+    #               16, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+    
+    for(pp in c(1:ncol(data2))){
+      
+      subdat2 <- data2[,pp]
+      errs2 <- abs(subdat2)
+      errs2 <- abs(errs2 - angle) #perturbation size
+      suberrs2 <- sort(errs2)
+      
+      plot(suberrs2, xlim = c(0, 31), ylim = c(0, max(suberrs2)+1), 
+           xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("Participant %d, %d-degree target", pp, angle), xaxt = 'n')
+      
+      abline(v = c(12, 19), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      axis(1, at = c(1, 12, 19, 30)) #tick marks for x axis
+      #axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2)
+      hist(suberrs2, breaks = length(suberrs2), xlab = "Angular error (°)", ylab = "Frequency",
+           main = sprintf("Histogram of errors, Participant %d, %d-degree target", pp, angle), xlim = c(0, max(suberrs2)+1))
+      
+    }
+  }
+}
+
+plotRDMROTParticipantErrorDistributions <- function(angles = c(15,25,35)){
+  
+  for(angle in angles){
+    data <- read.csv(sprintf('data/RDMROT_learningcurve_degrees_%02d.csv', angle))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data2 <- as.matrix(data[,2:dim(data)[2]])
+    
+    #par(mar=c(4,4,2,0.1))
+    par(mfrow = c(2,2))
+    #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+    # layout(matrix(c(1,2,3,4),
+    #               16, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+    
+    for(pp in c(1:ncol(data2))){
+      
+      subdat2 <- data2[,pp]
+      errs2 <- abs(subdat2)
+      errs2 <- abs(errs2 - angle) #perturbation size
+      suberrs2 <- sort(errs2)
+      
+      plot(suberrs2, xlim = c(0, 17), ylim = c(0, max(suberrs2)+1), 
+           xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("Participant %d, %d-degree target", pp, angle), xaxt = 'n')
+      
+      abline(v = c(7, 10), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      axis(1, at = c(1, 7, 10, 16)) #tick marks for x axis
+      #axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2)
+      hist(suberrs2, breaks = length(suberrs2), xlab = "Angular error (°)", ylab = "Frequency",
+           main = sprintf("Histogram of errors, Participant %d, %d-degree target", pp, angle), xlim = c(0, max(suberrs2)+1))
+      
+    }
+  }
+}
+
+plotRDMMIRParticipantErrorDistributions <- function(angles = c(15,25,35)){
+  
+  for(angle in angles){
+    data <- read.csv(sprintf('data/RDMMIR_learningcurve_degrees_%02d.csv', angle))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data2 <- as.matrix(data[,2:dim(data)[2]])
+    
+    #par(mar=c(4,4,2,0.1))
+    par(mfrow = c(2,2))
+    #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+    # layout(matrix(c(1,2,3,4),
+    #               16, 4, byrow = TRUE), widths=c(2,2,2,2), heights=c(1.5,1.5,1.5,1.5))
+    
+    for(pp in c(1:ncol(data2))){
+      
+      subdat2 <- data2[,pp]
+      errs2 <- abs(subdat2)
+      errs2 <- abs(errs2 - angle) #perturbation size
+      suberrs2 <- sort(errs2)
+      
+      plot(suberrs2, xlim = c(0, 17), ylim = c(0, max(suberrs2)+1), 
+           xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("Participant %d, %d-degree target", pp, angle), xaxt = 'n')
+      
+      abline(v = c(7, 10), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+      axis(1, at = c(1, 7, 10, 16)) #tick marks for x axis
+      #axis(2, at = c(-1000, -800, -600, -300, -200, -100, -50, 0, 50, 100, 200, 300, 600, 800, 1000), las=2)
+      hist(suberrs2, breaks = length(suberrs2), xlab = "Angular error (°)", ylab = "Frequency",
+           main = sprintf("Histogram of errors, Participant %d, %d-degree target", pp, angle), xlim = c(0, max(suberrs2)+1))
+      
+    }
+  }
+}
+
+
 # functions to read in TFR plots-----
 
 # getTFRplots <- function(roi = 'medfro', erps = 'frn'){
 #   
 #   img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_late_aligned_power-tfr.svg', erps, roi))
-#   print(img)
+#   print(img),
 #   img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_early_rot_power-tfr.svg', erps, roi))
 #   print(img)
 #   img <- image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rot_power-tfr.svg', erps, roi))
