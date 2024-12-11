@@ -31,24 +31,24 @@ plotPermTestEarlyLateERPs <- function(perturbs = c('earlyrot', 'laterot', 'early
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/ERP_EarlyLate_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -281,26 +281,26 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
     #NA to create empty plot
     # could maybe use plot.new() ?
     if(erps == 'frn'){
-      plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     } else if (erps == 'ern'){
-      plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     }
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       groupconfidence <- read.csv(file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'earlyrot'|group == 'earlyrdm'|group == 'earlymir'){
         err <- 'early'
@@ -604,23 +604,23 @@ plotPermTestEarlyLateLRPs <- function(perturbs = c('earlyrot', 'laterot', 'early
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Blocked_LRP_DF_EarlyLate_%s.csv', group))
       full_timepts <- data$time
-      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[201:501] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/EarlyLate_LRP_CI_%s.csv', group))
-      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      groupconfidence <- groupconfidence#[201:501,] #grab timepts we need
       
       if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
         err <- 'early'
@@ -815,23 +815,23 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 8), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 8), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-    axis(1, at = c( -1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(1, at = c( -2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned.csv', group))
       full_timepts <- data$timepts
-      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[201:501] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned_CI.csv', group))
-      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      groupconfidence <- groupconfidence#[201:501,] #grab timepts we need
       
       if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
         err <- 'early'
@@ -1129,24 +1129,24 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_EarlyLate_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/EarlyLate_ERP_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
         err <- 'early'
@@ -1379,23 +1379,23 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_vsAligned_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       groupconfidence <- read.csv(file=sprintf('data/Evoked_DF_vsAligned_%s_%s_CI.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'rot_b0'|group == 'rdm_b0'|group == 'mir_b0'){
         err <- 'early'
@@ -1699,24 +1699,24 @@ plotPermTestSmallLargeERPs <- function(perturbs = c('smallrot', 'largerot', 'sma
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/ERP_SmallLarge_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
         err <- 'sml'
@@ -1949,26 +1949,26 @@ plotPermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), t
     #NA to create empty plot
     # could maybe use plot.new() ?
     if(erps == 'frn'){
-      plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     } else if (erps == 'ern'){
-      plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+      plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
            xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
            main = sprintf("Difference Waves time-locked to movement onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     }
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       groupconfidence <- read.csv(file=sprintf('data/DiffWaves_SmallLarge_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'smallrot'|group == 'smallrdm'|group == 'smallmir'){
         err <- 'sml'
@@ -2271,23 +2271,23 @@ plotPermTestSmallLargeLRPs <- function(perturbs = c('smallrot', 'largerot', 'sma
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s.csv', group))
       full_timepts <- data$time
-      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[201:501] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/SmallLarge_LRP_CI_%s.csv', group))
-      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      groupconfidence <- groupconfidence#[201:501,] #grab timepts we need
       
       if(group == 'rot_sml'|group == 'rdm_sml'|group == 'mir_sml'){
         err <- 'sml'
@@ -2477,23 +2477,23 @@ plotPermTestSmallLargeLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("LRP time-locked to go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
-    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsALigned.csv', group))
       full_timepts <- data$timepts
-      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[201:501] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsALigned_CI.csv', group))
-      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      groupconfidence <- groupconfidence#[201:501,] #grab timepts we need
       
       if(group == 'rot_sml'|group == 'rdm_sml'|group == 'mir_sml'){
         err <- 'sml'
@@ -2790,24 +2790,24 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       #read in CI files created
       groupconfidence <- read.csv(file=sprintf('data/SmallLarge_ERP_CI_%s_%s.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'rot_sml'|group == 'rdm_sml'|group == 'mir_sml'){
         err <- 'sml'
@@ -3040,23 +3040,23 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
     
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
-    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
     axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_%s.csv', group, erps))
       full_timepts <- data$time
-      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      timepts <- full_timepts#[351:601] #remove .5 seconds before and after -1.5 and 1.5
       
       groupconfidence <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_%s_CI.csv', group, erps))
-      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      groupconfidence <- groupconfidence#[351:601,] #grab timepts we need
       
       if(group == 'rot_sml'|group == 'rdm_sml'|group == 'mir_sml'){
         err <- 'sml'
@@ -6398,7 +6398,7 @@ plotTFRBetaResults <- function(target='inline'){
 }
 
 
-# Plotting sorted error sizes----
+# Plotting to check for data splits in error sizes----
 
 plotROTParticipantErrorDistributions <- function(){
   
@@ -6588,6 +6588,669 @@ plotRDMMIRParticipantErrorDistributions <- function(angles = c(15,25,35)){
     }
   }
 }
+
+plotAllROTErrors <- function(){
+  
+  data <- read.csv(file='data/ROT_learningcurve_degrees.csv')
+  
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  
+  plot(NA, NA, xlim = c(0, 91), ylim = c(0, 61),
+       xlab = "Trial", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Fixed rotation", xaxt = 'n', yaxt = 'n')
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 45, 60, 80, 90)) #tick marks for x axis
+  axis(2, at = c(0, 10, 20, 30, 40, 50, 60), las=2)
+  
+  for(pp in c(1:ncol(data2))){
+    
+    subdat2 <- data2[,pp]
+    
+    errs2 <- abs(subdat2)
+    errs2 <- abs(errs2 - 30) #perturbation size
+    suberrs2 <- sort(errs2)
+    
+    smlmax <- suberrs2[36]
+    lrgmin <- suberrs2[55]
+    
+    
+    ctr <- 0
+    for(i in errs2){
+      ctr <- ctr + 1
+      if(i <= smlmax){
+        points(x = ctr, y = i, pch = 20, cex = 1.5, col='#005de42f')
+      } else if (i >= lrgmin){
+        points(x = ctr, y = i, pch = 20, cex = 1.5, col='#e516362f')
+      } else {
+        points(x = ctr, y = i, pch = 20, cex = 1.5, col='#A9A9A92f')
+      }
+      
+    }
+    
+  }
+  
+}
+
+plotAllMIRErrors <- function(angles = c(15,30,45)){
+  
+  plot(NA, NA, xlim = c(0, 91), ylim = c(0, 151),
+       xlab = "Trial", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Mirror Reversal", xaxt = 'n', yaxt = 'n')
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 45, 60, 80, 90)) #tick marks for x axis
+  axis(2, at = c(0, 10, 20, 30, 40, 50, 60, 100, 125, 150), las=2)
+  
+  for(angle in angles){
+    data <- read.csv(sprintf('data/MIR_learningcurve_degrees_%02d.csv', angle))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data2 <- as.matrix(data[,2:dim(data)[2]])
+    
+    for(pp in c(1:ncol(data2))){
+      
+      subdat2 <- data2[,pp]
+      
+      errs2 <- abs(subdat2)
+      errs2 <- abs(errs2 - angle) #perturbation size
+      suberrs2 <- sort(errs2)
+      
+      smlmax <- suberrs2[12]
+      lrgmin <- suberrs2[19]
+      
+      
+      ctr <- 0
+      for(i in errs2){
+        ctr <- ctr + 1
+        
+        if(is.na(i)){
+          next
+        }
+        
+        if(i <= smlmax){
+          points(x = ctr, y = i, pch = 20, cex = 1.5, col='#005de42f')
+        } else if (i >= lrgmin){
+          points(x = ctr, y = i, pch = 20, cex = 1.5, col='#e516362f')
+        } else {
+          points(x = ctr, y = i, pch = 20, cex = 1.5, col='#A9A9A92f')
+        }
+        
+      }
+      
+    }
+    
+  }
+}
+
+plotAllRDMErrors <- function(perturbs = c('RDMROT', 'RDMMIR'), angles = c(15,25,35)){
+  
+  plot(NA, NA, xlim = c(0, 49), ylim = c(0, 151),
+       xlab = "Trial", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Random rotation", xaxt = 'n', yaxt = 'n')
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 16, 32, 48)) #tick marks for x axis
+  axis(2, at = c(0, 10, 20, 30, 40, 50, 60, 100, 125, 150), las=2)
+  for (ptype in perturbs){
+    for(angle in angles){
+      data <- read.csv(sprintf('data/%s_learningcurve_degrees_%02d.csv', ptype, angle))
+      
+      data <- as.data.frame(data)
+      trialno <- data$trial
+      data2 <- as.matrix(data[,2:dim(data)[2]])
+      
+      for(pp in c(1:ncol(data2))){
+        
+        subdat2 <- data2[,pp]
+        
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size
+        suberrs2 <- sort(errs2)
+        
+        smlmax <- suberrs2[7]
+        lrgmin <- suberrs2[10]
+        
+        
+        ctr <- 0
+        for(i in errs2){
+          ctr <- ctr + 1
+          
+          if(is.na(i)){
+            next
+          }
+          
+          if(i <= smlmax){
+            points(x = ctr, y = i, pch = 20, cex = 1.5, col='#005de42f')
+          } else if (i >= lrgmin){
+            points(x = ctr, y = i, pch = 20, cex = 1.5, col='#e516362f')
+          } else {
+            points(x = ctr, y = i, pch = 20, cex = 1.5, col='#A9A9A92f')
+          }
+          
+        }
+        
+      }
+      
+    }
+  }
+}
+
+plotROTSortedErrorDistributions <- function(type='b'){
+  
+  data <- read.csv(file='data/ROT_learningcurve_degrees.csv')
+  
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  
+  groupdat <- data.frame()
+  
+  for(pp in c(1:ncol(data2))){
+    
+    subdat2 <- data2[,pp]
+    errs2 <- abs(subdat2)
+    errs2 <- abs(errs2 - 30) #perturbation size
+    suberrs2 <- sort(errs2)
+    
+    if (prod(dim(groupdat)) == 0){
+      groupdat <- suberrs2
+    } else {
+      groupdat <- cbind(groupdat, suberrs2)
+    }
+  }
+  
+  confidence <- data.frame()
+  
+  for (trial in trialno){
+    cireaches <- as.numeric(groupdat[trial, ])
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+  }
+  
+  ndat <- confidence[,2]
+  
+  plot(ndat, xlim = c(0, 91), ylim = c(0, max(ndat)+1),
+       xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Fixed rotation", xaxt = 'n')
+  
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 36, 55, 70, 90)) #tick marks for x axis
+  
+}
+
+plotMIRSortedErrorDistributions <- function(angles = c(15,30,45), type='b'){
+  
+  for(angle in angles){
+    data <- read.csv(sprintf('data/MIR_learningcurve_degrees_%02d.csv', angle))
+    data <- as.data.frame(data)
+    if(angle == 15){
+      trialno <- data$trial
+      data2 <- as.matrix(data[,2:dim(data)[2]])
+      for(pp in c(1:ncol(data2))){
+        subdat2 <- data2[,pp]
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+        data2[,pp] <- errs2
+      }
+      data15 <- data.frame(trialno, data2)
+    } else if (angle == 30){
+      trialno <- data$trial
+      data2 <- as.matrix(data[,2:dim(data)[2]])
+      for(pp in c(1:ncol(data2))){
+        subdat2 <- data2[,pp]
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+        data2[,pp] <- errs2
+      }
+      data30 <- data.frame(trialno, data2)
+    } else if (angle == 45){
+      trialno <- data$trial
+      data2 <- as.matrix(data[,2:dim(data)[2]])
+      for(pp in c(1:ncol(data2))){
+        subdat2 <- data2[,pp]
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+        data2[,pp] <- errs2
+      }
+      data45 <- data.frame(trialno, data2)
+    }
+  }
+  
+  #combine into one df
+  data15[is.na(data15)] <- data30[is.na(data15)]
+  data15[is.na(data15)] <- data45[is.na(data15)]
+  data <- data15
+  
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  groupdat <- data.frame()
+  
+  for(pp in c(1:ncol(data2))){
+    subdat2 <- data2[,pp]
+    suberrs2 <- sort(subdat2)
+    
+    if (prod(dim(groupdat)) == 0){
+      groupdat <- suberrs2
+    } else {
+      groupdat <- cbind(groupdat, suberrs2)
+    }
+  }
+  
+  #get CIs and mean
+  confidence <- data.frame()
+  
+  for (trial in trialno){
+    cireaches <- as.numeric(groupdat[trial, ])
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+  }
+  
+  ndat <- as.numeric(confidence[,2])
+  
+  plot(ndat, xlim = c(0, 91), ylim = c(0, max(ndat)+1),
+       xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Mirror reversal", xaxt = 'n')
+  
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 36, 55, 70, 90)) #tick marks for x axis
+  
+}
+
+plotRDMSortedErrorDistributions <- function(perturbs = c('RDMROT', 'RDMMIR'), angles = c(15,25,35), type='b'){
+  for(ptype in perturbs){
+    for(angle in angles){
+      data <- read.csv(sprintf('data/%s_learningcurve_degrees_%02d.csv', ptype, angle))
+      data <- as.data.frame(data)
+      if(angle == 15){
+        trialno <- data$trial
+        data2 <- as.matrix(data[,2:dim(data)[2]])
+        for(pp in c(1:ncol(data2))){
+          subdat2 <- data2[,pp]
+          errs2 <- abs(subdat2)
+          errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+          data2[,pp] <- errs2
+        }
+        data15 <- data.frame(trialno, data2)
+      } else if (angle == 25){
+        trialno <- data$trial
+        data2 <- as.matrix(data[,2:dim(data)[2]])
+        for(pp in c(1:ncol(data2))){
+          subdat2 <- data2[,pp]
+          errs2 <- abs(subdat2)
+          errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+          data2[,pp] <- errs2
+        }
+        data25 <- data.frame(trialno, data2)
+      } else if (angle == 35){
+        trialno <- data$trial
+        data2 <- as.matrix(data[,2:dim(data)[2]])
+        for(pp in c(1:ncol(data2))){
+          subdat2 <- data2[,pp]
+          errs2 <- abs(subdat2)
+          errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+          data2[,pp] <- errs2
+        }
+        data35 <- data.frame(trialno, data2)
+      }
+    }
+    if(ptype == 'RDMROT'){
+      #combine into one df
+      data15[is.na(data15)] <- data25[is.na(data15)]
+      data15[is.na(data15)] <- data35[is.na(data15)]
+      rdmrotdat <- data15
+    } else if (ptype == 'RDMMIR'){
+      #combine into one df
+      data15[is.na(data15)] <- data25[is.na(data15)]
+      data15[is.na(data15)] <- data35[is.na(data15)]
+      rdmmirdat <- data15
+    }
+  }
+  
+  rdmdat <- rbind(rdmrotdat, rdmmirdat)
+  trial <- c(1:nrow(rdmdat))
+  rdmdat$trialno <- trial
+  data <- rdmdat
+  
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  groupdat <- data.frame()
+  
+  for(pp in c(1:ncol(data2))){
+    subdat2 <- data2[,pp]
+    suberrs2 <- sort(subdat2)
+    
+    if (prod(dim(groupdat)) == 0){
+      groupdat <- suberrs2
+    } else {
+      groupdat <- cbind(groupdat, suberrs2)
+    }
+  }
+  
+  #get CIs and mean
+  confidence <- data.frame()
+  
+  for (trial in trialno){
+    cireaches <- as.numeric(groupdat[trial, ])
+    
+    if (type == "t"){
+      cireaches <- cireaches[!is.na(cireaches)]
+      citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+    } else if(type == "b"){
+      citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+    }
+    
+    if (prod(dim(confidence)) == 0){
+      confidence <- citrial
+    } else {
+      confidence <- rbind(confidence, citrial)
+    }
+  }
+  
+  ndat <- as.numeric(confidence[,2])
+  
+  plot(ndat, xlim = c(0, 97), ylim = c(0, max(ndat)+1),
+       xlab = "Sorted error indices", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Random rotation", xaxt = 'n')
+  
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 36, 55, 77, 96)) #tick marks for x axis
+  
+}
+
+plotALLSortedErrors <- function(){
+  par(mfrow = c(1,3))
+  
+  plotROTSortedErrorDistributions()
+  plotMIRSortedErrorDistributions()
+  plotRDMSortedErrorDistributions()
+}
+
+getMIRSortedErrors <- function(angles = c(15,30,45), participants = 32){
+  alldat <- data.frame()
+  
+  for(pp in c(1:participants)){
+    data15 <- data.frame()
+    data30 <- data.frame()
+    data45 <- data.frame()
+    for(angle in angles){
+      data <- read.csv(sprintf('data/MIR_learningcurve_degrees_%02d.csv', angle))
+      data <- as.data.frame(data)
+      trialno <- data$trial
+      data2 <- as.matrix(data[,2:dim(data)[2]])
+      subdat2 <- data2[,pp]
+      errs2 <- abs(subdat2)
+      errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+      target <- rep(NA, length(trialno))
+      participant <- rep(pp, length(trialno))
+      trialdat <- data.frame(participant, trialno, errs2, target)
+      for(t in trialno){
+        tdat <- trialdat[which(trialdat$trialno == t),]
+        if(!is.na(tdat$errs2)){
+          tdat$target <- angle
+        } else {
+          tdat$target <- NA
+        }
+        trialdat[t,] <- tdat
+      }
+      if(angle == 15){
+        data15 <- trialdat
+      } else if (angle == 30){
+        data30 <- trialdat
+      } else if (angle == 45){
+        data45 <- trialdat
+      }
+    }
+    #combine into one df
+    data15[is.na(data15)] <- data30[is.na(data15)]
+    data15[is.na(data15)] <- data45[is.na(data15)]
+    data <- data15
+    data <- as.data.frame(data[order(data$errs2),]) #sort
+    
+    if (prod(dim(alldat)) == 0){
+      alldat <- data
+    } else {
+      alldat <- rbind(alldat, data)
+    }
+    
+  }
+  return(alldat)
+}
+
+getMIRTargetTotals <- function(){
+  
+  data <- getMIRSortedErrors()
+  participants <- unique(data$participant)
+  
+  dat15 <- c()
+  dat30 <- c()
+  dat45 <- c()
+  
+  for(pp in c(1:length(participants))){
+    subdat <- data[which(data$participant == pp),]
+    subdat <- tail(subdat, 13)
+    subdat <- subdat[1:nrow(subdat)-1,]
+    target15 <- length(which(subdat$target == 15))
+    target30 <- length(which(subdat$target == 30))
+    target45 <- length(which(subdat$target == 45))
+    
+    dat15 <- c(dat15, target15)
+    dat30 <- c(dat30, target30)
+    dat45 <- c(dat45, target45)
+  }
+  
+  alldat <- data.frame(dat15, dat30, dat45)
+  total15 <- sum(alldat$dat15)
+  total30 <- sum(alldat$dat30)
+  total45 <- sum(alldat$dat45)
+  
+  cat('15 degree total out of 384:')
+  print(total15)
+  cat(', percentage: ')
+  print((total15/384)*100)
+  cat('\n 30 degree total out of 384:')
+  print(total30)
+  cat(', percentage: ')
+  print((total30/384)*100)
+  cat('\n 45 degree total out of 384:')
+  print(total45)
+  cat(', percentage: ')
+  print((total45/384)*100)
+}
+
+getRDMSortedErrors <- function(perturbs = c('RDMROT', 'RDMMIR'), angles = c(15,25,35), participants = 32){
+  alldat <- data.frame()
+  for(pp in c(1:participants)){
+    data15 <- data.frame()
+    data25 <- data.frame()
+    data35 <- data.frame()
+    for(angle in angles){
+      for(ptype in perturbs){
+        if(ptype == 'RDMROT'){
+          rotdata <- read.csv(sprintf('data/%s_learningcurve_degrees_%02d.csv', ptype, angle))
+        } else if (ptype == 'RDMMIR'){
+          mirdata <- read.csv(sprintf('data/%s_learningcurve_degrees_%02d.csv', ptype, angle))
+        }
+      }
+      
+      if(angle == 15){
+        data <- rbind(rotdata, mirdata)
+        data <- as.data.frame(data)
+        trialno <- c(1:nrow(data))
+        data2 <- as.matrix(data[,2:dim(data)[2]])
+        subdat2 <- data2[,pp]
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+        target <- rep(NA, length(trialno))
+        participant <- rep(pp, length(trialno))
+        trialdat <- data.frame(participant, trialno, errs2, target)
+        for(t in trialno){
+          tdat <- trialdat[which(trialdat$trialno == t),]
+          if(!is.na(tdat$errs2)){
+            tdat$target <- angle
+          } else {
+            tdat$target <- NA
+          }
+          trialdat[t,] <- tdat
+        }
+        data15 <- trialdat
+      } else if (angle == 25){
+        data <- rbind(rotdata, mirdata)
+        data <- as.data.frame(data)
+        trialno <- c(1:nrow(data))
+        data2 <- as.matrix(data[,2:dim(data)[2]])
+        subdat2 <- data2[,pp]
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+        target <- rep(NA, length(trialno))
+        participant <- rep(pp, length(trialno))
+        trialdat <- data.frame(participant, trialno, errs2, target)
+        for(t in trialno){
+          tdat <- trialdat[which(trialdat$trialno == t),]
+          if(!is.na(tdat$errs2)){
+            tdat$target <- angle
+          } else {
+            tdat$target <- NA
+          }
+          trialdat[t,] <- tdat
+        }
+        data25 <- trialdat
+      } else if (angle == 35){
+        data <- rbind(rotdata, mirdata)
+        data <- as.data.frame(data)
+        trialno <- c(1:nrow(data))
+        data2 <- as.matrix(data[,2:dim(data)[2]])
+        subdat2 <- data2[,pp]
+        errs2 <- abs(subdat2)
+        errs2 <- abs(errs2 - angle) #perturbation size, to grab errors, not hand deviations
+        target <- rep(NA, length(trialno))
+        participant <- rep(pp, length(trialno))
+        trialdat <- data.frame(participant, trialno, errs2, target)
+        for(t in trialno){
+          tdat <- trialdat[which(trialdat$trialno == t),]
+          if(!is.na(tdat$errs2)){
+            tdat$target <- angle
+          } else {
+            tdat$target <- NA
+          }
+          trialdat[t,] <- tdat
+        }
+        data35 <- trialdat
+      }
+    }
+    #combine into one df
+    data15[is.na(data15)] <- data25[is.na(data15)]
+    data15[is.na(data15)] <- data35[is.na(data15)]
+    data <- data15
+    data <- as.data.frame(data[order(data$errs2),]) #sort
+    
+    if (prod(dim(alldat)) == 0){
+      alldat <- data
+    } else {
+      alldat <- rbind(alldat, data)
+    }
+  }
+  return(alldat)
+}
+
+
+plotAllROTSmallLargeErrors <- function(){
+  
+  data <- read.csv(file='data/ROT_learningcurve_degrees.csv')
+  
+  data <- as.data.frame(data)
+  trialno <- data$trial
+  data2 <- as.matrix(data[,2:dim(data)[2]])
+  
+  plot(NA, NA, xlim = c(0, 91), ylim = c(0, 61),
+       xlab = "Trial", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Fixed rotation", xaxt = 'n', yaxt = 'n')
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 45, 60, 80, 90)) #tick marks for x axis
+  axis(2, at = c(0, 10, 20, 30, 40, 50, 60), las=2)
+  
+  for(pp in c(1:ncol(data2))){
+    
+    subdat2 <- data2[,pp]
+    
+    errs2 <- abs(subdat2)
+    errs2 <- abs(errs2 - 30) #perturbation size
+    suberrs2 <- sort(errs2)
+    
+    smlmax <- suberrs2[36]
+    lrgmin <- suberrs2[79]
+    
+    
+    ctr <- 0
+    for(i in errs2){
+      ctr <- ctr + 1
+      if(i <= smlmax){
+        points(x = ctr, y = i, pch = 20, cex = 1.5, col='#005de42f')
+      } else if (i >= lrgmin){
+        points(x = ctr, y = i, pch = 20, cex = 1.5, col='#e516362f')
+      } else {
+        next#points(x = ctr, y = i, pch = 20, cex = 1.5, col='#A9A9A92f')
+      }
+      
+    }
+    
+  }
+  
+}
+
+plotAllMIRSmallLargeErrors <- function(){
+  
+  plot(NA, NA, xlim = c(0, 91), ylim = c(0, 151),
+       xlab = "Trial", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Mirror Reversal", xaxt = 'n', yaxt = 'n')
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 45, 60, 80, 90)) #tick marks for x axis
+  axis(2, at = c(0, 10, 20, 30, 40, 50, 60, 100, 125, 150), las=2)
+  
+  data <- getMIRSortedErrors()
+  
+  participants <- unique(data$participant)
+  
+  for(pp in c(1:length(participants))){
+    subdat <- data[which(data$participant == pp),]
+    
+    largedat <- tail(subdat, 13)
+    largedat <- largedat[1:nrow(largedat)-1,]
+    points(x = largedat$trialno, y = largedat$errs2, pch = 20, cex = 1.5, col='#e516362f')
+    
+    smalldat <- head(subdat, 36)
+    points(x = smalldat$trialno, y = smalldat$errs2, pch = 20, cex = 1.5, col='#005de42f')
+    
+  }
+}
+
+
+
+
+
+
 
 
 # functions to read in TFR plots-----
