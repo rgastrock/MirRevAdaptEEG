@@ -7175,6 +7175,48 @@ getRDMSortedErrors <- function(perturbs = c('RDMROT', 'RDMMIR'), angles = c(15,2
   return(alldat)
 }
 
+getRDMTargetTotals <- function(){
+  
+  data <- getRDMSortedErrors()
+  participants <- unique(data$participant)
+  
+  dat15 <- c()
+  dat25 <- c()
+  dat35 <- c()
+  
+  for(pp in c(1:length(participants))){
+    subdat <- data[which(data$participant == pp),]
+    subdat <- tail(subdat, 13)
+    subdat <- subdat[1:nrow(subdat)-1,]
+    target15 <- length(which(subdat$target == 15))
+    target25 <- length(which(subdat$target == 25))
+    target35 <- length(which(subdat$target == 35))
+    
+    dat15 <- c(dat15, target15)
+    dat25 <- c(dat25, target25)
+    dat35 <- c(dat35, target35)
+  }
+  
+  alldat <- data.frame(dat15, dat25, dat35)
+  total15 <- sum(alldat$dat15)
+  total25 <- sum(alldat$dat25)
+  total35 <- sum(alldat$dat35)
+  
+  cat('15 degree total out of 384:')
+  print(total15)
+  cat(', percentage: ')
+  print((total15/384)*100)
+  cat('\n 25 degree total out of 384:')
+  print(total25)
+  cat(', percentage: ')
+  print((total25/384)*100)
+  cat('\n 35 degree total out of 384:')
+  print(total35)
+  cat(', percentage: ')
+  print((total35/384)*100)
+}
+
+
 
 plotAllROTSmallLargeErrors <- function(){
   
@@ -7200,7 +7242,7 @@ plotAllROTSmallLargeErrors <- function(){
     suberrs2 <- sort(errs2)
     
     smlmax <- suberrs2[36]
-    lrgmin <- suberrs2[79]
+    lrgmin <- suberrs2[73]
     
     
     ctr <- 0
@@ -7236,7 +7278,7 @@ plotAllMIRSmallLargeErrors <- function(){
   for(pp in c(1:length(participants))){
     subdat <- data[which(data$participant == pp),]
     
-    largedat <- tail(subdat, 13)
+    largedat <- tail(subdat, 19)
     largedat <- largedat[1:nrow(largedat)-1,]
     points(x = largedat$trialno, y = largedat$errs2, pch = 20, cex = 1.5, col='#e516362f')
     
@@ -7246,7 +7288,31 @@ plotAllMIRSmallLargeErrors <- function(){
   }
 }
 
-
+plotAllRDMSmallLargeErrors <- function(){
+  
+  plot(NA, NA, xlim = c(0, 97), ylim = c(0, 61),
+       xlab = "Trial", ylab = "Angular error (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Random rotation", xaxt = 'n', yaxt = 'n')
+  #abline(v = c(36, 55), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(1, at = c(1, 20, 45, 60, 80, 96)) #tick marks for x axis
+  axis(2, at = c(0, 10, 20, 30, 40, 50, 60), las=2)
+  
+  data <- getRDMSortedErrors()
+  
+  participants <- unique(data$participant)
+  
+  for(pp in c(1:length(participants))){
+    subdat <- data[which(data$participant == pp),]
+    
+    largedat <- tail(subdat, 19)
+    largedat <- largedat[1:nrow(largedat)-1,]
+    points(x = largedat$trialno, y = largedat$errs2, pch = 20, cex = 1.5, col='#e516362f')
+    
+    smalldat <- head(subdat, 36)
+    points(x = smalldat$trialno, y = smalldat$errs2, pch = 20, cex = 1.5, col='#005de42f')
+    
+  }
+}
 
 
 
