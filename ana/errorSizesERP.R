@@ -107,7 +107,7 @@ getMIRErrorSizeIndices <- function(angles = c(15,30,45), outlier_rmv = 'n'){
     
     subdat2 <- data2[,pp]
     suberrs2 <- sort(subdat2)
-    #get 36 lowest values for small (equivalent to 6 blocks late training) and 12 largest for large (equivalent to 2 blocks of early)
+    #get 36 lowest values for small (equivalent to 6 blocks late training) and 18 largest for large (equivalent to 3 blocks of early)
     smltrials <- 36
     sml <- head(suberrs2, smltrials)
     lrgtrials <- 18
@@ -203,7 +203,7 @@ getRDMErrorSizeIndices <- function(perturbs = c('RDMROT', 'RDMMIR'), angles = c(
     
     subdat2 <- data2[,pp]
     suberrs2 <- sort(subdat2)
-    #get 36 lowest values for small (equivalent to 6 blocks late training) and 12 largest for large (equivalent to 2 blocks of early)
+    #get 36 lowest values for small (equivalent to 6 blocks late training) and 18 largest for large (equivalent to 3 blocks of early)
     smltrials <- 36
     sml <- head(suberrs2, smltrials)
     lrgtrials <- 18

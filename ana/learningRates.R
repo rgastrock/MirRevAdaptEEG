@@ -982,7 +982,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-6, 16), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
@@ -994,7 +994,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
       #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
-      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
@@ -1051,19 +1051,19 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       }
       
       
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early ROT', 'Late ROT'),
+      legend(0.8,0,legend=c('Aligned','Early ROT', 'Late ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'rdm'){
@@ -1074,7 +1074,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-6, 16), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
@@ -1086,7 +1086,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
       #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
-      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
@@ -1143,19 +1143,19 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       }
       
       
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early RDM', 'Late RDM'),
+      legend(0.8,0,legend=c('Aligned','Early RDM', 'Late RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
       
@@ -1167,7 +1167,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-6, 16), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
@@ -1179,7 +1179,7 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
       #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
-      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s.csv', group, erps))
@@ -1236,19 +1236,19 @@ plotEarlyLateERPs <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline'
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       }
       
       
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early MIR', 'Late MIR'),
+      legend(0.8,0,legend=c('Aligned','Early MIR', 'Late MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
       
@@ -1312,7 +1312,7 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-6, 16), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
@@ -1324,7 +1324,7 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
       #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
-      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
@@ -1377,14 +1377,14 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
       }
       
       #add legend
-      legend(0.8,-5,legend=c('Early ROT - Aligned', 'Late ROT - Aligned'),
+      legend(0.8,0,legend=c('Early ROT - Aligned', 'Late ROT - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
       
@@ -1396,7 +1396,7 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-6, 16), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
@@ -1408,7 +1408,7 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
       #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
-      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
@@ -1461,14 +1461,14 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
       }
       
       #add legend
-      legend(0.8,-5,legend=c('Early RDM - Aligned', 'Late RDM - Aligned'),
+      legend(0.8,0,legend=c('Early RDM - Aligned', 'Late RDM - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'mir'){
@@ -1479,7 +1479,7 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
       #NA to create empty plot
       # could maybe use plot.new() ?
       if (erps == 'frn'){
-        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-16, 6), 
+        plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-6, 16), 
              xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
              main = sprintf("Difference waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
       } else if (erps == 'ern'){
@@ -1491,7 +1491,7 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
       abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
       #abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
       axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
-      axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+      axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
       
       for (group in groups){
         data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
@@ -1544,14 +1544,14 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_mir[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
       }
       
       #add legend
-      legend(0.8,-5,legend=c('Early MIR - Aligned', 'Late MIR - Aligned'),
+      legend(0.8,0,legend=c('Early MIR - Aligned', 'Late MIR - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }
