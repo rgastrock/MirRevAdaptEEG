@@ -15,6 +15,7 @@ library(dplyr)
 library(EnvStats)
 library(coin)
 library(magick)
+library(Reach)
 
 #Generic Functions----
 

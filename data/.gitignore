@@ -3,3 +3,5 @@
 
 # Except the following files
 !.gitignore
+!behavior
+!eeg
