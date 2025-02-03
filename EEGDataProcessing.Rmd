@@ -1,0 +1,22 @@
+---
+title: "EEG data processing using MNE-Python"
+output: html_notebook
+---
+
+# Overview
+
+This document discusses the analysis pipeline for the experiment's EEG data. We have written custom Python scripts to preprocess and analyze the data set, according to our defined conditions.
+
+# Downloading data
+
+First, we need to ensure that the data is available locally. Both behavioral and EEG data are available on OSF. You may run the code below to download the data.
+
+```{r}
+# Uncomment the lines below to download the data:
+# getBehaviorData()
+# getEEGData()
+```
+
+# EEG pre-processing
+
+See MirRevAdapt_Preprocessing_Funcs
