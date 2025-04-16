@@ -1755,8 +1755,8 @@ display: none;
 <div id="overview" class="section level1">
 <h1>Overview</h1>
 <p>This document discusses the analysis pipeline for the experiment’s
-EEG data. We have written custom Python scripts to preprocess and
-analyze the data set, according to our defined conditions.</p>
+EEG data. We have written custom Python scripts to preprocess, organize,
+and analyze the data set according to our defined conditions.</p>
 </div>
 <div id="downloading-data" class="section level1">
 <h1>Downloading data</h1>
@@ -1773,13 +1773,132 @@ to download the data.</p>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="eeg-pre-processing" class="section level1">
-<h1>EEG pre-processing</h1>
-<p>See MirRevAdapt_Preprocessing_Funcs</p>
+<div id="eeg-data-pre-processing" class="section level1">
+<h1>EEG data pre-processing</h1>
+<div id="mirrevadapt_preprocessing_funcs.py" class="section level2">
+<h2>MirRevAdapt_Preprocessing_Funcs.py</h2>
+<div id="instructions-for-python-script" class="section level3">
+<h3>Instructions for Python script</h3>
+<p>We used MNE-Python to pre-process and analyze the data. As such,
+certain dependencies called in the Python scripts will rely on having
+MNE installed.</p>
+<p>Our custom code implements the pre-processing steps described below.
+The user simply has to run the script to start pre-processing the EEG
+data. Note that with the amount of data within and across participants,
+along with the ICA fitting procedure, pre-processing will take several
+hours per participant. As such, we have saved the pre-processed epochs
+as part of the data downloaded, in case the user would want to skip this
+step.</p>
+</div>
+<div id="triggers" class="section level3">
+<h3>Triggers</h3>
+<p>Multiple events across trial types, and within each trial, correspond
+to unique EEG triggers (expressed as 5 digit integers below). A complete
+description of the trial events and trial types are found in our
+manuscript’s Methods section.</p>
+<div id="triggers-across-trial-types" class="section level4">
+<h4>Triggers across trial types</h4>
+<p>The different trial types are: resting state (16148), aligned reaches
+(16149), first block of random rotation (16150), rotation training
+(16151), washout following rotation training (16152), second block of
+random rotation (16153), mirror reversal training (16154), washout
+following mirror training (16155). There is also a trigger at the end of
+the block for each trial type (16156).</p>
+</div>
+<div id="triggers-within-a-trial" class="section level4">
+<h4>Triggers within a trial</h4>
+<p>Within each trial, the triggers correspond to trial onset (16138),
+target onset (16139), go signal (16140), reach onset (16141), feedback
+onset (16142), feedback at home (16143), fixation onset (16144).</p>
+</div>
+<div id="triggers-for-target-locations" class="section level4">
+<h4>Triggers for target locations</h4>
+<p>Each target location across the workspace also corresponds to its own
+trigger. Each target is positioned in one of four quadrants, at a set
+distance from the vertical or horizontal midline axis. The list of all
+possible target locations and their triggers are found below:</p>
+<p>Quadrant 1:<br />
+Vertical, near: 16164; Vertical, mid 16165; Vertical, far: 16166</p>
+<p>Horizontal, near: 16158; Horizontal, mid: 16159; Horizontal, far
+16160</p>
+<p>Quadrant 2:<br />
+Vertical, near: 16184; Vertical, mid: 16185; Vertical, far: 16186</p>
+<p>Horizontal, near: 16178; Horizontal, mid: 16179; Horizontal, far:
+16180</p>
+<p>Quadrant 3:<br />
+Vertical, near: 16167; Vertical, mid: 16168; Vertical, far: 16169</p>
+<p>Horizontal, near: 16161; Horizontal, mid: 16162; Horizontal, far
+16163</p>
+<p>Quadrant 4:<br />
+Vertical, near: 16187; Vertical, mid: 16188; Vertical, far: 16189</p>
+<p>Horizontal, near: 16181; Horizontal, mid: 16182; Horizontal, far:
+16183</p>
+</div>
+</div>
+<div id="pre-processing-steps" class="section level3">
+<h3>Pre-processing steps</h3>
+<p>We collected data using a 32-channel BioSemi ActiveTwo system. Data
+were sampled at 512 Hz. Electrodes are positioned according to the
+international 10-20 system. We used the left and right mastoids as
+reference electrodes. We then applied a high-pass filter at 0.1 Hz, a
+low-pass filter at 200 Hz, and a notch filter at 60, 120, 180, and 240
+Hz. Epochs were defined by aligning data to a specific event. As we are
+interested in EEG activity before and after the reaching movement, we
+aligned data to either the go signal onset (pre-movement) or the
+feedback onset (post-movement), and defined each epoch’s time window to
+range 2 seconds before and after the event.</p>
+<p>For artifact removal, we fit an Independent Component Analysis (ICA;
+extended infomax with 1000 iterations) to the epoched data. We then used
+the ICLabel method to label the different output components. With this
+method, each component label is identified as coming from the brain, eye
+movements, or other artifacts with a corresponding probability. For our
+study, we only included components labelled as “brain” and “other” with
+a probability of greater than 80%. The other components either did not
+reach this threshold or were labelled as eye, muscle or other movement
+artifacts. Thus, we removed these artifacts when applying the ICA to the
+EEG data.</p>
+<p>Finally, we downsampled the EEG data to 200 Hz. and generated
+pre-processed epochs for each participant across all their trials.</p>
+</div>
+</div>
+</div>
+<div id="behavior-data-pre-processing" class="section level1">
+<h1>Behavior data pre-processing</h1>
+<p>We then split the epochs into different conditions, dependent on
+participants’ behavioral performance throughout the experiment.</p>
+<div id="data-split-trial-types" class="section level3">
+<h3>data split: trial types</h3>
+<p>First, we split the data according to trial types. That is, we
+compared behavioral and EEG data across these trial types: aligned
+reaches, random rotation trials, rotation training, and mirror reversal
+training.</p>
+</div>
+<div id="data-split-early-versus-late-training" class="section level3">
+<h3>data split: early versus late training</h3>
+<p>We are interested in investigating how learning progresses throughout
+perturbation training. As such, we expect that participants should
+perform movements with more errors at the beginning of training,
+compared to later on in training. While we observe no learning or a more
+or less stable magnitude of errors for the aligned and random rotation
+trials, we do observe a reduction of errors for both rotation and mirror
+reversal trials. Thus, we split the epoched data into early training
+(first two blocks of training: 12 trials) and late training (last six
+blocks of training: 36 trials) for the rotation and mirror trial types.
+Given that the random rotation is introduced in two separate blocks
+prior to the rotation and mirror trials, we combined both blocks as they
+do not show differences in performance. From this combined set of
+trials, the first two blocks (12 trials) are considered as early
+training, while the last 4 blocks (24 trials) are considered as late
+training. Finally, since the aligned trials do not show any changes
+across trials, we used all 48 trials for analyses.</p>
+</div>
+<div id="data-split-small-versus-large-errors" class="section level3">
+<h3>data split: small versus large errors</h3>
 <!-- rnb-text-end -->
 </div>
+</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkVFRyBkYXRhIHByb2Nlc3NpbmcgdXNpbmcgTU5FLVB5dGhvbiINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCiMgT3ZlcnZpZXcNCg0KVGhpcyBkb2N1bWVudCBkaXNjdXNzZXMgdGhlIGFuYWx5c2lzIHBpcGVsaW5lIGZvciB0aGUgZXhwZXJpbWVudCdzIEVFRyBkYXRhLiBXZSBoYXZlIHdyaXR0ZW4gY3VzdG9tIFB5dGhvbiBzY3JpcHRzIHRvIHByZXByb2Nlc3MgYW5kIGFuYWx5emUgdGhlIGRhdGEgc2V0LCBhY2NvcmRpbmcgdG8gb3VyIGRlZmluZWQgY29uZGl0aW9ucy4NCg0KIyBEb3dubG9hZGluZyBkYXRhDQoNCkZpcnN0LCB3ZSBuZWVkIHRvIGVuc3VyZSB0aGF0IHRoZSBkYXRhIGlzIGF2YWlsYWJsZSBsb2NhbGx5LiBCb3RoIGJlaGF2aW9yYWwgYW5kIEVFRyBkYXRhIGFyZSBhdmFpbGFibGUgb24gT1NGLiBZb3UgbWF5IHJ1biB0aGUgY29kZSBiZWxvdyB0byBkb3dubG9hZCB0aGUgZGF0YS4NCg0KYGBge3J9DQojIFVuY29tbWVudCB0aGUgbGluZXMgYmVsb3cgdG8gZG93bmxvYWQgdGhlIGRhdGE6DQojIGdldEJlaGF2aW9yRGF0YSgpDQojIGdldEVFR0RhdGEoKQ0KYGBgDQoNCiMgRUVHIHByZS1wcm9jZXNzaW5nDQoNClNlZSBNaXJSZXZBZGFwdF9QcmVwcm9jZXNzaW5nX0Z1bmNzDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkVFRyBkYXRhIHByb2Nlc3NpbmcgdXNpbmcgTU5FLVB5dGhvbiINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCiMgT3ZlcnZpZXcNCg0KVGhpcyBkb2N1bWVudCBkaXNjdXNzZXMgdGhlIGFuYWx5c2lzIHBpcGVsaW5lIGZvciB0aGUgZXhwZXJpbWVudCdzIEVFRyBkYXRhLiBXZSBoYXZlIHdyaXR0ZW4gY3VzdG9tIFB5dGhvbiBzY3JpcHRzIHRvIHByZXByb2Nlc3MsIG9yZ2FuaXplLCBhbmQgYW5hbHl6ZSB0aGUgZGF0YSBzZXQgYWNjb3JkaW5nIHRvIG91ciBkZWZpbmVkIGNvbmRpdGlvbnMuDQoNCiMgRG93bmxvYWRpbmcgZGF0YQ0KDQpGaXJzdCwgd2UgbmVlZCB0byBlbnN1cmUgdGhhdCB0aGUgZGF0YSBpcyBhdmFpbGFibGUgbG9jYWxseS4gQm90aCBiZWhhdmlvcmFsIGFuZCBFRUcgZGF0YSBhcmUgYXZhaWxhYmxlIG9uIE9TRi4gWW91IG1heSBydW4gdGhlIGNvZGUgYmVsb3cgdG8gZG93bmxvYWQgdGhlIGRhdGEuDQoNCmBgYHtyfQ0KIyBVbmNvbW1lbnQgdGhlIGxpbmVzIGJlbG93IHRvIGRvd25sb2FkIHRoZSBkYXRhOg0KIyBnZXRCZWhhdmlvckRhdGEoKQ0KIyBnZXRFRUdEYXRhKCkNCmBgYA0KDQojIEVFRyBkYXRhIHByZS1wcm9jZXNzaW5nDQoNCiMjICBNaXJSZXZBZGFwdF9QcmVwcm9jZXNzaW5nX0Z1bmNzLnB5DQoNCiMjIyBJbnN0cnVjdGlvbnMgZm9yIFB5dGhvbiBzY3JpcHQNCg0KV2UgdXNlZCBNTkUtUHl0aG9uIHRvIHByZS1wcm9jZXNzIGFuZCBhbmFseXplIHRoZSBkYXRhLiBBcyBzdWNoLCBjZXJ0YWluIGRlcGVuZGVuY2llcyBjYWxsZWQgaW4gdGhlIFB5dGhvbiBzY3JpcHRzIHdpbGwgcmVseSBvbiBoYXZpbmcgTU5FIGluc3RhbGxlZC4NCg0KT3VyIGN1c3RvbSBjb2RlIGltcGxlbWVudHMgdGhlIHByZS1wcm9jZXNzaW5nIHN0ZXBzIGRlc2NyaWJlZCBiZWxvdy4gVGhlIHVzZXIgc2ltcGx5IGhhcyB0byBydW4gdGhlIHNjcmlwdCB0byBzdGFydCBwcmUtcHJvY2Vzc2luZyB0aGUgRUVHIGRhdGEuIE5vdGUgdGhhdCB3aXRoIHRoZSBhbW91bnQgb2YgZGF0YSB3aXRoaW4gYW5kIGFjcm9zcyBwYXJ0aWNpcGFudHMsIGFsb25nIHdpdGggdGhlIElDQSBmaXR0aW5nIHByb2NlZHVyZSwgcHJlLXByb2Nlc3Npbmcgd2lsbCB0YWtlIHNldmVyYWwgaG91cnMgcGVyIHBhcnRpY2lwYW50LiBBcyBzdWNoLCB3ZSBoYXZlIHNhdmVkIHRoZSBwcmUtcHJvY2Vzc2VkIGVwb2NocyBhcyBwYXJ0IG9mIHRoZSBkYXRhIGRvd25sb2FkZWQsIGluIGNhc2UgdGhlIHVzZXIgd291bGQgd2FudCB0byBza2lwIHRoaXMgc3RlcC4NCg0KIyMjIFRyaWdnZXJzDQoNCk11bHRpcGxlIGV2ZW50cyBhY3Jvc3MgdHJpYWwgdHlwZXMsIGFuZCB3aXRoaW4gZWFjaCB0cmlhbCwgY29ycmVzcG9uZCB0byB1bmlxdWUgRUVHIHRyaWdnZXJzIChleHByZXNzZWQgYXMgNSBkaWdpdCBpbnRlZ2VycyBiZWxvdykuIEEgY29tcGxldGUgZGVzY3JpcHRpb24gb2YgdGhlIHRyaWFsIGV2ZW50cyBhbmQgdHJpYWwgdHlwZXMgYXJlIGZvdW5kIGluIG91ciBtYW51c2NyaXB0J3MgTWV0aG9kcyBzZWN0aW9uLg0KDQojIyMjIFRyaWdnZXJzIGFjcm9zcyB0cmlhbCB0eXBlcw0KVGhlIGRpZmZlcmVudCB0cmlhbCB0eXBlcyBhcmU6IHJlc3Rpbmcgc3RhdGUgKDE2MTQ4KSwgYWxpZ25lZCByZWFjaGVzICgxNjE0OSksIGZpcnN0IGJsb2NrIG9mIHJhbmRvbSByb3RhdGlvbiAoMTYxNTApLCByb3RhdGlvbiB0cmFpbmluZyAoMTYxNTEpLCB3YXNob3V0IGZvbGxvd2luZyByb3RhdGlvbiB0cmFpbmluZyAoMTYxNTIpLCBzZWNvbmQgYmxvY2sgb2YgcmFuZG9tIHJvdGF0aW9uICgxNjE1MyksIG1pcnJvciByZXZlcnNhbCB0cmFpbmluZyAoMTYxNTQpLCB3YXNob3V0IGZvbGxvd2luZyBtaXJyb3IgdHJhaW5pbmcgKDE2MTU1KS4gVGhlcmUgaXMgYWxzbyBhIHRyaWdnZXIgYXQgdGhlIGVuZCBvZiB0aGUgYmxvY2sgZm9yIGVhY2ggdHJpYWwgdHlwZSAoMTYxNTYpLg0KDQojIyMjIFRyaWdnZXJzIHdpdGhpbiBhIHRyaWFsDQpXaXRoaW4gZWFjaCB0cmlhbCwgdGhlIHRyaWdnZXJzIGNvcnJlc3BvbmQgdG8gdHJpYWwgb25zZXQgKDE2MTM4KSwgdGFyZ2V0IG9uc2V0ICgxNjEzOSksIGdvIHNpZ25hbCAoMTYxNDApLCByZWFjaCBvbnNldCAoMTYxNDEpLCBmZWVkYmFjayBvbnNldCAoMTYxNDIpLCBmZWVkYmFjayBhdCBob21lICgxNjE0MyksIGZpeGF0aW9uIG9uc2V0ICgxNjE0NCkuDQoNCiMjIyMgVHJpZ2dlcnMgZm9yIHRhcmdldCBsb2NhdGlvbnMNCkVhY2ggdGFyZ2V0IGxvY2F0aW9uIGFjcm9zcyB0aGUgd29ya3NwYWNlIGFsc28gY29ycmVzcG9uZHMgdG8gaXRzIG93biB0cmlnZ2VyLiBFYWNoIHRhcmdldCBpcyBwb3NpdGlvbmVkIGluIG9uZSBvZiBmb3VyIHF1YWRyYW50cywgYXQgYSBzZXQgZGlzdGFuY2UgZnJvbSB0aGUgdmVydGljYWwgb3IgaG9yaXpvbnRhbCBtaWRsaW5lIGF4aXMuIFRoZSBsaXN0IG9mIGFsbCBwb3NzaWJsZSB0YXJnZXQgbG9jYXRpb25zIGFuZCB0aGVpciB0cmlnZ2VycyBhcmUgZm91bmQgYmVsb3c6DQoNClF1YWRyYW50IDE6ICANClZlcnRpY2FsLCBuZWFyOiAxNjE2NDsNClZlcnRpY2FsLCBtaWQgMTYxNjU7DQpWZXJ0aWNhbCwgZmFyOiAxNjE2Ng0KDQpIb3Jpem9udGFsLCBuZWFyOiAxNjE1ODsNCkhvcml6b250YWwsIG1pZDogMTYxNTk7DQpIb3Jpem9udGFsLCBmYXIgMTYxNjANCg0KUXVhZHJhbnQgMjogIA0KVmVydGljYWwsIG5lYXI6IDE2MTg0Ow0KVmVydGljYWwsIG1pZDogMTYxODU7DQpWZXJ0aWNhbCwgZmFyOiAxNjE4Ng0KDQpIb3Jpem9udGFsLCBuZWFyOiAxNjE3ODsNCkhvcml6b250YWwsIG1pZDogMTYxNzk7DQpIb3Jpem9udGFsLCBmYXI6IDE2MTgwDQoNClF1YWRyYW50IDM6ICANClZlcnRpY2FsLCBuZWFyOiAxNjE2NzsNClZlcnRpY2FsLCBtaWQ6IDE2MTY4Ow0KVmVydGljYWwsIGZhcjogMTYxNjkNCg0KSG9yaXpvbnRhbCwgbmVhcjogMTYxNjE7DQpIb3Jpem9udGFsLCBtaWQ6IDE2MTYyOw0KSG9yaXpvbnRhbCwgZmFyIDE2MTYzDQoNClF1YWRyYW50IDQ6ICANClZlcnRpY2FsLCBuZWFyOiAxNjE4NzsNClZlcnRpY2FsLCBtaWQ6IDE2MTg4Ow0KVmVydGljYWwsIGZhcjogMTYxODkNCg0KSG9yaXpvbnRhbCwgbmVhcjogMTYxODE7DQpIb3Jpem9udGFsLCBtaWQ6IDE2MTgyOw0KSG9yaXpvbnRhbCwgZmFyOiAxNjE4Mw0KDQojIyMgUHJlLXByb2Nlc3Npbmcgc3RlcHMNCg0KV2UgY29sbGVjdGVkIGRhdGEgdXNpbmcgYSAzMi1jaGFubmVsIEJpb1NlbWkgQWN0aXZlVHdvIHN5c3RlbS4gRGF0YSB3ZXJlIHNhbXBsZWQgYXQgNTEyIEh6LiBFbGVjdHJvZGVzIGFyZSBwb3NpdGlvbmVkIGFjY29yZGluZyB0byB0aGUgaW50ZXJuYXRpb25hbCAxMC0yMCBzeXN0ZW0uIFdlIHVzZWQgdGhlIGxlZnQgYW5kIHJpZ2h0IG1hc3RvaWRzIGFzIHJlZmVyZW5jZSBlbGVjdHJvZGVzLiBXZSB0aGVuIGFwcGxpZWQgYSBoaWdoLXBhc3MgZmlsdGVyIGF0IDAuMSBIeiwgYSBsb3ctcGFzcyBmaWx0ZXIgYXQgMjAwIEh6LCBhbmQgYSBub3RjaCBmaWx0ZXIgYXQgNjAsIDEyMCwgMTgwLCBhbmQgMjQwIEh6LiBFcG9jaHMgd2VyZSBkZWZpbmVkIGJ5IGFsaWduaW5nIGRhdGEgdG8gYSBzcGVjaWZpYyBldmVudC4gQXMgd2UgYXJlIGludGVyZXN0ZWQgaW4gRUVHIGFjdGl2aXR5IGJlZm9yZSBhbmQgYWZ0ZXIgdGhlIHJlYWNoaW5nIG1vdmVtZW50LCB3ZSBhbGlnbmVkIGRhdGEgdG8gZWl0aGVyIHRoZSBnbyBzaWduYWwgb25zZXQgKHByZS1tb3ZlbWVudCkgb3IgdGhlIGZlZWRiYWNrIG9uc2V0IChwb3N0LW1vdmVtZW50KSwgYW5kIGRlZmluZWQgZWFjaCBlcG9jaCdzIHRpbWUgd2luZG93IHRvIHJhbmdlIDIgc2Vjb25kcyBiZWZvcmUgYW5kIGFmdGVyIHRoZSBldmVudC4gDQoNCkZvciBhcnRpZmFjdCByZW1vdmFsLCB3ZSBmaXQgYW4gSW5kZXBlbmRlbnQgQ29tcG9uZW50IEFuYWx5c2lzIChJQ0E7IGV4dGVuZGVkIGluZm9tYXggd2l0aCAxMDAwIGl0ZXJhdGlvbnMpIHRvIHRoZSBlcG9jaGVkIGRhdGEuIFdlIHRoZW4gdXNlZCB0aGUgSUNMYWJlbCBtZXRob2QgdG8gbGFiZWwgdGhlIGRpZmZlcmVudCBvdXRwdXQgY29tcG9uZW50cy4gV2l0aCB0aGlzIG1ldGhvZCwgZWFjaCBjb21wb25lbnQgbGFiZWwgaXMgaWRlbnRpZmllZCBhcyBjb21pbmcgZnJvbSB0aGUgYnJhaW4sIGV5ZSBtb3ZlbWVudHMsIG9yIG90aGVyIGFydGlmYWN0cyB3aXRoIGEgY29ycmVzcG9uZGluZyBwcm9iYWJpbGl0eS4gRm9yIG91ciBzdHVkeSwgd2Ugb25seSBpbmNsdWRlZCBjb21wb25lbnRzIGxhYmVsbGVkIGFzICJicmFpbiIgYW5kICJvdGhlciIgd2l0aCBhIHByb2JhYmlsaXR5IG9mIGdyZWF0ZXIgdGhhbiA4MCUuIFRoZSBvdGhlciBjb21wb25lbnRzIGVpdGhlciBkaWQgbm90IHJlYWNoIHRoaXMgdGhyZXNob2xkIG9yIHdlcmUgbGFiZWxsZWQgYXMgZXllLCBtdXNjbGUgb3Igb3RoZXIgbW92ZW1lbnQgYXJ0aWZhY3RzLiBUaHVzLCB3ZSByZW1vdmVkIHRoZXNlIGFydGlmYWN0cyB3aGVuIGFwcGx5aW5nIHRoZSBJQ0EgdG8gdGhlIEVFRyBkYXRhLg0KDQpGaW5hbGx5LCB3ZSBkb3duc2FtcGxlZCB0aGUgRUVHIGRhdGEgdG8gMjAwIEh6LiBhbmQgZ2VuZXJhdGVkIHByZS1wcm9jZXNzZWQgZXBvY2hzIGZvciBlYWNoIHBhcnRpY2lwYW50IGFjcm9zcyBhbGwgdGhlaXIgdHJpYWxzLg0KDQoNCiMgQmVoYXZpb3IgZGF0YSBwcmUtcHJvY2Vzc2luZw0KDQpXZSB0aGVuIHNwbGl0IHRoZSBlcG9jaHMgaW50byBkaWZmZXJlbnQgY29uZGl0aW9ucywgZGVwZW5kZW50IG9uIHBhcnRpY2lwYW50cycgYmVoYXZpb3JhbCBwZXJmb3JtYW5jZSB0aHJvdWdob3V0IHRoZSBleHBlcmltZW50Lg0KDQojIyMgZGF0YSBzcGxpdDogdHJpYWwgdHlwZXMNCkZpcnN0LCB3ZSBzcGxpdCB0aGUgZGF0YSBhY2NvcmRpbmcgdG8gdHJpYWwgdHlwZXMuIFRoYXQgaXMsIHdlIGNvbXBhcmVkIGJlaGF2aW9yYWwgYW5kIEVFRyBkYXRhIGFjcm9zcyB0aGVzZSB0cmlhbCB0eXBlczogYWxpZ25lZCByZWFjaGVzLCByYW5kb20gcm90YXRpb24gdHJpYWxzLCByb3RhdGlvbiB0cmFpbmluZywgYW5kIG1pcnJvciByZXZlcnNhbCB0cmFpbmluZy4NCg0KIyMjIGRhdGEgc3BsaXQ6IGVhcmx5IHZlcnN1cyBsYXRlIHRyYWluaW5nDQpXZSBhcmUgaW50ZXJlc3RlZCBpbiBpbnZlc3RpZ2F0aW5nIGhvdyBsZWFybmluZyBwcm9ncmVzc2VzIHRocm91Z2hvdXQgcGVydHVyYmF0aW9uIHRyYWluaW5nLiBBcyBzdWNoLCB3ZSBleHBlY3QgdGhhdCBwYXJ0aWNpcGFudHMgc2hvdWxkIHBlcmZvcm0gbW92ZW1lbnRzIHdpdGggbW9yZSBlcnJvcnMgYXQgdGhlIGJlZ2lubmluZyBvZiB0cmFpbmluZywgY29tcGFyZWQgdG8gbGF0ZXIgb24gaW4gdHJhaW5pbmcuIFdoaWxlIHdlIG9ic2VydmUgbm8gbGVhcm5pbmcgb3IgYSBtb3JlIG9yIGxlc3Mgc3RhYmxlIG1hZ25pdHVkZSBvZiBlcnJvcnMgZm9yIHRoZSBhbGlnbmVkIGFuZCByYW5kb20gcm90YXRpb24gdHJpYWxzLCB3ZSBkbyBvYnNlcnZlIGEgcmVkdWN0aW9uIG9mIGVycm9ycyBmb3IgYm90aCByb3RhdGlvbiBhbmQgbWlycm9yIHJldmVyc2FsIHRyaWFscy4gVGh1cywgd2Ugc3BsaXQgdGhlIGVwb2NoZWQgZGF0YSBpbnRvIGVhcmx5IHRyYWluaW5nIChmaXJzdCB0d28gYmxvY2tzIG9mIHRyYWluaW5nOiAxMiB0cmlhbHMpIGFuZCBsYXRlIHRyYWluaW5nIChsYXN0IHNpeCBibG9ja3Mgb2YgdHJhaW5pbmc6IDM2IHRyaWFscykgZm9yIHRoZSByb3RhdGlvbiBhbmQgbWlycm9yIHRyaWFsIHR5cGVzLiBHaXZlbiB0aGF0IHRoZSByYW5kb20gcm90YXRpb24gaXMgaW50cm9kdWNlZCBpbiB0d28gc2VwYXJhdGUgYmxvY2tzIHByaW9yIHRvIHRoZSByb3RhdGlvbiBhbmQgbWlycm9yIHRyaWFscywgd2UgY29tYmluZWQgYm90aCBibG9ja3MgYXMgdGhleSBkbyBub3Qgc2hvdyBkaWZmZXJlbmNlcyBpbiBwZXJmb3JtYW5jZS4gRnJvbSB0aGlzIGNvbWJpbmVkIHNldCBvZiB0cmlhbHMsIHRoZSBmaXJzdCB0d28gYmxvY2tzICgxMiB0cmlhbHMpIGFyZSBjb25zaWRlcmVkIGFzIGVhcmx5IHRyYWluaW5nLCB3aGlsZSB0aGUgbGFzdCA0IGJsb2NrcyAoMjQgdHJpYWxzKSBhcmUgY29uc2lkZXJlZCBhcyBsYXRlIHRyYWluaW5nLiBGaW5hbGx5LCBzaW5jZSB0aGUgYWxpZ25lZCB0cmlhbHMgZG8gbm90IHNob3cgYW55IGNoYW5nZXMgYWNyb3NzIHRyaWFscywgd2UgdXNlZCBhbGwgNDggdHJpYWxzIGZvciBhbmFseXNlcy4gDQoNCiMjIyBkYXRhIHNwbGl0OiBzbWFsbCB2ZXJzdXMgbGFyZ2UgZXJyb3JzDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K</div>
 
 
 
