@@ -1,13 +1,118 @@
+import queue
+from queue import Queue
 import numpy as np
 from typing import Tuple
+from typing_extensions import Self
 from itertools import combinations
 from math import comb
+import matplotlib.pyplot as plt
+import threading
+
+def execute(q: Queue) -> None:
+    while True:
+        t = q.get()
+        if t is None:
+            q.put(None)
+            print("no more job exiting", flush=True)
+            break
+        f = t[0]
+        args: Tuple = t[1]
+        f(*args)
+
+def covarianceVolume2D(thisVolume: np.ndarray, 
+                       pindx: np.ndarray,
+                       nSamples: int, 
+                       nElectrodes: int,
+                       nTrials: int,
+                       nPairs: int,
+                       cond: int,
+                       subj: int,
+                       nPointsInXX: np.ndarray,
+                       nPointsInYY: np.ndarray,
+                       nPointsInXY: np.ndarray,
+                       sumXX: np.ndarray,
+                       sumYY: np.ndarray,
+                       sumXY: np.ndarray,
+                       task_queue: Queue,
+                       done_queue: Queue,
+                       n_done: int) -> None:
+    sxt = nSamples * nTrials
+    sxp = nSamples * nPairs
+    thisVolume = np.transpose(thisVolume, (1, 0, 2))
+    thisVolume = np.reshape(thisVolume, (nElectrodes, sxt))
+    thisMu = np.nanmean(thisVolume, axis=1, dtype=np.float32)
+    thisVolume = thisVolume - np.repeat(thisMu[:, np.newaxis], sxt, axis=1)
+    thisVolume = np.reshape(thisVolume, (nElectrodes, nSamples, nTrials))
+    
+    concatX = np.reshape(thisVolume[:, :, pindx[0, :]], (nElectrodes, sxp))
+    concatY = np.reshape(thisVolume[:, :, pindx[1, :]], (nElectrodes, sxp))
+    notNanX = ~np.isnan(concatX)
+    notNanY = ~np.isnan(concatY)
+    np.nan_to_num(concatX, copy=False)
+    np.nan_to_num(concatY, copy=False)
+
+    task_queue.put((covarianceSumPoints, (concatX,
+                                                    concatX,
+                                                    notNanX,
+                                                    notNanX,
+                                                    cond,
+                                                    subj,
+                                                    nPointsInXX,
+                                                    sumXX,
+                                          task_queue,
+                                          done_queue,
+                                          n_done)))
+    task_queue.put((covarianceSumPoints, (concatY,
+                                                    concatY,
+                                                    notNanY,
+                                                    notNanY,
+                                                    cond,
+                                                    subj,
+                                                    nPointsInYY,
+                                                    sumYY,
+                                          task_queue,
+                                          done_queue,
+                                          n_done)))
+    task_queue.put((covarianceSumPoints, (concatX,
+                                                    concatY,
+                                                    notNanX,
+                                                    notNanY,
+                                                    cond,
+                                                    subj,
+                                                    nPointsInXY,
+                                                    sumXY,
+                                          task_queue,
+                                          done_queue,
+                                          n_done)))
+    print("done covarianceVolume2D", cond, subj, flush=True)
+
+def covarianceSumPoints(concat0: np.ndarray,
+                        concat1: np.ndarray,
+                        notNan0: np.ndarray,
+                        notNan1: np.ndarray,
+                        cond: int,
+                        subj: int,
+                        nPoints: np.ndarray,
+                        sums: np.ndarray,
+                        task_queue: Queue,
+                        done_queue: Queue,
+                        n_done: int) -> None:
+    print("conputing covarianceSumPoints", cond, subj, flush=True)
+    nPoints[cond, subj] = np.matmul(notNan0, np.transpose(notNan1), dtype=int)
+    sums[cond, subj] = np.matmul(concat0, np.transpose(concat1), dtype=np.float32)
+    n = done_queue.get()
+    n = n + 1
+    done_queue.put(n)
+
+    if n == n_done:
+        task_queue.put(None)
+    print("done covarianceSumPoints", cond, subj, flush=True)
 
 # find knee point of a curve
 # y: array of y values
 # x: array of x values (optional)
 # returns the x value and the index of the x value
-def knee_pt(y: np.array, x: np.array = None) -> Tuple[float, int]:
+def knee_pt(y: np.ndarray, x: np.ndarray | None = None) -> Tuple[float, int]:
     res_x = float('nan')
     idx_of_result = float('nan')
     if x is None:
@@ -50,15 +155,27 @@ def knee_pt(y: np.array, x: np.array = None) -> Tuple[float, int]:
     return res_x, ind_list[idx_of_result]
 
 class RCAModel:
-    def fit(self, data: np.ndarray, nReg: int = None, nComp: int = 3, condRange: slice = None, subjRange: slice = None) -> None:
-        _, self.components_, _, _ = RCAModel.rcaRun(data, nReg, nComp, condRange, subjRange)
+    def fit(self, 
+            data: np.ndarray, 
+            nReg: int | None = None, 
+            nComp: int = 3, 
+            condRange: slice | None = None, 
+            subjRange: slice | None = None, 
+            cov_process_num: int = 1) -> Self:
+        _, self.components_, self.A_, self.dGenSort_, self.Rxx_, self.Ryy_, self.Rxy_, self.K_ = RCAModel.rcaRun(data, nReg, nComp, condRange, subjRange, cov_process_num)
         return self
 
     def transform(self, data: np.ndarray) -> np.ndarray:
         return RCAModel.rcaProject(data, self.components_)
     
-    def fit_transform(self, data: np.ndarray, nReg: int = None, nComp: int = 3, condRange: slice = None, subjRange: slice = None) -> np.ndarray:
-        Y, self.components_, _, _ = RCAModel.rcaRun(data, nReg, nComp, condRange, subjRange)
+    def fit_transform(self, 
+                      data: np.ndarray, 
+                      nReg: int | None = None, 
+                      nComp: int = 3, 
+                      condRange: slice | None = None, 
+                      subjRange: slice | None = None,
+                      cov_process_num: int = 1) -> np.ndarray:
+        Y, self.components_, self.A_, self.dGenSort_, self.Rxx_, self.Ryy_, self.Rxy_, self.K_ = RCAModel.rcaRun(data, nReg, nComp, condRange, subjRange, cov_process_num)
         return Y
 
     # compute spatial filters maximizing reliability across trials given precomputed auto- and cross-covariance matrices
@@ -73,35 +190,112 @@ class RCAModel:
     #          dGenSort: sorted eigenvalues of the generalized eigenvalue problem
     #          K: number of autocovariance dimensions to diagonalize
     @staticmethod
-    def rcaTrain(Rxx: np.matrix, Ryy: np.matrix, Rxy: np.matrix, K: int = None, C: int = 3) -> Tuple[np.matrix, np.matrix, np.matrix, np.matrix, int]:
+    def rcaTrain(Rxx: np.matrix, Ryy: np.matrix, Rxy: np.matrix, K: int | None = None, C: int = 3) -> Tuple[np.matrix, np.matrix, np.matrix, np.matrix, int]:
         if Rxx.shape != Rxy.shape:
             raise ValueError("Rxx and Rxy must have the same shape")
         eValues, eVectors = np.linalg.eig(Rxx+Ryy)
-        sort_indexes = np.argsort(np.abs(eValues), axis=0)
+        eValues = eValues.astype(np.float32)
+        eVectors = eVectors.astype(np.float32)
+
+        sort_indexes = np.argsort(eValues, axis=0)
         eValues = np.take_along_axis(eValues, sort_indexes, axis=0)
         eVectors = eVectors[:, sort_indexes]
         if K is None:
             _, indices = knee_pt(eValues, np.arange(0, len(eValues)))
             K = len(eValues) - indices - 1
-            
-        eValues_index = np.argsort(eValues, axis=0)
-        eValues = np.take_along_axis(eValues, eValues_index, axis=0)
-        eVectors = eVectors[:, eValues_index]
 
         eValues = eValues[-1-K:]
-        Rw = np.matmul(eVectors[:, -1-K:], np.matmul(np.diag(1 / eValues), np.matmul(np.conjugate(np.transpose(eVectors[:, -1-K:])), Rxy + np.conjugate(np.transpose(Rxy)))))
+        Rw = np.matmul(eVectors[:, -1-K:], np.matmul(np.diag(1 / eValues), np.matmul(np.transpose(eVectors[:, -1-K:]), Rxy + np.transpose(Rxy))))
         
-
         dGen, vGen = np.linalg.eig(Rw)
+        dGen = dGen.astype(np.float32)
+        vGen = vGen.astype(np.float32)
+        
         dGen_index = np.argsort(np.abs(dGen), axis=0)
-        dGenSort = np.abs(dGen[dGen_index])
+        dGenSort = np.asmatrix(np.abs(dGen[dGen_index]))
 
-        W = vGen[:, dGen_index[::-1]]
-        Wsub = W[:, :C]
+        W = np.asmatrix(vGen[:, dGen_index[::-1]])
+        Wsub = np.asmatrix(W[:, :C])
         Rpool = 0.5 * (Rxx + Ryy)
-        A = np.matmul(np.matmul(Rpool, Wsub), np.linalg.inv(np.matmul(np.conjugate(np.transpose(Wsub)), np.matmul(Rpool, Wsub))))
+        A = np.matmul(np.matmul(Rpool, Wsub), np.linalg.inv(np.matmul(np.transpose(Wsub), np.matmul(Rpool, Wsub))))
         return Wsub, A, W, dGenSort, K
     
+    # same as preComputeRcaCovariances, but use thread
+    @staticmethod
+    def preComputeRcaCovariancesThread(data: np.ndarray, condRange: slice | None = None, subjRange: slice | None = None, cov_process_num: int = 2) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        if condRange is None:
+            condRange = slice(0, data.shape[0])
+        if subjRange is None:
+            subjRange = slice(0, data.shape[1])
+        data = data[condRange, subjRange]
+        nCond = data.shape[0]
+        nSubjects = data.shape[1]
+        print("selected ", nCond, " conditions and ", nSubjects, " subjects for training")
+        nElectrodes = data[0, 0].shape[1]
+        sumXX = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.float32, order="F")
+        sumYY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.float32, order="F")
+        sumXY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.float32, order="F")
+        nPointsInXX = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int, order="F")
+        nPointsInYY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int, order="F")
+        nPointsInXY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int, order="F")
+        
+        pindx_cache = {}
+        n_processes = cov_process_num
+        if n_processes < 1:
+            n_processes = 2
+        
+        print("process number:", n_processes)
+        n_done = nCond * nSubjects * 3
+        done_queue = queue.Queue(1)
+        done_queue.put(0)
+        task_queue = queue.LifoQueue()
+        
+        threads = tuple(threading.Thread(target=execute, args=(task_queue,)) for _ in range(n_processes))
+        for th in threads:
+            th.start()
+        
+        for cond in range(0, nCond):
+            for subj in range(0, nSubjects):
+                print("computing covariances for condition ", cond, " and subject ", subj)
+                thisVolume = data[cond, subj]
+                nSamples = thisVolume.shape[0]
+                nElectrodes = thisVolume.shape[1]
+                if nSamples < nElectrodes:
+                    print("WARNING: number of samples is less than number of electrodes")
+                nTrials = thisVolume.shape[2]
+                pindx = None
+                if nTrials in pindx_cache:
+                    pindx = pindx_cache[nTrials]
+                else:
+                    pindx = np.ndarray((comb(nTrials, 2), 2), dtype=int)
+                    for k, e in enumerate(combinations(range(0, nTrials), 2)):
+                        pindx[k, :] = e
+                    pindx = np.transpose(np.concatenate((pindx, pindx[:, ::-1]), axis=0))
+                    pindx_cache[nTrials] = pindx
+
+                nPairs = pindx.shape[1]
+                task_queue.put((covarianceVolume2D, (thisVolume,
+                                                          pindx,
+                                                          nSamples,
+                                                          nElectrodes,
+                                                          nTrials,
+                                                     nPairs,
+                                                          cond,
+                                                          subj,
+                                                     nPointsInXX,
+                                                          nPointsInYY,
+                                                          nPointsInXY,
+                                                          sumXX,
+                                                          sumYY,
+                                                          sumXY,
+                                                          task_queue,
+                                                          done_queue,
+                                                          n_done)))
+        for th in threads:
+            th.join()
+        print("done joining")
+        return sumXX, sumYY, sumXY, nPointsInXX, nPointsInYY, nPointsInXY
+
     # across-trial covariance matrices for input into rcaTrain()
     # data: nCond x nSubjects array of nSamples x nElectrodes x nTrials data volumes
     # condRange: range of conditions to include in training (defaults to all conditions)
@@ -113,7 +307,7 @@ class RCAModel:
     #          nPointsInYY: nCond x nSubjects x nElectrodes x nElectrodes array of number of points in each summed autocovariance matrix for Y
     #          nPointsInXY: nCond x nSubjects x nElectrodes x nElectrodes array of number of points in each summed cross-covariance matrix for X and Y
     @staticmethod
-    def preComputeRcaCovariances(data: np.ndarray, condRange: slice = None, subjRange: slice = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def preComputeRcaCovariances(data: np.ndarray, condRange: slice | None = None, subjRange: slice | None = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         if condRange is None:
             condRange = slice(0, data.shape[0])
         if subjRange is None:
@@ -123,13 +317,15 @@ class RCAModel:
         nSubjects = data.shape[1]
         print("selected ", nCond, " conditions and ", nSubjects, " subjects for training")
         nElectrodes = data[0, 0].shape[1]
-        sumXX = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.complex128)
-        sumYY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.complex128)
-        sumXY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.complex128)
-        nPointsInXX = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int)
-        nPointsInYY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int)
-        nPointsInXY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int)
+        sumXX = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.float32, order="F")
+        sumYY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.float32, order="F")
+        sumXY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=np.float32, order="F")
+        nPointsInXX = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int, order="F")
+        nPointsInYY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int, order="F")
+        nPointsInXY = np.zeros((nCond, nSubjects, nElectrodes, nElectrodes), dtype=int, order="F")
         
+        pindx_cache = {}
+
         for cond in range(0, nCond):
             for subj in range(0, nSubjects):
                 print("computing covariances for condition ", cond, " and subject ", subj)
@@ -139,22 +335,29 @@ class RCAModel:
                 if nSamples < nElectrodes:
                     print("WARNING: number of samples is less than number of electrodes")
                 nTrials = thisVolume.shape[2]
-                pindx = np.ndarray((comb(nTrials, 2), 2), dtype=int)
-                for k, e in enumerate(combinations(range(0, nTrials), 2)):
-                    pindx[k, :] = e
-                pindx = np.concatenate((pindx, pindx[:, ::-1]), axis=0)
-                nPairs = pindx.shape[0]
+
+                pindx = None
+                if nTrials in pindx_cache:
+                    pindx = pindx_cache[nTrials]
+                else:
+                    pindx = np.ndarray((comb(nTrials, 2), 2), dtype=int)
+                    for k, e in enumerate(combinations(range(0, nTrials), 2)):
+                        pindx[k, :] = e
+                    pindx = np.transpose(np.concatenate((pindx, pindx[:, ::-1]), axis=0))
+                    pindx_cache[nTrials] = pindx
+                
+                nPairs = pindx.shape[1]
                 
                 sxt = nSamples * nTrials
                 thisVolume = np.transpose(thisVolume, (1, 0, 2))
                 thisVolume = np.reshape(thisVolume, (nElectrodes, sxt))
-                thisMu = np.nanmean(thisVolume, axis=1)
+                thisMu = np.nanmean(thisVolume, axis=1, dtype=np.float32)
                 thisVolume = thisVolume - np.repeat(thisMu[:, np.newaxis], sxt, axis=1)
                 thisVolume = np.reshape(thisVolume, (nElectrodes, nSamples, nTrials))
                 
                 sxp = nSamples * nPairs
-                concatX = thisVolume[:, :, pindx[:, 0]]
-                concatY = thisVolume[:, :, pindx[:, 1]]
+                concatX = thisVolume[:, :, pindx[0, :]]
+                concatY = thisVolume[:, :, pindx[1, :]]
                 concatX = np.reshape(concatX, (nElectrodes, sxp))
                 concatY = np.reshape(concatY, (nElectrodes, sxp))
                 
@@ -168,9 +371,9 @@ class RCAModel:
                 np.nan_to_num(concatX, copy=False)
                 np.nan_to_num(concatY, copy=False)
 
-                sumXX[cond, subj] = np.matmul(concatX, np.conjugate(np.transpose(concatX)))
-                sumYY[cond, subj] = np.matmul(concatY, np.conjugate(np.transpose(concatY)))
-                sumXY[cond, subj] = np.matmul(concatX, np.conjugate(np.transpose(concatY)))
+                sumXX[cond, subj] = np.matmul(concatX, np.transpose(concatX), dtype=np.float32)
+                sumYY[cond, subj] = np.matmul(concatY, np.transpose(concatY), dtype=np.float32)
+                sumXY[cond, subj] = np.matmul(concatX, np.transpose(concatY), dtype=np.float32)
 
         return sumXX, sumYY, sumXY, nPointsInXX, nPointsInYY, nPointsInXY
 
@@ -187,7 +390,7 @@ class RCAModel:
         for c in range(0, nCond):
             for s in range(0, nSubjects):
                 data3D = data[c, s]
-                Y[c, s] = np.ndarray((data3D.shape[0], nComp, data3D.shape[2]), dtype=np.complex128)
+                Y[c, s] = np.ndarray((data3D.shape[0], nComp, data3D.shape[2]), dtype=np.float32)
                 nSamples, nElectrodes, nTrials = data3D.shape
                 if nSamples < nElectrodes:
                     print("WARNING: number of samples is less than number of electrodes")
@@ -195,7 +398,7 @@ class RCAModel:
                     raise ValueError("number of electrodes in data and W must be the same")
 
                 for comp in range(0, nComp):
-                    rep = np.repeat(np.transpose(np.conjugate(W[:, comp])), nTrials)
+                    rep = np.repeat(np.transpose(np.array(W[:, comp])), nTrials)
                     st = np.stack([rep for _ in range(0, nSamples)], axis=0)
                     rst = np.reshape(st, [nSamples, W.shape[0], nTrials])
                     temp = np.multiply(data3D, rst)
@@ -221,19 +424,38 @@ class RCAModel:
     #          A: channel x component forward model
     #          dGenSort: sorted eigenvalues of the generalized eigenvalue problem
     @staticmethod
-    def rcaRun(data: np.ndarray, nReg: int = None, nComp: int = 3, condRange: slice = None, subjRange: slice = None) -> Tuple[np.ndarray, np.matrix, np.matrix, np.matrix]:
+    def rcaRun(data: np.ndarray, nReg: int | None = None, nComp: int = 3, condRange: slice | None = None, subjRange: slice | None = None, cov_process_num: int = 1) -> Tuple[np.ndarray, np.matrix, np.matrix, np.matrix, np.ndarray, np.ndarray, np.ndarray, int]:
         if condRange is None:
             condRange = slice(0, data.shape[0])
         if subjRange is None:
             subjRange = slice(0, data.shape[1])
-        sumXX, sumYY, sumXY, nPointsInXX, nPointsInYY, nPointsInXY = RCAModel.preComputeRcaCovariances(data, condRange, subjRange)
+        sumXX, sumYY, sumXY, nPointsInXX, nPointsInYY, nPointsInXY = RCAModel.preComputeRcaCovariancesThread(data, condRange, subjRange, cov_process_num) if cov_process_num > 1 else RCAModel.preComputeRcaCovariances(data, condRange, subjRange)
         
-        Rxx = np.sum(np.sum(sumXX, axis=1), axis=0) / np.sum(np.sum(nPointsInXX, axis=1), axis=0)
-        Ryy = np.sum(np.sum(sumYY, axis=1), axis=0) / np.sum(np.sum(nPointsInYY, axis=1), axis=0)
-        Rxy = np.sum(np.sum(sumXY, axis=1), axis=0) / np.sum(np.sum(nPointsInXY, axis=1), axis=0)
-        Wsub, A, _, dGenSort, _ = RCAModel.rcaTrain(Rxx, Ryy, Rxy, nReg, nComp)
+        Rxx = np.sum(np.sum(sumXX, axis=1), axis=0) / np.sum(np.sum(nPointsInXX, axis=1), axis=0, dtype=np.float32)
+        Ryy = np.sum(np.sum(sumYY, axis=1), axis=0) / np.sum(np.sum(nPointsInYY, axis=1), axis=0, dtype=np.float32)
+        Rxy = np.sum(np.sum(sumXY, axis=1), axis=0) / np.sum(np.sum(nPointsInXY, axis=1), axis=0, dtype=np.float32)
+        Wsub, A, _, dGenSort, K = RCAModel.rcaTrain(Rxx, Ryy, Rxy, nReg, nComp)
         Y = RCAModel.rcaProject(data, Wsub)
-        return Y, Wsub, A, dGenSort
+        return Y, Wsub, A, dGenSort, Rxx, Ryy, Rxy, K
+
+    def rcaExplained(self, nInclude: int = 1) -> Tuple[np.ndarray, np.float32, np.ndarray, np.ndarray]:
+        model = self
+        pcaEigs, _ = np.linalg.eig(model.Rxx_ + model.Ryy_)
+        pcaEigs = pcaEigs.astype(np.float32)
+        pcaEigs_index = np.argsort(np.abs(pcaEigs), axis=0)
+        pcaEigs_index = pcaEigs_index[::-1]
+        pcaEigs = np.take_along_axis(pcaEigs, pcaEigs_index, axis=0)
+        pcaVarExpl = np.sum(pcaEigs[0:nInclude], axis=0) / np.sum(pcaEigs, axis=0)
+        
+        rcaEigns = model.dGenSort_[::-1]
+        rcaRelExpl = np.sum(rcaEigns[0:nInclude], axis=0) / np.sum(rcaEigns, axis=0)
+
+        Rtotal = 0.5 * (model.Rxx_ + model.Ryy_)
+        sigmas = np.diag(model.components_.T @ Rtotal @ model.components_) / np.diag(model.components_.T @ model.components_)
+        rcaVarExpl = np.float32(np.sum(sigmas[0:nInclude]) / np.sum(sigmas))
+        return rcaRelExpl, rcaVarExpl, pcaVarExpl, pcaEigs
     
 def RCA() -> RCAModel:
     return RCAModel()
+
+
