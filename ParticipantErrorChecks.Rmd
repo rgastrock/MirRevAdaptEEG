@@ -12,6 +12,8 @@ output:
   #   toc_float: true
 ---
 
+This document contains plots and some correlations regarding error sizes in the different trial types. Individual data show high variability of small and large errors within and across participants. That is, not every individual shows larger errors early in training and smaller error at the end of training. As such, we have decided to analyze early vs. late training and small vs. large errors separately (see MNE-PythonProcessingScripts R ntbk).
+
 ```{r, warning=FALSE, message=FALSE}
 source('ana/shared.R')
 source('ana/learningRates.R')
