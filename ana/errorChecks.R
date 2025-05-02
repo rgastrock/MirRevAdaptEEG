@@ -136,8 +136,8 @@ getMIRErrorIndices <- function(angles = c(15,30,45)){
   dat15[is.na(dat15)] = dat30[is.na(dat15)] #combine 15 and 30
   dat15[is.na(dat15)] = dat45[is.na(dat15)] #combine with 45
   alldat <- dat15
-  #return(alldat)
-  write.csv(alldat, file='data/ErrorCheck.csv', row.names = F) 
+  return(alldat)
+  #write.csv(alldat, file='data/ErrorCheck.csv', row.names = F) 
 }
 
 plotMIRErrorIndices <- function(){
