@@ -1,5 +1,5 @@
 ---
-title: "Permutation Statistics Analyses"
+title: "ERP Permutation Statistics Analyses"
 author: "Raphael Q. Gastrock"
 date: "2024-07-26"
 output: 
