@@ -2024,7 +2024,7 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-6, 16), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
@@ -2032,7 +2032,7 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
     axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
-    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_EarlyLate_%s_%s.csv', group, erps))
@@ -2090,79 +2090,79 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['early']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['early']][['S']]
-        points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'laterot'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'earlyrdm'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 1, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['early']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['early']][['S']]
-        points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'laterdm'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'earlymir'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['early']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['early']][['S']]
-        points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'latemir'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       }
     }
     
@@ -2207,40 +2207,40 @@ plotPermTestEarlyLateP3 <- function(perturbs = c('earlyrot', 'laterot', 'earlyrd
           col <- colourscheme[['late']][['S']]
         }
         #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-        lower <- c(rep(-15, length(permtime)))
-        upper <- c(rep(-14, length(permtime)))
+        lower <- c(rep(-5, length(permtime)))
+        upper <- c(rep(-4, length(permtime)))
         polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
     if(ptype == 'earlyrot'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early ROT'),
+      legend(0.8,0,legend=c('Aligned','Early ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'laterot'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Late ROT'),
+      legend(0.8,0,legend=c('Aligned','Late ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'earlyrdm'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early RDM'),
+      legend(0.8,0,legend=c('Aligned','Early RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'laterdm'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Late RDM'),
+      legend(0.8,0,legend=c('Aligned','Late RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'earlymir'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Early MIR'),
+      legend(0.8,0,legend=c('Aligned','Early MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['early']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'latemir'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Late MIR'),
+      legend(0.8,0,legend=c('Aligned','Late MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }
@@ -2274,7 +2274,7 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-6, 16), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
@@ -2282,7 +2282,7 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
     axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
-    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    axis(2, at = c(-5, 0, 5, 1, 15), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_vsAligned_%s_%s.csv', group, erps))
@@ -2336,23 +2336,23 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 15, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'rdm'){
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 15, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'mir'){
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['late']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['late']][['S']]
-        points(x = mo_mir[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 15, pch = 20, cex = 1.5, col=col)
       }
     }
     
@@ -2377,25 +2377,25 @@ plotPermTestEarlyLateDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'), 
           col <- colourscheme[['late']][['S']]
         }
         #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-        lower <- c(rep(-15, length(permtime)))
-        upper <- c(rep(-14, length(permtime)))
+        lower <- c(rep(-5, length(permtime)))
+        upper <- c(rep(-4, length(permtime)))
         polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
     if(ptype == 'rot'){
       #add legend
-      legend(0.8,-5,legend=c('Early ROT - Aligned', 'Late ROT - Aligned'),
+      legend(0.8,0,legend=c('Early ROT - Aligned', 'Late ROT - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'rdm'){
       #add legend
-      legend(0.8,-5,legend=c('Early RDM - Aligned', 'Late RDM - Aligned'),
+      legend(0.8,0,legend=c('Early RDM - Aligned', 'Late RDM - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'mir'){
       #add legend
-      legend(0.8,-5,legend=c('Early MIR - Aligned', 'Late MIR - Aligned'),
+      legend(0.8,0,legend=c('Early MIR - Aligned', 'Late MIR - Aligned'),
              col=c(colourscheme[['early']][['S']],colourscheme[['late']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }
@@ -4580,7 +4580,7 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-6, 16), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("ERP time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
@@ -4588,7 +4588,7 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
     axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
-    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_%s_%s.csv', group, erps))
@@ -4646,79 +4646,79 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['sml']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['sml']][['S']]
-        points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'largerot'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['lrg']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['lrg']][['S']]
-        points(x = mo_rot[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'smallrdm'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['sml']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['sml']][['S']]
-        points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'largerdm'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['lrg']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['lrg']][['S']]
-        points(x = mo_rdm[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'smallmir'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['sml']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['sml']][['S']]
-        points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'largemir'){
         mo_aln <- read.csv(file='data/MovementOnset_CI_aln.csv')
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['aligned']][['T']]
-        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_aln[,1], mo_aln[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['aligned']][['S']]
-        points(x = mo_aln[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_aln[,2], y = 15, pch = 20, cex = 1.5, col=col)
         
         col <- colourscheme[['lrg']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(4.5, 4.5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(14.5, 14.5), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['lrg']][['S']]
-        points(x = mo_mir[,2], y = 4.5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 14.5, pch = 20, cex = 1.5, col=col)
       }
     }
     
@@ -4763,40 +4763,40 @@ plotPermTestSmallLargeP3 <- function(perturbs = c('smallrot', 'largerot', 'small
           col <- colourscheme[['lrg']][['S']]
         }
         #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-        lower <- c(rep(-15, length(permtime)))
-        upper <- c(rep(-14, length(permtime)))
+        lower <- c(rep(-5, length(permtime)))
+        upper <- c(rep(-4, length(permtime)))
         polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
     if(ptype == 'smallrot'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Small ROT'),
+      legend(0.8,0,legend=c('Aligned','Small ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['sml']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'largerot'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Large ROT'),
+      legend(0.8,0,legend=c('Aligned','Large ROT'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['lrg']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'smallrdm'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Small RDM'),
+      legend(0.8,0,legend=c('Aligned','Small RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['sml']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'largerdm'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Large RDM'),
+      legend(0.8,0,legend=c('Aligned','Large RDM'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['lrg']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'smallmir'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Small MIR'),
+      legend(0.8,0,legend=c('Aligned','Small MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['sml']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'largemir'){
       #add legend
-      legend(0.8,-5,legend=c('Aligned','Large MIR'),
+      legend(0.8,0,legend=c('Aligned','Large MIR'),
              col=c(colourscheme[['aligned']][['S']],colourscheme[['lrg']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }
@@ -4830,7 +4830,7 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
     #NA to create empty plot
     # could maybe use plot.new() ?
     
-    plot(NA, NA, xlim = c(-2, 2), ylim = c(-16, 6), 
+    plot(NA, NA, xlim = c(-2, 2), ylim = c(-6, 16), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
          main = sprintf("Difference Waves time-locked to feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
     
@@ -4838,7 +4838,7 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
     abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
     abline(v = c(0.15, 0.28, 0.5), col = 8, lty = 3) #include P3 in same plot
     axis(1, at = c(-2, -1.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 1.5, 2)) #tick marks for x axis
-    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
     
     for (group in groups){
       data <- read.csv(file=sprintf('data/Evoked_DF_SmallLarge_vsAligned_%s_%s.csv', group, erps))
@@ -4892,23 +4892,23 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
         mo_rot <- read.csv(file='data/MovementOnset_CI_rot.csv')
         
         col <- colourscheme[['lrg']][['T']]
-        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rot[,1], mo_rot[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['lrg']][['S']]
-        points(x = mo_rot[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rot[,2], y = 15, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'rdm'){
         mo_rdm <- read.csv(file='data/MovementOnset_CI_rdm.csv')
         
         col <- colourscheme[['lrg']][['T']]
-        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_rdm[,1], mo_rdm[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['lrg']][['S']]
-        points(x = mo_rdm[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_rdm[,2], y = 15, pch = 20, cex = 1.5, col=col)
       } else if (ptype == 'mir'){
         mo_mir <- read.csv(file='data/MovementOnset_CI_mir.csv')
         
         col <- colourscheme[['lrg']][['T']]
-        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(5, 5), col = col, lty = 1, lwd = 8)
+        lines(x = c(mo_mir[,1], mo_mir[,3]), y = c(15, 15), col = col, lty = 1, lwd = 8)
         col <- colourscheme[['lrg']][['S']]
-        points(x = mo_mir[,2], y = 5, pch = 20, cex = 1.5, col=col)
+        points(x = mo_mir[,2], y = 15, pch = 20, cex = 1.5, col=col)
       }
     }
     
@@ -4933,25 +4933,25 @@ plotPermTestSmallLargeDiffWavesP3 <- function(perturbs = c('rot', 'rdm', 'mir'),
           col <- colourscheme[['lrg']][['S']]
         }
         #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-        lower <- c(rep(-15, length(permtime)))
-        upper <- c(rep(-14, length(permtime)))
+        lower <- c(rep(-5, length(permtime)))
+        upper <- c(rep(-4, length(permtime)))
         polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
       }
     }
     
     if(ptype == 'rot'){
       #add legend
-      legend(0.8,-5,legend=c('Small ROT - Aligned', 'Large ROT - Aligned'),
+      legend(0.8,0,legend=c('Small ROT - Aligned', 'Large ROT - Aligned'),
              col=c(colourscheme[['sml']][['S']],colourscheme[['lrg']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'rdm'){
       #add legend
-      legend(0.8,-5,legend=c('Small RDM - Aligned', 'Large RDM - Aligned'),
+      legend(0.8,0,legend=c('Small RDM - Aligned', 'Large RDM - Aligned'),
              col=c(colourscheme[['sml']][['S']],colourscheme[['lrg']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     } else if (ptype == 'mir'){
       #add legend
-      legend(0.8,-5,legend=c('Small MIR - Aligned', 'Large MIR - Aligned'),
+      legend(0.8,0,legend=c('Small MIR - Aligned', 'Large MIR - Aligned'),
              col=c(colourscheme[['sml']][['S']],colourscheme[['lrg']][['S']]),
              lty=1,bty='n',cex=1,lwd=2)
     }

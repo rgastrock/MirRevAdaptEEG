@@ -1,7 +1,7 @@
 ---
 title: "ERP Permutation Statistics Analyses"
 author: "Raphael Q. Gastrock"
-date: "2024-07-26"
+date: "2025-05-06"
 output: 
   html_document:
     toc: true
@@ -9,27 +9,27 @@ output:
     toc_float: true
 ---
 
-This document contains permutation tests conducted for both ERP and TFR analyses
+This document contains figures and statistics used for ERP analyses
 
 ```{r, warning=FALSE, message=FALSE}
 source('ana/shared.R')
 source('ana/learningRates.R')
-source('ana/errorSizesERP.R')
-source('ana/directionMoves.R')
-source('ana/p3analysis.R')
 source('ana/permutationTtest.R')
+source('ana/directionMoves.R')
 ```
 
 
-# ERP Analyses
+# Early vs. Late conditions
 
-## Early vs Late conditions
+## Error Feedback Processing
 
-### Feedback-related Negativity (FRN)
-
-This is time-locked to feedback onset. Analyses includes 10 fronto-central-parietal electrodes:
+We time-locked to the feedback onset, or after the participants have performed the reaching movement. For these set of analyses we include 10 fronto-central-parietal electrodes:  
 
 FCz, F3, Fz, F4, C3, Cz, C4, P3, Pz, P4
+
+We then baseline 100 ms prior to the feedback onset and compare signal differences from the feedback onset until 1 second after. We compare whether two signals are statistically different from each other by implementing cluster-based permutation statistics. If the difference between two signals for a given set of timepoints exceed a T-value threshold, then these timepoints are identified as clusters (indicated in plots below as light-shaded bars). However, after running 1000 permutations, these clusters are deemed significant if the probability of a difference occurring is not merely due to chance. These significant clusters are what we report in the manuscript and are indicated in the plots below as solid bars.
+
+We compare signals across conditions in three steps. First, we compare whether each early or late condition in each perturbation type is different from the aligned condition. Next, we calculate difference waves between each condition and the aligned condition, such that we can compare early and late conditions directly. Finally, we calculate difference waves between early and late conditions in each perturbation type, such that we can compare across perturbation types.
 
 #### Comparison to aligned reaches (baseline)
 
@@ -43,15 +43,19 @@ plotPermTestEarlyLateERPs()
 plotPermTestEarlyLateDiffWaves()
 ```
 
+We find differences between early and late conditions in only the fixed and random rotation perturbations. These differences show a more positive peak for early training around 250 ms post-feedback.
+
 #### Comparison across perturbation types
 
 ```{r}
 plotPermTestPTypeEarlyLateDiffWaves()
 ```
 
-### P3 component
+We find a significant cluster showing a difference between mirror and random conditions. This is likely due to the lack of a difference between early and late in the mirror condition, but the presence of the effect in the random perturbation. Although clusters were identified in comparing fixed rotation with mirror, these were not significant.
 
-This is also time-locked to feedback onset, but only considers electrodes along the midline:
+### P3 component (Exploratory)
+
+This is also time-locked to feedback onset, but only considers electrodes along the midline: 
 
 FCz, Fz, Cz, Pz
 
@@ -67,15 +71,55 @@ plotPermTestEarlyLateP3()
 plotPermTestEarlyLateDiffWavesP3()
 ```
 
+Similar to our analyses including more electrodes, we observe a more positive peak for early training around 250 ms post-feedback in fixed and random rotation perturbations, but not in the mirror perturbation.
+
 #### Comparison across perturbation types
 
 ```{r}
 plotPermTestPTypeEarlyLateDiffWavesP3()
 ```
 
+The mirror and random perturbation conditions show a difference after 250 ms post-feedback.
+
+## Movement Preparation Processing
+
+We time-locked to the go signal onset, which occurs 1 second after target onset. For these set of analyses, we include C3 and C4 electrodes (motor areas in both hemispheres).
+
+We then baseline 300 ms prior to the target onset and compare signal differences from the target onset until the go signal onset (1 sec duration). We compare conditions using the same statistical procedure and analyses steps mentioned in the feedback error processing section.
+
+### Readiness Potential (RP)
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestEarlyLateRP()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestEarlyLateRPDiffWaves()
+```
+
+We find that the late condition for the fixed rotation perturbation is more positive, around 100 ms prior to the go signal onset.
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeEarlyLateRPDiffWaves()
+```
+
+We find a difference between rotation and random perturbations, likely driven by the difference observed between early and late training in the fixed rotation perturbation.
+
 ### Lateralized Readiness Potential (LRP)
 
-This is time-locked to the go signal onset, which is 1 second after target onset. Analyses includes C3 and C4 electrodes, and considers only reaches to the left or right side of the workspace.
+We observed that the RPs were lateralized for trials in which participants either moved to the right or left side of the workspace. That is, C3 showed a more negative RP than C4, for movements to the right of the workspace, while this was flipped for movements to the left of the workspace. This effect seems more pronounced in the aligned condition, but is still observed for the average activity shown in the other perturbation types.
+
+```{r, fig.width= 14, fig.height=18}
+plotWorkspaceLRPs()
+```
+
+Notably, we only observe this effect for targets located near the horizontal axis. That is, the effect goes away if we consider the targets near the vertical axis. As such, we calculate Lateralized RPs: (right C3 - right C4) - (left C3 - left C4), and only consider epochs where participants had to move either to the left or right of the workspace.
 
 #### Comparison to aligned reaches (baseline)
 
@@ -95,13 +139,13 @@ plotPermTestEarlyLateLRPDiffWaves()
 plotPermTestPTypeEarlyLateLRPDiffWaves()
 ```
 
-## Small vs Large conditions
+We do not find any differences across conditions for LRPs.
 
-### Feedback-related Negativity (FRN)
+# Small vs. Large conditions
 
-This is time-locked to feedback onset. Analyses includes 10 fronto-central-parietal electrodes:
+## Error Feedback Processing
 
-FCz, F3, Fz, F4, C3, Cz, C4, P3, Pz, P4
+We repeat the same analyses steps as the ones above, however, we now split the data according to small and large errors.
 
 #### Comparison to aligned reaches (baseline)
 
@@ -109,11 +153,13 @@ FCz, F3, Fz, F4, C3, Cz, C4, P3, Pz, P4
 plotPermTestSmallLargeERPs()
 ```
 
-#### Comparison between early and late training
+#### Comparison between small and large error conditions
 
 ```{r}
 plotPermTestSmallLargeDiffWaves()
 ```
+
+Trials where a small error is experienced show a sustained positivity post-feedback in all perturbation conditions. However, this difference seems to occur at a later timepoint for the fixed rotation.
 
 #### Comparison across perturbation types
 
@@ -121,11 +167,9 @@ plotPermTestSmallLargeDiffWaves()
 plotPermTestPTypeSmallLargeDiffWaves()
 ```
 
-### P3 component
+However, there are no differences when comparing across perturbations.
 
-This is also time-locked to feedback onset, but only considers electrodes along the midline:
-
-FCz, Fz, Cz, Pz
+### P3 component (Exploratory)
 
 #### Comparison to aligned reaches (baseline)
 
@@ -145,9 +189,35 @@ plotPermTestSmallLargeDiffWavesP3()
 plotPermTestPTypeSmallLargeDiffWavesP3()
 ```
 
-### Lateralized Readiness Potential (LRP)
+We do not find any differences when comparing across perturbation types.
 
-This is time-locked to the go signal onset, which is 1 second after target onset. Analyses includes C3 and C4 electrodes, and considers only reaches to the left or right side of the workspace.
+## Movement Preparation Processing
+
+### Readiness Potential (RPs)
+
+#### Comparison to aligned reaches (baseline)
+
+```{r}
+plotPermTestSmallLargeRP()
+```
+
+#### Comparison between early and late training
+
+```{r}
+plotPermTestSmallLargeRPDiffWaves()
+```
+
+We find no differences between small and large errors during movement preparation across perturbation types.
+
+#### Comparison across perturbation types
+
+```{r}
+plotPermTestPTypeSmallLargeRPDiffWaves()
+```
+
+We find no differences across perturbation types during movement preparation.
+
+### Lateralized Readiness Potential (LRPs)
 
 #### Comparison to aligned reaches (baseline)
 
@@ -161,8 +231,24 @@ plotPermTestSmallLargeLRPs()
 plotPermTestSmallLargeLRPDiffWaves()
 ```
 
+We find no differences between small and large errors during movement preparation across perturbation types.
+
 #### Comparison across perturbation types
 
 ```{r}
 plotPermTestPTypeSmallLargeLRPDiffWaves()
 ```
+
+We find no differences across perturbation types during movement preparation.
+
+# Manuscript plots
+
+Although we have all figures and statistical comparisons in this document, we summarize the main findings in the manuscript.
+
+```{r, fig.width = 11, fig.height=12}
+plotFeedbackERP()
+plotReadinessERP()
+plotLateralizedRP()
+```
+
+
