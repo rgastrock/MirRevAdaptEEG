@@ -1,7 +1,7 @@
 ---
-title: "TFR analyses for mirror and rotation adaptation"
+title: "Time Frequency Representation Analyses"
 author: "Raphael Q. Gastrock"
-date: "2024-04-19"
+date: "20254-054-0819"
 output:
   # pdf_document:
   #   toc: true
@@ -12,20 +12,22 @@ output:
     toc_float: true
 ---
 
-This document shows plots and  time-frequency analyses related to feedback error processing and movement preparation for different perturbation types: fixed rotation, mirror reversal, random rotation.
+This document contains figures and statistics used for Time-Frequency Representation (TFR) analyses.
 
 ```{r, warning=FALSE, message=FALSE}
 source('ana/shared.R')
 source('ana/permutationTtest.R')
 ```
 
-# Feedback error processing
+# Error Feedback Processing
 
-We transform the signals across epochs into time-frequency representations (TFRs) using Morlet wavelet (6 cycles) convolution. The frequencies we include are log-spaced values that range from 6 to 35 Hz. First, we show plots time-locked to feedback onset. We include 250 ms before the feedback onset, to show TFRs around the movement onset, given that we observed some ERPs during these timepoints. However, we shift our focus to analyzing the second that follows feedback onset. 
+We transform the signals across epochs into time-frequency representations (TFRs) using Morlet wavelet (6 cycles) convolution. The frequencies we include are log-spaced values that range from 6 to 35 Hz. First, we show plots time-locked to feedback onset. We include 250 ms before the feedback onset, to show TFRs around the movement onset. However, we focus our statistical analyses for the second that follows feedback onset. 
 
-## Early vs. Late training
+## Early vs. Late conditions
 
-To focus better on differences between early and late training within each perturbation type, we only analyze the first two blocks of trials during early training (first 12 training trials) and the last two blocks of trials during late training (last 12 training trials). We then generate TFRs for each of the conditions (early vs. late for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
+We define early and late conditions in a similar manner to how we defined these conditions in our ERP analyses. That is, we consider the first two blocks of rotation and mirror training (first 12 trials) as early training and the last six blocks (36 trials) as late training. For the random rotation, we combined both random rotation sets as they do not show differences in performance. From this combined set of trials, the first two blocks (12 trials) are considered as early training, while the last 4 blocks (24 trials) are considered as late training.
+
+We then generate TFRs for each of the conditions (early vs. late for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches (48 trials). We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1).
 
 ### Time-Frequency Representations
 
@@ -68,22 +70,12 @@ plotPermTestEarlyLateTFRs(freqs = 'theta', roi = 'medfro')
 plotPermTestEarlyLateTFRs(freqs = 'theta', roi = 'latcen')
 ```
 
-For the medial frontal areas, we observe significant clusters for the early random and mirror conditions around 250ms post-feedback onset. This is less evident for late random and mirror conditions. We do not find significant clusters for both rotation conditions.
-
-For the lateral central areas, we find the same pattern of results, where the first 250 ms post-feedback onset show significant clusters when compared to aligned reaches, but there are no significant clusters for the fixed rotation condition.
-
 ##### Alpha band
 
 ```{r}
 plotPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'medfro')
 plotPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'latcen')
 ```
-
-Note that we only consider time points from feedback onset until 1 second post-feedback.
-
-For the medial frontal areas, we do not observe any clusters for the early and late fixed rotation during the time points we consider. Although the early fixed rotation condition showed a significant cluster, this may likely be due to movements performed on the way back to the start position. We observe a significant cluster between 0.5 sec to 1.0 sec during early training in the random rotation condition, which is not observed during late training. Finally, we observe clusters for both early and late mirror training, suggesting that mirror training produced a decrease in alpha power compared to the aligned condition. However, none reached statistical significance.
-
-For the lateral central areas, we find significant clusters only during early and late mirror training, where the decrease in alpha power seems to occur earlier on (around movement onset) during late training.
 
 ##### Beta band
 
@@ -92,11 +84,9 @@ plotPermTestEarlyLateTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestEarlyLateTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-For the medial frontal areas, we observe significant clusters during early training with the random rotation (around 250 ms to 800 ms) but not during late training. We also observe significant clusters during early and late mirror training.
-
-For the lateral central areas, we find significant clusters only during early training with the random rotation, just prior to 500 ms after feedback onset.
-
 ### Time-Frequency Representations (Early vs. Late Difference Waves)
+
+We then calculate the TFR differences between each early or late condition and the aligned condition. Then we compare early from late in each of the perturbation types.
 
 #### Medial frontal areas
 
@@ -126,9 +116,7 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', 
 ```
 
 
-#### Frequency bands comparing difference waves between early and late training
-
-Next, we subtract the aligned condition from each early and late condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
+#### Frequency bands comparing differences between early and late training
 
 ##### Theta band
 
@@ -137,9 +125,9 @@ plotPermTestEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'medfro')
 plotPermTestEarlyLateDiffWavesTFRs(freqs = 'theta', roi = 'latcen')
 ```
 
-For the medial frontal areas, although we observe some clusters for the fixed and random rotation conditions, none of these are significant.
+For the medial frontal areas, we observe differences between early and late in the random perturbation. This difference occurs around 300 ms up to 1 second following feedback onset.
 
-For the lateral central areas, we observe a similar pattern of results, where we do not find any significant clusters when comparing early and late training.
+For the lateral central areas, we observe a difference in the random and mirror perturbations, where we observe early training to be more negative than the late condition.
 
 ##### Alpha band
 
@@ -150,7 +138,7 @@ plotPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
 
 For the medial frontal areas, we do not find any significant clusters.
 
-For the lateral central areas, we observe some clusters areound feedback onset for mirror training, but none are significant.
+For the lateral central areas, we observe a difference between early and late training in the rotation perturbation, where late training is more positive around 500 ms to 750 ms post-feedback onset.
 
 ##### Beta band
 
@@ -159,11 +147,13 @@ plotPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-For the medial frontal areas, we only find significant clusters for random rotation training, with late training having increased beta power for almost the full second post-feedback. 
+For the medial frontal areas, we find differences between early and late training for the random perturbation, with early training having more negative beta power around 250 to 500 ms post-feedback.
 
-For the lateral central areas, we observe some clusters for each perturbation, but none are significant.
+For the lateral central areas, we observe differences in the mirror perturbation, where early training is more negative than late, around 500 ms to 900 ms post-feedback.
 
 ### Time-Frequency Representations (Perturbation type comparisons)
+
+Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 #### Medial frontal areas
 
@@ -187,8 +177,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rdm_power-tfr.svg', erps, roi),
 ```
 
 #### Frequency bands comparing across perturbation types
-
-Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 ##### Theta band
 
@@ -215,11 +203,11 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-We observe a significant cluster when comparing mirror and random perturbations, around 250 ms post-feedback.
+We observe a significant cluster when comparing fixed and random rotation perturbations, around 250 ms post-feedback, with random rotation showing more positive activity.
 
 ## Small vs. Large errors
 
-We then identify trials where participants either committed small or large errors. We defined small errors as the lowest 40% of error magnitudes across all perturbed trials, while large errors were the highest 40%. We then generate TFRs for each of the conditions (small vs. large for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
+We repeat the same analyses steps, but now compare small and large errors experienced after the reaching movement. We defined these small and large error conditions similar to how we defined them in our ERP analyses.
 
 ### Time-Frequency Representations
 
@@ -262,10 +250,6 @@ plotPermTestSmallLargeTFRs(freqs = 'theta', roi = 'medfro')
 plotPermTestSmallLargeTFRs(freqs = 'theta', roi = 'latcen')
 ```
 
-For the medial frontal areas, we find significant clusters for the large random rotation, as well as small and large mirror conditions. Theta power was increased around the time after feedback onset and lasted until around 500 ms post-feedback. Theta power was increased until after more than 500 ms post-feedback for large errors in the mirror condition.
-
-For the lateral central areas, although we observe significant clusters in the other conditions, these clusters occur near 1 sec post-feedback, which could be related to moving back to the home position. Thus, we only consider the large error condition during mirror training to have a significant cluster around feedback onset up to after more than 500 ms post-feedback.
-
 ##### Alpha band
 
 ```{r}
@@ -273,9 +257,6 @@ plotPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'medfro')
 plotPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'latcen')
 ```
 
-For the medial frontal areas, we find significant clusters for the large fixed rotation, occurring around movement onset until around 350 ms post-feedback. We also find a significant cluster for the small random rotation, which seems to be generally lower compared to aligned from around after 250 ms post-feedback, until the end of the trial.
-
-For the lateral central areas, we observe significant clusters during large fixed rotation, small random rotation, and small mirror conditions. 
 
 ##### Beta band
 
@@ -284,11 +265,10 @@ plotPermTestSmallLargeTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestSmallLargeTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-For medial frontal areas, we observe lower beta power post-feedback for only the small mirror condition.
-
-For the lateral central areas, we do not find any significant clusters.
 
 ### Time-Frequency Representations (Small vs. Large Difference Waves)
+
+Next, we subtract the aligned condition from each small and large condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
 
 #### Medial frontal areas
 
@@ -320,8 +300,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_contrast_power-tfr.s
 
 #### Frequency bands comparing difference waves between small and large errors
 
-Next, we subtract the aligned condition from each small and large condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
-
 ##### Theta band
 
 ```{r}
@@ -347,9 +325,11 @@ plotPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-We only find a significant cluster for the lateral central ROI, during random rotation training. This occurs around movement onset until a few ms post-feedback, where beta power is decreased for large errors compared to small errors.
+We only find a significant cluster for the lateral central ROI, during random rotation training. This occurs around 800 ms post-feedback, where beta power seems to be increased for large errors compared to small errors.
 
 ### Time-Frequency Representations (Perturbation Type Comparisons)
+
+Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 #### Medial frontal areas
 
@@ -374,8 +354,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rdm_power-tfr.svg', erps, roi),
 
 
 #### Frequency bands comparing across perturbation types
-
-Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 ##### Theta band
 
@@ -402,12 +380,12 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-We find a significant cluster when comparing mirror and random perturbation types.
+We find significant clusters in the lateral central ROI, when comparing the fixed rotation and mirror with the random rotation perturbation.
 
 
 # Movement preparation
 
-Next, we show TFR plots time-locked to the go signal onset. We include time points from -1.5 sec to zero, but focus our analyses on the second prior to the go signal. That is, once the target is cued until they are allowed to move towards the target.
+Next, we show TFR plots anad analyses time-locked to the go signal onset. We include time points from -1.5 seconds to zero, but focus our analyses on the second prior to the go signal. That is, once the target is cued until they are allowed to move towards the target.
 
 ## Early vs. Late training
 
@@ -454,8 +432,6 @@ plotGoOnsetPermTestEarlyLateTFRs(freqs = 'theta', roi = 'medfro')
 plotGoOnsetPermTestEarlyLateTFRs(freqs = 'theta', roi = 'latcen')
 ```
 
-We only find a significant cluster for the lateral central area during late random rotation training. 
-
 ##### Alpha band
 
 ```{r}
@@ -463,9 +439,6 @@ plotGoOnsetPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'medfro')
 plotGoOnsetPermTestEarlyLateTFRs(freqs = 'alpha', roi = 'latcen')
 ```
 
-For the medial frontal area, we find higher alpha power prior to the go signal onset during early random rotation training. We also find lower alpha power just before the go signal onset during late mirror training.
-
-For the lateral central area, we do not find any significant clusters.
 
 ##### Beta band
 
@@ -474,11 +447,9 @@ plotGoOnsetPermTestEarlyLateTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestEarlyLateTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-For the medial frontal region, we find lower beta power during both early fixed rotation training and late random rotation training, prior to the go signal. Clusters were identified for both early and late mirror training, but these were not significant. 
-
-We do not observe significant clusters for the lateral central area.
-
 ### Time-Frequency Representations (Early vs. Late Difference Waves)
+
+Next, we subtract the aligned condition from each early and late condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
 
 #### Medial frontal areas
 
@@ -510,8 +481,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_late_rdm_contrast_power-tfr.svg', 
 
 #### Frequency bands comparing difference waves between early and late training
 
-Next, we subtract the aligned condition from each early and late condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
-
 ##### Theta band
 
 ```{r}
@@ -528,7 +497,7 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
 plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
 ```
 
-We only find a significant cluster in the medial frontal area, when comparing early and late random rotation training. Alpha was decreased later on in training for the random condition.
+We find differences in both ROIs when comparing early and late random perturbation training. In both ROIs, alpha power is decreased in late random training compared to early.
 
 ##### Beta band
 
@@ -537,9 +506,11 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-We do not find significant clusters.
+We find differences in both ROIs when comparing early and late random perturbation training. In both ROIs, beta power is decreased in late random training compared to early.
 
 ### Time-Frequency Representations (Perturbation type comparisons)
+
+Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 #### Medial frontal areas
 
@@ -563,8 +534,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_EL_rdm_power-tfr.svg', erps, roi),
 ```
 
 #### Frequency bands comparing across perturbation types
-
-Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 ##### Theta band
 
@@ -595,7 +564,7 @@ We do not observe any significant clusters for both regions of interest.
 
 ## Small vs. Large errors
 
-We then identify trials where participants either committed small or large errors. We defined small errors as the lowest 40% of error magnitudes across all perturbed trials, while large errors were the highest 40%. We then generate TFRs for each of the conditions (small vs. large for fixed rotation, mirror reversal, random rotation), and calculate TFRs for the baseline aligned reaches. We focused on two different regions of interest (ROIs): the medial frontal areas (F1, Fz, F2, FC1, FCz, FC2, C1, Cz, C2) and lateral central areas of the left hemisphere (i.e., opposite the moving hand; C5, C3, CP5, CP3, CP1, P5, P3, P1)
+We then repeat the same analyses steps but now compare small and large error conditions.
 
 ### Time-Frequency Representations
 
@@ -627,18 +596,12 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_power-tfr.svg', erps
 
 #### Frequency bands compared to aligned baseline
 
-For each ROI, we calculate the mean power (µV²) within each participant of the following frequency bands: theta (6-8 Hz), alpha (9-13 Hz), and beta (13-25 Hz). We then compare these mean frequencies between small and large error conditions for the different perturbation types. 
-
-First, we compare each small or large condition to the aligned baseline condition. For statistical analyses, we implemented a cluster-based permutation t-test. Clusters of time points that exceed the t-value threshold (determined by a t-distribution, given a p-value of 0.05 and sample size of 32) will be shown in light orange or red colors, while clusters of time points that significantly differ from chance after 1000 permutations will be shown in dark orange or red colors.
-
 ##### Theta band
 
 ```{r}
 plotGoOnsetPermTestSmallLargeTFRs(freqs = 'theta', roi = 'medfro')
 plotGoOnsetPermTestSmallLargeTFRs(freqs = 'theta', roi = 'latcen')
 ```
-
-We do not find any significant clusters.
 
 ##### Alpha band
 
@@ -647,10 +610,6 @@ plotGoOnsetPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'medfro')
 plotGoOnsetPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'latcen')
 ```
 
-For the medial frontal areas, we find significant clusters for the small and large mirror conditions.
-
-For the lateral central areas, we observe significant clusters during small random rotation, and large mirror conditions. 
-
 ##### Beta band
 
 ```{r}
@@ -658,11 +617,9 @@ plotGoOnsetPermTestSmallLargeTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestSmallLargeTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-For medial frontal areas, we observe significant clusters for the large rotation condition, occurring a few ms after target onset. We also observe significant clusters for small random and small mirror conditions, just prior to go signal onset.
-
-For the lateral central areas, we find significant clusters for small random and small mirror conditions.
-
 ### Time-Frequency Representations (Small vs. Large Difference Waves)
+
+Next, we subtract the aligned condition from each small and large condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 #### Medial frontal areas
 
@@ -694,8 +651,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_lrgerrors_rdm_contrast_power-tfr.s
 
 #### Frequency bands comparing difference waves between small and large errors
 
-Next, we subtract the aligned condition from each small and large condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
-
 ##### Theta band
 
 ```{r}
@@ -712,7 +667,7 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
 plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
 ```
 
-We find a significant cluster for random condition in lateral central areas.
+We find a significant cluster for random condition in lateral central areas, where small errors are more negative than large errors.
 
 ##### Beta band
 
@@ -721,9 +676,11 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-We do not find significant clusters for both regions of interest.
+We find differences in both ROIs for the rotation perturbation, where large errors show more negative power than small errors.
 
 ### Time-Frequency Representations (Perturbation Type Comparisons)
+
+Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
 
 #### Medial frontal areas
 
@@ -749,8 +706,6 @@ image_read_svg(sprintf('doc/fig/tfr_mne/%s/%s_SL_rdm_power-tfr.svg', erps, roi),
 
 #### Frequency bands comparing across perturbation types
 
-Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
-
 ##### Theta band
 
 ```{r}
@@ -767,7 +722,7 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'medfro')
 plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'alpha', roi = 'latcen')
 ```
 
-For the lateral central area, we find a difference between mirror and random perturbation, where mirror alpha power is decreased compared to random, just prior to the go signal onset.
+For the lateral central area, we find a difference between fixed rotation and mirror perturbations, where rotation alpha power is decreased compared to mirror, just following the target onset.
 
 ##### Beta band
 
@@ -776,7 +731,17 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
-For the lateral central area, we find a significant cluster when comparing mirror and fixed rotation, occurring just after target onset. Beta power for the fixed rotation is lower compared to mirror.
+For the lateral central area, we find a significant cluster when comparing mirror and fixed rotation, occurring just after target onset. Beta power for the fixed rotation is lower compared to mirror. We also observe more negative power for rotation compared to mirror in medial frontal areas, but this occurs later and for a much shorter time.
+
+# Manuscript plots
+
+Although we have all figures and statistical comparisons in this document, we summarize the main findings in the manuscript.
+
+```{r, fig.width = 11, fig.height=12}
+plotTFRThetaResults()
+plotTFRAlphaResults()
+plotTFRBetaResults()
+```
 
 
 
