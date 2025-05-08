@@ -27,6 +27,8 @@ We also confirm expected pattern of results for RT, MT and PL. We find that RTs 
 
 These findings are similar to our findings in a previous study (Gastrock et al., 2024). In the current study, we perform statistical tests for the behavioral data to confirm learning in the fixed rotation and mirror perturbations. The rest of the analyses focuses on the EEG data.
 
+From these behavioral data, we decided on our early vs. late and small vs. large conditions.
+
 # Statistics
 
 ```{r}
