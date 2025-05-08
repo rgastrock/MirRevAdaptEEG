@@ -1,0 +1,38 @@
+---
+title: "Behavioral analyses"
+author: "Raphael Q. Gastrock"
+date: "2025-05-08"
+output: html_document
+---
+
+This document contains figures and statistics used in analyzing the behavioral data across the different perturbation types.
+
+```{r, warning=FALSE, message=FALSE}
+source('ana/shared.R')
+source('ana/learningRates.R')
+source('ana/movementAnalyses.R')
+```
+
+# Measures analyzing reach performance
+
+We investigate how learning progresses for the different perturbation types, and look into other movement measures such as reaction time, movement time, and path length.
+
+```{r}
+plotBehaviorLearning()
+```
+
+We find that participants learned the fixed rotation and mirror perturbations. However, variability across participants is greated in the mirror perturbation. As expected, we do not observe learning in the random perturbation.
+
+We also confirm expected pattern of results for RT, MT and PL. We find that RTs are initially slower across all perturbation types, but the mirror perturbation produced the slowest RTs early on in training. From the plots, we also do not observe differences in MTs and PLs, but PL in the mirror condition seems to have higher variability.
+
+These findings are similar to our findings in a previous study (Gastrock et al., 2024). In the current study, we perform statistical tests for the behavioral data to confirm learning in the fixed rotation and mirror perturbations. The rest of the analyses focuses on the EEG data.
+
+# Statistics
+
+```{r}
+getLCBlockedtTests()
+```
+
+We compare the first, second, and last blocks (6 trials each) of training in the fixed rotation and mirror perturbations, and find no differences between the two. However, we do confirm that learning has occurred in the rotation perturbation when comparing the first and last block of training, where the amount of compensation is higher at the end of training. We do not find a difference between the first and last block of mirror training, but this is likely due to the high variability in block 1. However, when we compare the second and last blocks of mirror training, we find a difference, thereby confirming that learning has occured by the end of training.
+
+
