@@ -1144,6 +1144,7 @@ getPTypeDiffWavesSmallLargeCI <- function(groups = c('rot_diff', 'rdm_diff', 'mi
     data <- as.data.frame(data)
     timepts <- data$time
     data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    data1 <- data1*-1 #multiply by -1 to change direction (large minus small is now small minus large)
     
     confidence <- data.frame()
     
@@ -1766,6 +1767,7 @@ getRPPTypeDiffWavesSmallLargeCI <- function(groups = c('rot_diff', 'rdm_diff', '
     data <- as.data.frame(data)
     timepts <- data$time
     data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    data1 <- data1*-1 #multiply by -1 to change direction (large minus small is now small minus large)
     
     confidence <- data.frame()
     

@@ -2776,6 +2776,7 @@ getSmallvsLargePTypeLRPDiffWavesCI <- function(perturbs = c('rot', 'rdm', 'mir')
     
     data <- as.data.frame(data)
     data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    data1 <- data1*-1 #multiply by -1 to get small minus large rather than large minus small
     
     confidence <- data.frame()
     

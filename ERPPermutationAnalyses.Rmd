@@ -35,12 +35,14 @@ We compare signals across conditions in three steps. First, we compare whether e
 
 ```{r}
 plotPermTestEarlyLateERPs()
+getEarlyLateERPPvalStats(comparison='vsAligned', erps='frn')
 ```
 
 #### Comparison between early and late training
 
 ```{r}
 plotPermTestEarlyLateDiffWaves()
+getEarlyLateERPPvalStats(comparison='EarlyvsLate', erps='frn')
 ```
 
 We find differences between early and late conditions in only the fixed and random rotation perturbations. These differences show a more positive peak for early training around 250 ms post-feedback.
@@ -49,6 +51,7 @@ We find differences between early and late conditions in only the fixed and rand
 
 ```{r}
 plotPermTestPTypeEarlyLateDiffWaves()
+getEarlyLateERPPvalStats(comparison='PerturbTypeComp', erps='frn')
 ```
 
 We find a significant cluster showing a difference between mirror and random conditions. This is likely due to the lack of a difference between early and late in the mirror condition, but the presence of the effect in the random perturbation. Although clusters were identified in comparing fixed rotation with mirror, these were not significant.
@@ -93,12 +96,14 @@ We then baseline 300 ms prior to the target onset and compare signal differences
 
 ```{r}
 plotPermTestEarlyLateRP()
+getEarlyLateERPPvalStats(comparison='vsAligned', erps='rp')
 ```
 
 #### Comparison between early and late training
 
 ```{r}
 plotPermTestEarlyLateRPDiffWaves()
+getEarlyLateERPPvalStats(comparison='EarlyvsLate', erps='rp')
 ```
 
 We find that the late condition for the fixed rotation perturbation is more positive, around 100 ms prior to the go signal onset.
@@ -107,6 +112,7 @@ We find that the late condition for the fixed rotation perturbation is more posi
 
 ```{r}
 plotPermTestPTypeEarlyLateRPDiffWaves()
+getEarlyLateERPPvalStats(comparison='PerturbTypeComp', erps='rp')
 ```
 
 We find a difference between rotation and random perturbations, likely driven by the difference observed between early and late training in the fixed rotation perturbation.
@@ -125,18 +131,21 @@ Notably, we only observe this effect for targets located near the horizontal axi
 
 ```{r}
 plotPermTestEarlyLateLRPs()
+getEarlyLateERPPvalStats(comparison='vsAligned', erps='lrp')
 ```
 
 #### Comparison between early and late training
 
 ```{r}
 plotPermTestEarlyLateLRPDiffWaves()
+getEarlyLateERPPvalStats(comparison='EarlyvsLate', erps='lrp')
 ```
 
 #### Comparison across perturbation types
 
 ```{r}
 plotPermTestPTypeEarlyLateLRPDiffWaves()
+getEarlyLateERPPvalStats(comparison='PerturbTypeComp', erps='lrp')
 ```
 
 We do not find any differences across conditions for LRPs.
@@ -151,12 +160,14 @@ We repeat the same analyses steps as the ones above, however, we now split the d
 
 ```{r}
 plotPermTestSmallLargeERPs()
+getSmallLargeERPPvalStats(comparison = 'vsAligned', erps = 'frn')
 ```
 
 #### Comparison between small and large error conditions
 
 ```{r}
 plotPermTestSmallLargeDiffWaves()
+getSmallLargeERPPvalStats(comparison = 'SmallvsLarge', erps = 'frn')
 ```
 
 Trials where a small error is experienced show a sustained positivity post-feedback in all perturbation conditions. However, this difference seems to occur at a later timepoint for the fixed rotation.
@@ -165,6 +176,7 @@ Trials where a small error is experienced show a sustained positivity post-feedb
 
 ```{r}
 plotPermTestPTypeSmallLargeDiffWaves()
+getSmallLargeERPPvalStats(comparison = 'PerturbTypeComp', erps = 'frn')
 ```
 
 However, there are no differences when comparing across perturbations.
@@ -177,7 +189,7 @@ However, there are no differences when comparing across perturbations.
 plotPermTestSmallLargeP3()
 ```
 
-#### Comparison between early and late training
+#### Comparison between small and large errors
 
 ```{r}
 plotPermTestSmallLargeDiffWavesP3()
@@ -199,12 +211,14 @@ We do not find any differences when comparing across perturbation types.
 
 ```{r}
 plotPermTestSmallLargeRP()
+getSmallLargeERPPvalStats(comparison = 'vsAligned', erps = 'rp')
 ```
 
-#### Comparison between early and late training
+#### Comparison between small and large errors
 
 ```{r}
 plotPermTestSmallLargeRPDiffWaves()
+getSmallLargeERPPvalStats(comparison = 'SmallvsLarge', erps = 'rp')
 ```
 
 We find no differences between small and large errors during movement preparation across perturbation types.
@@ -213,6 +227,7 @@ We find no differences between small and large errors during movement preparatio
 
 ```{r}
 plotPermTestPTypeSmallLargeRPDiffWaves()
+getSmallLargeERPPvalStats(comparison = 'PerturbTypeComp', erps = 'rp')
 ```
 
 We find no differences across perturbation types during movement preparation.
@@ -223,12 +238,14 @@ We find no differences across perturbation types during movement preparation.
 
 ```{r}
 plotPermTestSmallLargeLRPs()
+getSmallLargeERPPvalStats(comparison = 'vsAligned', erps = 'lrp')
 ```
 
-#### Comparison between early and late training
+#### Comparison between small and large errors
 
 ```{r}
 plotPermTestSmallLargeLRPDiffWaves()
+getSmallLargeERPPvalStats(comparison = 'SmallvsLarge', erps = 'lrp')
 ```
 
 We find no differences between small and large errors during movement preparation across perturbation types.
@@ -237,6 +254,7 @@ We find no differences between small and large errors during movement preparatio
 
 ```{r}
 plotPermTestPTypeSmallLargeLRPDiffWaves()
+getSmallLargeERPPvalStats(comparison = 'PerturbTypeComp', erps = 'lrp')
 ```
 
 We find no differences across perturbation types during movement preparation.

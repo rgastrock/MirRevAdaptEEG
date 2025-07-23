@@ -3160,7 +3160,7 @@ plotPermTestPTypeSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir')
   if(erps == 'frn'){
     plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 10), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-         main = "Large-Small difference: Feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = "Small-Large difference: Feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -3888,7 +3888,7 @@ plotPermTestPTypeSmallLargeRPDiffWaves <- function(groups = c('rot', 'rdm', 'mir
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-       main = "Large-Small difference: Go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = "Small-Large difference: Go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
@@ -4411,7 +4411,7 @@ plotPermTestPTypeSmallLargeLRPDiffWaves <- function(groups = c('rot', 'rdm', 'mi
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
        xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-       main = "Large-Small LRP difference: go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = "Small-Large LRP difference: go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
@@ -6678,6 +6678,7 @@ getPTypeDiffWavesSmallLargeTFRCI <- function(groups = c('rot', 'rdm', 'mir'), ty
     data <- as.data.frame(data)
     timepts <- data$time
     data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    data1 <- data1*-1 #multiply by -1 to change large minus small to small minus large
     
     confidence <- data.frame()
     
@@ -7182,7 +7183,7 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'm
   if(erps == 'frn'){
     plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-yval - 10, yval + 10), 
          xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
-         main = sprintf("%s %s\nLarge-Small difference: feedback onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = sprintf("%s %s\nSmall-Large difference: feedback onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -7783,7 +7784,7 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'r
   
   plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-yval - 10, yval + 10), 
        xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
-       main = sprintf("%s %s\nLarge-Small difference: go signal onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+       main = sprintf("%s %s\nSmall-Large difference: go signal onset", reg, freqs), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   
   
   abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -8482,6 +8483,48 @@ plotTFRBetaResults <- function(target='inline'){
   if (target=='svg') {
     dev.off()
   }
+  
+}
+
+# Read in permutation test statistics----
+#comparison = "vsAligned", "EarlyvsLate", "PerturbTypeComp"
+getEarlyLateERPPvalStats <- function(comparison, erps){
+  
+  data <- read.csv(file=sprintf('data/Permutation_test_%s_%s.csv', comparison, erps))
+  return(data)
+  
+}
+
+getEarlyLateTFRPvalStats <- function(comparison, erps, roi){
+  
+  data <- read.csv(file=sprintf('data/TFR_Permutation_test_%s_%s_%s.csv', comparison, erps, roi))
+  return(data)
+  
+}
+
+getSmallLargeERPPvalStats <- function(comparison, erps){
+  
+  if(comparison == 'SmallvsLarge'){
+    data <- read.csv(file=sprintf('data/Permutation_test_%s_%s.csv', comparison, erps))
+  } else if (comparison == 'PerturbTypeComp') {
+    data <- read.csv(file=sprintf('data/Permutation_test_SmallLarge_%s_%s.csv', comparison, erps))
+  } else if (comparison == 'vsAligned'){
+    data <- read.csv(file=sprintf('data/Permutation_test_%s_SmallLarge_%s.csv', comparison, erps))
+  }
+  
+  return(data)
+  
+}
+
+getSmallLargeTFRPvalStats <- function(comparison, erps, roi){
+  
+  if (comparison == 'SmallvsLarge'){
+    data <- read.csv(file=sprintf('data/TFR_Permutation_test_%s_%s_%s.csv', comparison, erps, roi))
+  } else {
+    data <- read.csv(file=sprintf('data/TFR_Permutation_test_ErrorSize_%s_%s_%s.csv', comparison, erps, roi))
+  }
+  
+  return(data)
   
 }
 

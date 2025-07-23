@@ -84,6 +84,14 @@ plotPermTestEarlyLateTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestEarlyLateTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
+##### Statistics
+
+```{r}
+getEarlyLateTFRPvalStats(comparison = 'vsAligned', erps = 'frn', roi = 'medfro')
+getEarlyLateTFRPvalStats(comparison = 'vsAligned', erps = 'frn', roi = 'latcen')
+```
+
+
 ### Time-Frequency Representations (Early vs. Late Difference Waves)
 
 We then calculate the TFR differences between each early or late condition and the aligned condition. Then we compare early from late in each of the perturbation types.
@@ -151,6 +159,13 @@ For the medial frontal areas, we find differences between early and late trainin
 
 For the lateral central areas, we observe differences in the mirror perturbation, where early training is more negative than late, around 500 ms to 900 ms post-feedback.
 
+##### Statistics
+
+```{r}
+getEarlyLateTFRPvalStats(comparison = 'EarlyvsLate', erps = 'frn', roi = 'medfro')
+getEarlyLateTFRPvalStats(comparison = 'EarlyvsLate', erps = 'frn', roi = 'latcen')
+```
+
 ### Time-Frequency Representations (Perturbation type comparisons)
 
 Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
@@ -204,6 +219,13 @@ plotPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
 We observe a significant cluster when comparing fixed and random rotation perturbations, around 250 ms post-feedback, with random rotation showing more positive activity.
+
+##### Statistics
+
+```{r}
+getEarlyLateTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'frn', roi = 'medfro')
+getEarlyLateTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'frn', roi = 'latcen')
+```
 
 ## Small vs. Large errors
 
@@ -265,6 +287,12 @@ plotPermTestSmallLargeTFRs(freqs = 'beta', roi = 'medfro')
 plotPermTestSmallLargeTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
+##### Statistics
+
+```{r}
+getSmallLargeTFRPvalStats(comparison = 'vsAligned', erps = 'frn', roi = 'medfro')
+getSmallLargeTFRPvalStats(comparison = 'vsAligned', erps = 'frn', roi = 'latcen')
+```
 
 ### Time-Frequency Representations (Small vs. Large Difference Waves)
 
@@ -327,6 +355,13 @@ plotPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 
 We only find a significant cluster for the lateral central ROI, during random rotation training. This occurs around 800 ms post-feedback, where beta power seems to be increased for large errors compared to small errors.
 
+##### Statistics
+
+```{r}
+getSmallLargeTFRPvalStats(comparison = 'SmallvsLarge', erps = 'frn', roi = 'medfro')
+getSmallLargeTFRPvalStats(comparison = 'SmallvsLarge', erps = 'frn', roi = 'latcen')
+```
+
 ### Time-Frequency Representations (Perturbation Type Comparisons)
 
 Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
@@ -382,6 +417,12 @@ plotPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 
 We find significant clusters in the lateral central ROI, when comparing the fixed rotation and mirror with the random rotation perturbation.
 
+##### Statistics
+
+```{r}
+getSmallLargeTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'frn', roi = 'medfro')
+getSmallLargeTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'frn', roi = 'latcen')
+```
 
 # Movement preparation
 
@@ -447,6 +488,13 @@ plotGoOnsetPermTestEarlyLateTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestEarlyLateTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
+##### Statistics
+
+```{r}
+getEarlyLateTFRPvalStats(comparison = 'vsAligned', erps = 'lrp', roi = 'medfro')
+getEarlyLateTFRPvalStats(comparison = 'vsAligned', erps = 'lrp', roi = 'latcen')
+```
+
 ### Time-Frequency Representations (Early vs. Late Difference Waves)
 
 Next, we subtract the aligned condition from each early and late condition, across the different perturbation types. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves
@@ -508,6 +556,13 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 
 We find differences in both ROIs when comparing early and late random perturbation training. In both ROIs, beta power is decreased in late random training compared to early.
 
+##### Statistics
+
+```{r}
+getEarlyLateTFRPvalStats(comparison = 'EarlyvsLate', erps = 'lrp', roi = 'medfro')
+getEarlyLateTFRPvalStats(comparison = 'EarlyvsLate', erps = 'lrp', roi = 'latcen')
+```
+
 ### Time-Frequency Representations (Perturbation type comparisons)
 
 Next, we subtract the early from the late condition, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
@@ -562,6 +617,13 @@ plotGoOnsetPermTestPTypeEarlyLateDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 
 We do not observe any significant clusters for both regions of interest.
 
+##### Statistics
+
+```{r}
+getEarlyLateTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'lrp', roi = 'medfro')
+getEarlyLateTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'lrp', roi = 'latcen')
+```
+
 ## Small vs. Large errors
 
 We then repeat the same analyses steps but now compare small and large error conditions.
@@ -615,6 +677,13 @@ plotGoOnsetPermTestSmallLargeTFRs(freqs = 'alpha', roi = 'latcen')
 ```{r}
 plotGoOnsetPermTestSmallLargeTFRs(freqs = 'beta', roi = 'medfro')
 plotGoOnsetPermTestSmallLargeTFRs(freqs = 'beta', roi = 'latcen')
+```
+
+##### Statistics
+
+```{r}
+getSmallLargeTFRPvalStats(comparison = 'vsAligned', erps = 'lrp', roi = 'medfro')
+getSmallLargeTFRPvalStats(comparison = 'vsAligned', erps = 'lrp', roi = 'latcen')
 ```
 
 ### Time-Frequency Representations (Small vs. Large Difference Waves)
@@ -678,6 +747,13 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 
 We find differences in both ROIs for the rotation perturbation, where large errors show more negative power than small errors.
 
+##### Statistics
+
+```{r}
+getSmallLargeTFRPvalStats(comparison = 'SmallvsLarge', erps = 'lrp', roi = 'medfro')
+getSmallLargeTFRPvalStats(comparison = 'SmallvsLarge', erps = 'lrp', roi = 'latcen')
+```
+
 ### Time-Frequency Representations (Perturbation Type Comparisons)
 
 Next, we subtract the small from the large error conditions, across the different perturbation types. Then, we compare each perturbation type with the other two. Statistical analyses will still be based from the cluster-based permutation tests conducted on these difference waves.
@@ -732,6 +808,13 @@ plotGoOnsetPermTestPTypeSmallLargeDiffWavesTFRs(freqs = 'beta', roi = 'latcen')
 ```
 
 For the lateral central area, we find a significant cluster when comparing mirror and fixed rotation, occurring just after target onset. Beta power for the fixed rotation is lower compared to mirror. We also observe more negative power for rotation compared to mirror in medial frontal areas, but this occurs later and for a much shorter time.
+
+##### Statistics
+
+```{r}
+getSmallLargeTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'lrp', roi = 'medfro')
+getSmallLargeTFRPvalStats(comparison = 'PerturbTypeComp', erps = 'lrp', roi = 'latcen')
+```
 
 # Manuscript plots
 
