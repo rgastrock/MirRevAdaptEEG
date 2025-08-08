@@ -11,6 +11,7 @@ This document contains figures and statistics used in analyzing the behavioral d
 source('ana/shared.R')
 source('ana/learningRates.R')
 source('ana/movementAnalyses.R')
+source('ana/reachAftereffects.R')
 ```
 
 # Measures analyzing reach performance
@@ -21,7 +22,7 @@ We investigate how learning progresses for the different perturbation types, and
 plotBehaviorLearning()
 ```
 
-We find that participants learned the fixed rotation and mirror perturbations. However, variability across participants is greated in the mirror perturbation. As expected, we do not observe learning in the random perturbation.
+We find that participants learned the fixed rotation and mirror perturbations. However, variability across participants is greater in the mirror perturbation. As expected, we do not observe learning in the random perturbation.
 
 We also confirm expected pattern of results for RT, MT and PL. We find that RTs are initially slower across all perturbation types, but the mirror perturbation produced the slowest RTs early on in training. From the plots, we also do not observe differences in MTs and PLs, but PL in the mirror condition seems to have higher variability.
 
@@ -35,6 +36,22 @@ From these behavioral data, we decided on our early vs. late and small vs. large
 getLCBlockedtTests()
 ```
 
-We compare the first, second, and last blocks (6 trials each) of training in the fixed rotation and mirror perturbations, and find no differences between the two. However, we do confirm that learning has occurred in the rotation perturbation when comparing the first and last block of training, where the amount of compensation is higher at the end of training. We do not find a difference between the first and last block of mirror training, but this is likely due to the high variability in block 1. However, when we compare the second and last blocks of mirror training, we find a difference, thereby confirming that learning has occured by the end of training.
+We compare the first, second, and last blocks (6 trials each) of training in the fixed rotation and mirror perturbations, and find no differences between the two. However, we do confirm that learning has occurred in the rotation perturbation when comparing the first and last block of training, where the amount of compensation is higher at the end of training. We do not find a difference between the first and last block of mirror training, but this is likely due to the high variability in block 1. However, when we compare the second and last blocks of mirror training, we find a difference, thereby confirming that learning has occurred by the end of training.
 
+#Washout trials: Reach aftereffects
 
+We also plot data from washout trials, to confirm expectations that reach aftereffects, or the persistent deviation in hand movements despite perturbation removal, are only observed for the fixed rotation and not the mirror reversal perturbation.
+
+```{r}
+plotCollapsedBlockedIndRAE()
+```
+
+We find a more gradual decrease in compensation for the fixed rotation compared to the mirror reversal, thereby confirming our expectations that aftereffects are only observed in the fixed rotation perturbation.
+
+#Statistics
+
+```{r}
+getRAEBlockedtTests()
+```
+
+We find that the compensation for the fixed rotation is different from compensation in the mirror perturbation for the first, second, and last blocks of washout, suggesting that compensation in the fixed rotation is higher compared to the mirror perturbation. Moreover, we confirm that afteffects are present in the fixed rotation, given the significant difference between the first and last blocks of rotation training. We do not find the same difference in the mirror perturbation, suggesting an absence of aftereffects for this perturbation type.
