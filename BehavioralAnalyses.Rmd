@@ -12,6 +12,7 @@ source('ana/shared.R')
 source('ana/learningRates.R')
 source('ana/movementAnalyses.R')
 source('ana/reachAftereffects.R')
+source('ana/orderEffects.R')
 ```
 
 # Measures analyzing reach performance
@@ -38,7 +39,7 @@ getLCBlockedtTests()
 
 We compare the first, second, and last blocks (6 trials each) of training in the fixed rotation and mirror perturbations, and find no differences between the two. However, we do confirm that learning has occurred in the rotation perturbation when comparing the first and last block of training, where the amount of compensation is higher at the end of training. We do not find a difference between the first and last block of mirror training, but this is likely due to the high variability in block 1. However, when we compare the second and last blocks of mirror training, we find a difference, thereby confirming that learning has occurred by the end of training.
 
-#Washout trials: Reach aftereffects
+# Washout trials: Reach aftereffects
 
 We also plot data from washout trials, to confirm expectations that reach aftereffects, or the persistent deviation in hand movements despite perturbation removal, are only observed for the fixed rotation and not the mirror reversal perturbation.
 
@@ -48,10 +49,132 @@ plotCollapsedBlockedIndRAE()
 
 We find a more gradual decrease in compensation for the fixed rotation compared to the mirror reversal, thereby confirming our expectations that aftereffects are only observed in the fixed rotation perturbation.
 
-#Statistics
+# Statistics
 
 ```{r}
 getRAEBlockedtTests()
 ```
 
-We find that the compensation for the fixed rotation is different from compensation in the mirror perturbation for the first, second, and last blocks of washout, suggesting that compensation in the fixed rotation is higher compared to the mirror perturbation. Moreover, we confirm that afteffects are present in the fixed rotation, given the significant difference between the first and last blocks of rotation training. We do not find the same difference in the mirror perturbation, suggesting an absence of aftereffects for this perturbation type.
+We find that the compensation for the fixed rotation is different from compensation in the mirror perturbation for the first, second, and last blocks of washout, suggesting that compensation in the fixed rotation is higher compared to the mirror perturbation. Moreover, we confirm that aftereffects are present in the fixed rotation, given the significant difference between the first and last blocks of rotation training. We do not find the same difference in the mirror perturbation, suggesting an absence of aftereffects for this perturbation type.
+
+However, it is interesting to note that the compensation for the fixed rotation remains higher than compensation in the mirror perturbation until the last block of washout.
+
+# Perturbation order effects
+
+We check for any differences in performance, depending on whether participants trained with one perturbation first or after training in the other perturbation. We compare performance both during training and during washout trials.
+
+## Rotation Perturbation training
+
+```{r}
+plotROTBlocked()
+getROTBlockedtTests()
+```
+
+We find no order effects, suggesting that learning in one perturbation does not affect learning in the other perturbation type.
+
+## Rotation Washout trials
+
+```{r}
+plotROTRAEBlocked()
+getROTRAEBlockedtTests()
+```
+
+We find no order effects, suggesting that compensation during washout does not differ, regardless of whether participants experienced the rotation perturbation first or after the other perturbation.
+
+## Mirror Perturbation training
+
+```{r}
+plotMIRBlocked()
+getMIRBlockedtTests()
+```
+
+We find no order effects, suggesting that learning in one perturbation does not affect learning in the other perturbation type.
+
+## Mirror Washout trials
+
+```{r}
+plotMIRRAEBlocked()
+getMIRRAEBlockedtTests()
+```
+
+We find no order effects, suggesting that participants had no aftereffects, regardless of when they experienced the mirror perturbation.
+
+# Target location effects
+
+We check for any differences in performance, depending on whether participants experienced target locations, either in the clockwise or counterclockwise direction, relative to the workspace axis. We compare performance both during training and during washout trials.
+
+## Rotation Perturbation training
+
+```{r}
+plotROTTargetBlocked()
+getROTTargetBlockedtTests()
+```
+
+We find no target location effects, suggesting that rotation perturbation learning is not affected by the location of targets relative to the workspace axis.
+
+## Rotation Washout trials
+
+```{r}
+plotROTRAETargetBlocked()
+getROTRAETargetBlockedtTests()
+```
+
+We find no target location effects, suggesting that compensation during washout does not differ regardless of target locations.
+
+## Mirror Perturbation training
+
+```{r}
+plotMIRTargetBlocked()
+getMIRTargetBlockedtTests()
+```
+
+We find no target location effects, suggesting that mirror perturbation learning is not affected by the location of targets relative to the workspace axis.
+
+## Mirror Washout trials
+
+```{r}
+plotMIRRAETargetBlocked()
+getMIRRAETargetBlockedtTests()
+```
+
+We find no order effects, suggesting that participants had no aftereffects, regardless of target location in the mirror perturbation.
+
+# Axis orientation effects
+
+We check for any differences in performance, depending on whether participants experienced each perturbation in either the vertical or horizontal axis of the workspace. We compare performance both during training and during washout trials.
+
+## Rotation Perturbation training
+
+```{r}
+plotROTAxisBlocked()
+getROTAxisBlockedtTests()
+```
+
+We find no axis orientation effects, suggesting that axis orientation has no effect on rotation perturbation learning.
+
+## Rotation Washout trials
+
+```{r}
+plotROTRAEAxisBlocked()
+getROTRAEAxisBlockedtTests()
+```
+
+We find no axis orientation effects in the second and last block of washout, suggesting that axis orientation does not affect aftereffects. However, we do find a significant difference in the first block (p = .04) but the BF value of 1.95 suggests that this difference is anecdotal.
+
+## Mirror Perturbation training
+
+```{r}
+plotMIRAxisBlocked()
+getMIRAxisBlockedtTests()
+```
+
+We find no axis orientation effects, suggesting that axis orientation has no effect on mirror perturbation learning.
+
+## Mirror Washout trials
+
+```{r}
+plotMIRRAEAxisBlocked()
+getMIRRAEAxisBlockedtTests()
+```
+
+We find no axis orientation effects, suggesting that participants had no aftereffects, regardless of the axis they trained with.
