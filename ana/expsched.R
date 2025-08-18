@@ -288,6 +288,220 @@ plotTabletConditions <- function(conds = c(1,2,3,4), target='inline'){
   }
 }
 
+#create tablet experiment axes
+plotNewTabletConditions <- function(conds = c(1,2,3,4), target='inline'){
+  
+  if (target == 'svg') {
+    svglite(file='doc/fig/Fig0B_TabletConditions.svg', width=12, height=4, pointsize=18, system_fonts=list(sans='Arial'))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  layout(matrix(c(1,2,3,4), 1, 4), widths=c(1,1,1,1), heights=c(4,4,4,4))
+  
+  #Quadrant 1
+  targ1 <- as.circular(7.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ2 <- as.circular(15, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ3 <- as.circular(22.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ4 <- as.circular(67.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ5 <- as.circular(75, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ6 <- as.circular(82.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  
+  #Quadrant 2
+  targ7 <- as.circular(97.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ8 <- as.circular(105, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ9 <- as.circular(112.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ10 <- as.circular(157.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ11 <- as.circular(165, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ12 <- as.circular(172.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  
+  #Quadrant 3
+  targ13 <- as.circular(187.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ14 <- as.circular(195, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ15 <- as.circular(202.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ16 <- as.circular(247.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ17 <- as.circular(255, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ18 <- as.circular(262.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  
+  #Quadrant 4
+  targ19 <- as.circular(277.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ20 <- as.circular(285, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ21 <- as.circular(292.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ22 <- as.circular(337.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ23 <- as.circular(345, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ24 <- as.circular(352.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  
+  #Quadrant extra (fixes constant rotation direction)
+  #Q2
+  targ25 <- as.circular(127.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ26 <- as.circular(135, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ27 <- as.circular(142.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  #Q4
+  targ28 <- as.circular(307.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ29 <- as.circular(315, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ30 <- as.circular(322.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  #Q3
+  targ31 <- as.circular(217.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ32 <- as.circular(225, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ33 <- as.circular(232.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  #Q1
+  targ34 <- as.circular(37.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ35 <- as.circular(45, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  targ36 <- as.circular(52.5, type='angles', units='degrees', template = 'none', modulo = 'asis', zero = 0, rotation = 'counter')
+  
+  for(cond in conds){
+    if(cond == 1){
+      x <- c(-NA, 0, NA)
+      plot(x, sin(x), axes=FALSE, xlim = c(-1,1), ylim = c(-1,1), xlab = '', ylab = '', asp=1, main = 'Participant ID: 0 and 1')
+      abline(h = 0, col = '#e51636ff', lwd = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(v= 0, col = '#005de4ff', lwd = 2)
+      axis(1, at = 0, labels = 'Mirror', tick = FALSE, col.axis = '#005de4ff') #tick marks for x axis
+      axis(2, at = 0, labels = 'Rotation', tick = FALSE, col.axis = '#e51636ff', las=2) #tick marks for y axis 
+      
+      #Quadrant 1
+      points.circular(targ1, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ2, pch = 16, col = '#00CED1')
+      points.circular(targ3, pch = 16, col = '#c400c4ff')
+      points.circular(targ4, pch = 16, col = '#c400c4ff')
+      points.circular(targ5, pch = 16, col = '#00CED1')
+      points.circular(targ6, pch = 16, col = '#A9A9A9ff')
+      #Quadrant 3
+      points.circular(targ13, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ14, pch = 16, col = '#00CED1')
+      points.circular(targ15, pch = 16, col = '#c400c4ff')
+      points.circular(targ16, pch = 16, col = '#c400c4ff')
+      points.circular(targ17, pch = 16, col = '#00CED1')
+      points.circular(targ18, pch = 16, col = '#A9A9A9ff')
+      
+      arrows.circular(targ7, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ8, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ9, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ10, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ11, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ12, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      
+      arrows.circular(targ19, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ20, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ21, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ22, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ23, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ24, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+    } else if (cond == 2){
+      x <- c(-NA, 0, NA)
+      plot(x, sin(x), axes=FALSE, xlim = c(-1,1), ylim = c(-1,1), xlab = '', ylab = '', asp=1, main = 'Participant ID: 2 and 3')
+      abline(h = 0, col = '#e51636ff', lwd = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(v= 0, col = '#005de4ff', lwd = 2)
+      axis(1, at = 0, labels = 'Mirror', tick = FALSE, col.axis = '#005de4ff') #tick marks for x axis
+      axis(2, at = 0, labels = 'Rotation', tick = FALSE, col.axis = '#e51636ff', las=2) #tick marks for y axis
+      
+      #Quadrant 2
+      points.circular(targ7, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ8, pch = 16, col = '#00CED1')
+      points.circular(targ9, pch = 16, col = '#c400c4ff')
+      points.circular(targ10, pch = 16, col = '#c400c4ff')
+      points.circular(targ11, pch = 16, col = '#00CED1')
+      points.circular(targ12, pch = 16, col = '#A9A9A9ff')
+      #Quadrant 4
+      points.circular(targ19, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ20, pch = 16, col = '#00CED1')
+      points.circular(targ21, pch = 16, col = '#c400c4ff')
+      points.circular(targ22, pch = 16, col = '#c400c4ff')
+      points.circular(targ23, pch = 16, col = '#00CED1')
+      points.circular(targ24, pch = 16, col = '#A9A9A9ff')
+      
+      arrows.circular(targ30, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ29, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ28, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ6, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ5, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ4, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      
+      arrows.circular(targ27, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ26, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ25, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ18, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ17, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ16, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+    } else if (cond == 3){
+      x <- c(-NA, 0, NA)
+      plot(x, sin(x), axes=FALSE, xlim = c(-1,1), ylim = c(-1,1), xlab = '', ylab = '', asp=1, main = 'Participant ID: 4 and 5')
+      abline(v = 0, col = '#e51636ff', lwd = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(h= 0, col = '#005de4ff', lwd = 2)
+      axis(2, at = 0, labels = 'Mirror', tick = FALSE, col.axis = '#005de4ff', las=2) #tick marks for x axis
+      axis(1, at = 0, labels = 'Rotation', tick = FALSE, col.axis = '#e51636ff') #tick marks for y axis
+      
+      #Quadrant 2
+      points.circular(targ7, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ8, pch = 16, col = '#00CED1')
+      points.circular(targ9, pch = 16, col = '#c400c4ff')
+      points.circular(targ10, pch = 16, col = '#c400c4ff')
+      points.circular(targ11, pch = 16, col = '#00CED1')
+      points.circular(targ12, pch = 16, col = '#A9A9A9ff')
+      #Quadrant 4
+      points.circular(targ19, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ20, pch = 16, col = '#00CED1')
+      points.circular(targ21, pch = 16, col = '#c400c4ff')
+      points.circular(targ22, pch = 16, col = '#c400c4ff')
+      points.circular(targ23, pch = 16, col = '#00CED1')
+      points.circular(targ24, pch = 16, col = '#A9A9A9ff')
+      
+      arrows.circular(targ1, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ2, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ3, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ4, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ5, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ6, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      
+      arrows.circular(targ13, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ14, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ15, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ16, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ17, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ18, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+    } else if (cond == 4){
+      x <- c(-NA, 0, NA)
+      plot(x, sin(x), axes=FALSE, xlim = c(-1,1), ylim = c(-1,1), xlab = '', ylab = '', asp=1, main = 'Participant ID: 6 and 7')
+      abline(v = 0, col = '#e51636ff', lwd = 2) #creates horizontal dashed lines through y =  0 and 30
+      abline(h= 0, col = '#005de4ff', lwd = 2)
+      axis(2, at = 0, labels = 'Mirror', tick = FALSE, col.axis = '#005de4ff', las=2) #tick marks for x axis
+      axis(1, at = 0, labels = 'Rotation', tick = FALSE, col.axis = '#e51636ff') #tick marks for y axis
+      
+      #Quadrant 1
+      points.circular(targ1, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ2, pch = 16, col = '#00CED1')
+      points.circular(targ3, pch = 16, col = '#c400c4ff')
+      points.circular(targ4, pch = 16, col = '#c400c4ff')
+      points.circular(targ5, pch = 16, col = '#00CED1')
+      points.circular(targ6, pch = 16, col = '#A9A9A9ff')
+      #Quadrant 3
+      points.circular(targ13, pch = 16, col = '#A9A9A9ff')
+      points.circular(targ14, pch = 16, col = '#00CED1')
+      points.circular(targ15, pch = 16, col = '#c400c4ff')
+      points.circular(targ16, pch = 16, col = '#c400c4ff')
+      points.circular(targ17, pch = 16, col = '#00CED1')
+      points.circular(targ18, pch = 16, col = '#A9A9A9ff')
+      
+      arrows.circular(targ36, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ35, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ34, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ12, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ11, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ10, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      
+      arrows.circular(targ33, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ32, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ31, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+      arrows.circular(targ24, length = 0, angle = 0, lwd=2, col = '#A9A9A9ff')
+      arrows.circular(targ23, length = 0, angle = 0, lwd=2, col = '#00CED1')
+      arrows.circular(targ22, length = 0, angle = 0, lwd=2, col = '#c400c4ff')
+    }
+  }
+  
+  if (target == 'svg') {
+    dev.off()
+  }
+}
+
+
 # #create online experiment axes
 # plotOnlineConditions <- function(conds = c(1,2,3,4), target='inline'){
 #   
