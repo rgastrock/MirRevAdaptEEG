@@ -427,6 +427,135 @@ plotPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), ta
   }
 }
 
+plotCheckROTEarlyLateDiffWaves <- function(perturbs = c('earlyrot', 'laterot'), target='inline', erps = 'frn', type='b') {
+  #but we can save plot as svg file
+  if (target=='svg' & erps == 'frn') {
+    svglite(file=sprintf('doc/fig/Fig100_FRN_DiffWaves_EarlyLate_ROTTargets.svg'), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    if(erps == 'frn'){
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-6, 16), 
+           xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("Feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    }
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
+    
+    if(ptype == 'earlyrot'){
+      groups = c('earlyrot_ppaxis', 'earlyrot_ppquad')
+      pname = 'Early Fixed Rotation'
+    } else if (ptype == 'laterot'){
+      groups = c('laterot_ppaxis', 'laterot_ppquad')
+      pname = 'Late Fixed Rotation'
+    }
+    
+    for (group in groups){
+      if(group == 'earlyrot_ppaxis'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'earlyrot_ppquad'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'laterot_ppaxis'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'laterot_ppquad'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      
+      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      colourscheme <- getROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(0,15,legend=c('Early ROT: Movement along axis', 'Early ROT: Movement along quadrant'),
+             col=c(colourscheme[['earlyrot_ppaxis']][['S']],colourscheme[['earlyrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='laterot'){
+      #add legend
+      legend(0,15,legend=c('Late ROT: Movement along axis', 'Late ROT: Movement along quadrant'),
+             col=c(colourscheme[['laterot_ppaxis']][['S']],colourscheme[['laterot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
 plotCompletePermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'frn') {
   
   for(ptype in perturbs){
@@ -1161,6 +1290,132 @@ plotPermTestEarlyLateRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), 
   }
 }
 
+plotCheckROTEarlyLateDiffWavesRP <- function(perturbs = c('earlyrot', 'laterot'), target='inline', erps = 'rp', type='b') {
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file=sprintf('doc/fig/Fig100A_RP_DiffWaves_EarlyLate_ROTTargets.svg'), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    if(ptype == 'earlyrot'){
+      groups = c('earlyrot_ppaxis', 'earlyrot_ppquad')
+      pname = 'Early Fixed Rotation'
+    } else if (ptype == 'laterot'){
+      groups = c('laterot_ppaxis', 'laterot_ppquad')
+      pname = 'Late Fixed Rotation'
+    }
+    
+    for (group in groups){
+      if(group == 'earlyrot_ppaxis'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'earlyrot_ppquad'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'laterot_ppaxis'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'laterot_ppquad'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      colourscheme <- getROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(-1,10,legend=c('Early ROT: Movement along axis', 'Early ROT: Movement along quadrant'),
+             col=c(colourscheme[['earlyrot_ppaxis']][['S']],colourscheme[['earlyrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='laterot'){
+      #add legend
+      legend(-1,10,legend=c('Late ROT: Movement along axis', 'Late ROT: Movement along quadrant'),
+             col=c(colourscheme[['laterot_ppaxis']][['S']],colourscheme[['laterot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
 plotCompletePermTestEarlyLateRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'rp') {
   
   for(ptype in perturbs){
@@ -1838,6 +2093,128 @@ plotPermTestEarlyLateLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
     if (target=='svg') {
       dev.off()
     }
+  }
+}
+
+plotCheckROTEarlyLateDiffWavesLRP <- function(perturbs = c('earlyrot', 'laterot'), target='inline', type='b') {
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file=sprintf('doc/fig/Fig100B_LRP_DiffWaves_EarlyLate_ROTTargets.svg'), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("LRP, Go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    if(ptype == 'earlyrot'){
+      groups = c('earlyrot_ppaxis', 'earlyrot_ppquad')
+      pname = 'Early Fixed Rotation'
+    } else if (ptype == 'laterot'){
+      groups = c('laterot_ppaxis', 'laterot_ppquad')
+      pname = 'Late Fixed Rotation'
+    }
+    
+    for (group in groups){
+      if(group == 'earlyrot_ppaxis'){
+        cond <- 'rot_b0'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned.csv', cond))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 'timepts')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'earlyrot_ppquad'){
+        cond <- 'rot_b0'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned.csv', cond))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 'timepts')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'laterot_ppaxis'){
+        cond <- 'rot_b1'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned.csv', cond))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 'timepts')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'laterot_ppquad'){
+        cond <- 'rot_b1'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_%s_vsALigned.csv', cond))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 'timepts')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$timepts
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      colourscheme <- getROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(-1,-10,legend=c('Early ROT: Movement along axis', 'Early ROT: Movement along quadrant'),
+             col=c(colourscheme[['earlyrot_ppaxis']][['S']],colourscheme[['earlyrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='laterot'){
+      #add legend
+      legend(-1,-10,legend=c('Late ROT: Movement along axis', 'Late ROT: Movement along quadrant'),
+             col=c(colourscheme[['laterot_ppaxis']][['S']],colourscheme[['laterot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
   }
 }
 
@@ -2989,6 +3366,136 @@ plotPermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), t
   }
 }
 
+plotCheckROTSmallLargeDiffWaves <- function(perturbs = c('smallrot', 'largerot'), target='inline', erps = 'frn', type='b') {
+  #but we can save plot as svg file
+  if (target=='svg' & erps == 'frn') {
+    svglite(file=sprintf('doc/fig/Fig100C_FRN_DiffWaves_SmallLarge_ROTTargets.svg'), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    if(erps == 'frn'){
+      plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-6, 16), 
+           xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("Feedback onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    }
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
+    
+    if(ptype == 'smallrot'){
+      groups = c('smallrot_ppaxis', 'smallrot_ppquad')
+      pname = 'Small, Fixed Rotation'
+    } else if (ptype == 'largerot'){
+      groups = c('largerot_ppaxis', 'largerot_ppquad')
+      pname = 'Large, Fixed Rotation'
+    }
+    
+    for (group in groups){
+      if(group == 'smallrot_ppaxis'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'smallrot_ppquad'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'largerot_ppaxis'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'largerot_ppquad'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      
+      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      colourscheme <- getSIZEROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'smallrot'){
+      #add legend
+      legend(0,15,legend=c('Small ROT: Movement along axis', 'Small ROT: Movement along quadrant'),
+             col=c(colourscheme[['smallrot_ppaxis']][['S']],colourscheme[['smallrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='largerot'){
+      #add legend
+      legend(0,15,legend=c('Large ROT: Movement along axis', 'Large ROT: Movement along quadrant'),
+             col=c(colourscheme[['largerot_ppaxis']][['S']],colourscheme[['largerot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
+
 plotCompletePermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'frn') {
   
   for(ptype in perturbs){
@@ -3723,6 +4230,132 @@ plotPermTestSmallLargeRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'),
   }
 }
 
+plotCheckROTSmallLargeDiffWavesRP <- function(perturbs = c('smallrot', 'largerot'), target='inline', erps = 'rp', type='b') {
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file=sprintf('doc/fig/Fig100D_RP_DiffWaves_SmallLarge_ROTTargets.svg'), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    if(ptype == 'smallrot'){
+      groups = c('smallrot_ppaxis', 'smallrot_ppquad')
+      pname = 'Small, Fixed Rotation'
+    } else if (ptype == 'largerot'){
+      groups = c('largerot_ppaxis', 'largerot_ppquad')
+      pname = 'Large, Fixed Rotation'
+    }
+    
+    for (group in groups){
+      if(group == 'smallrot_ppaxis'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'smallrot_ppquad'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'largerot_ppaxis'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 
+                         'pp016', 'pp017', 'pp020', 'pp021', 'pp024', 'pp025', 'pp028', 'pp029', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'largerot_ppquad'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/DiffWaves_DF_SmallLarge_%s_%s.csv', cond, erps))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 
+                         'pp018', 'pp019', 'pp022', 'pp023', 'pp026', 'pp027', 'pp030', 'pp031', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      colourscheme <- getSIZEROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'smallrot'){
+      #add legend
+      legend(-1,10,legend=c('Small ROT: Movement along axis', 'Small ROT: Movement along quadrant'),
+             col=c(colourscheme[['smallrot_ppaxis']][['S']],colourscheme[['smallrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='largerot'){
+      #add legend
+      legend(-1,10,legend=c('Large ROT: Movement along axis', 'Large ROT: Movement along quadrant'),
+             col=c(colourscheme[['largerot_ppaxis']][['S']],colourscheme[['largerot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
 plotCompletePermTestSmallLargeRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'rp') {
   
   for(ptype in perturbs){
@@ -4395,6 +5028,128 @@ plotPermTestSmallLargeLRPDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir')
     if (target=='svg') {
       dev.off()
     }
+  }
+}
+
+plotCheckROTSmallLargeDiffWavesLRP <- function(perturbs = c('smallrot', 'largerot'), target='inline', type='b') {
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file=sprintf('doc/fig/Fig100E_LRP_DiffWaves_SmallLarge_ROTTargets.svg'), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("LRP, Go signal onset: %s", ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    if(ptype == 'smallrot'){
+      groups = c('smallrot_ppaxis', 'smallrot_ppquad')
+      pname = 'Small, Fixed Rotation'
+    } else if (ptype == 'largerot'){
+      groups = c('largerot_ppaxis', 'largerot_ppquad')
+      pname = 'Large, Fixed Rotation'
+    }
+    
+    for (group in groups){
+      if(group == 'smallrot_ppaxis'){
+        cond <- 'rot_sml'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsALigned.csv', cond))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 'timepts')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'smallrot_ppquad'){
+        cond <- 'rot_sml'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsALigned.csv', cond))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 'timepts')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'largerot_ppaxis'){
+        cond <- 'rot_lrg'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsALigned.csv', cond))
+        pp_rot_axis <- c('pp000', 'pp001', 'pp004', 'pp005', 'pp008', 'pp009', 'pp012', 'pp013', 'timepts')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'largerot_ppquad'){
+        cond <- 'rot_lrg'
+        data <- read.csv(file=sprintf('data/Blocked_LRP_DF_SmallLarge_%s_vsALigned.csv', cond))
+        pp_rot_quad <- c('pp002', 'pp003', 'pp006', 'pp007', 'pp010', 'pp011', 'pp014', 'pp015', 'timepts')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$timepts
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      colourscheme <- getSIZEROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'smallrot'){
+      #add legend
+      legend(-1,-10,legend=c('Small ROT: Movement along axis', 'Small ROT: Movement along quadrant'),
+             col=c(colourscheme[['smallrot_ppaxis']][['S']],colourscheme[['smallrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='largerot'){
+      #add legend
+      legend(-1,-10,legend=c('Large ROT: Movement along axis', 'Large ROT: Movement along quadrant'),
+             col=c(colourscheme[['largerot_ppaxis']][['S']],colourscheme[['largerot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
   }
 }
 
@@ -5788,6 +6543,152 @@ plotPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir')
   }
 }
 
+plotCheckROTPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('earlyrot', 'laterot'), target='inline', erps = 'frn', type = 'b', freqs, roi) {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'alpha') {
+    svglite(file=sprintf('doc/fig/Fig100F_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig100F_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'theta') {
+    svglite(file=sprintf('doc/fig/Fig100F_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    if(ptype == 'earlyrot'){
+      groups = c('earlyrot_ppaxis', 'earlyrot_ppquad')
+    } else if (ptype == 'laterot'){
+      groups = c('laterot_ppaxis', 'laterot_ppquad')
+    }
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    
+    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-yval - 10, yval +10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to feedback onset: %s", roi, freqs, ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    
+    for (group in groups){
+      
+      if(group == 'earlyrot_ppaxis'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'earlyrot_ppquad'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'laterot_ppaxis'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'laterot_ppquad'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      groupconfidence <- groupconfidence[351:601,]
+      
+      colourscheme <- getROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(0,yval,legend=c('Early ROT: Movement along axis', 'Early ROT: Movement along quadrant'),
+             col=c(colourscheme[['earlyrot_ppaxis']][['S']],colourscheme[['earlyrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='laterot'){
+      #add legend
+      legend(0,yval,legend=c('Late ROT: Movement along axis', 'Late ROT: Movement along quadrant'),
+             col=c(colourscheme[['laterot_ppaxis']][['S']],colourscheme[['laterot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
 plotPermTestPTypeEarlyLateDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mir'), perturbs = c('rotvmir', 'rotvrdm', 'mirvrdm'), target='inline', erps = 'frn', freqs, roi) {
   
   #but we can save plot as svg file
@@ -6393,6 +7294,151 @@ plotGoOnsetPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('rot', 'rdm',
     if (target=='svg') {
       dev.off()
     }
+  }
+}
+
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs <- function(perturbs = c('earlyrot', 'laterot'), target='inline', erps = 'lrp', type = 'b', freqs, roi) {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'alpha') {
+    svglite(file=sprintf('doc/fig/Fig100G_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig100G_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'theta') {
+    svglite(file=sprintf('doc/fig/Fig100G_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    if(ptype == 'earlyrot'){
+      groups = c('earlyrot_ppaxis', 'earlyrot_ppquad')
+    } else if (ptype == 'laterot'){
+      groups = c('laterot_ppaxis', 'laterot_ppquad')
+    }
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-yval - 10, yval +10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to go signal onset: %s", roi, freqs, ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    
+    for (group in groups){
+      
+      if(group == 'earlyrot_ppaxis'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'earlyrot_ppquad'){
+        cond <- 'earlyrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'laterot_ppaxis'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'laterot_ppquad'){
+        cond <- 'laterot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      groupconfidence <- groupconfidence[201:501,]
+      
+      colourscheme <- getROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'earlyrot'){
+      #add legend
+      legend(-1,yval,legend=c('Early ROT: Movement along axis', 'Early ROT: Movement along quadrant'),
+             col=c(colourscheme[['earlyrot_ppaxis']][['S']],colourscheme[['earlyrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='laterot'){
+      #add legend
+      legend(-1,yval,legend=c('Late ROT: Movement along axis', 'Late ROT: Movement along quadrant'),
+             col=c(colourscheme[['laterot_ppaxis']][['S']],colourscheme[['laterot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
   }
 }
 
@@ -7152,6 +8198,152 @@ plotPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm', 'mir'
   }
 }
 
+plotCheckROTPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('smallrot', 'largerot'), target='inline', erps = 'frn', type = 'b', freqs, roi) {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'alpha') {
+    svglite(file=sprintf('doc/fig/Fig100H_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig100H_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'theta') {
+    svglite(file=sprintf('doc/fig/Fig100H_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    if(ptype == 'smallrot'){
+      groups = c('smallrot_ppaxis', 'smallrot_ppquad')
+    } else if (ptype == 'largerot'){
+      groups = c('largerot_ppaxis', 'largerot_ppquad')
+    }
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    
+    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-yval - 10, yval +10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to feedback onset: %s", roi, freqs, ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    
+    for (group in groups){
+      
+      if(group == 'smallrot_ppaxis'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'smallrot_ppquad'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'largerot_ppaxis'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'largerot_ppquad'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      groupconfidence <- groupconfidence[351:601,]
+      
+      colourscheme <- getSIZEROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'smallrot'){
+      #add legend
+      legend(0,yval,legend=c('Small ROT: Movement along axis', 'Small ROT: Movement along quadrant'),
+             col=c(colourscheme[['smallrot_ppaxis']][['S']],colourscheme[['smallrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='largerot'){
+      #add legend
+      legend(0,yval,legend=c('Large ROT: Movement along axis', 'Large ROT: Movement along quadrant'),
+             col=c(colourscheme[['largerot_ppaxis']][['S']],colourscheme[['largerot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
 plotPermTestPTypeSmallLargeDiffWavesTFRs <- function(groups = c('rot', 'rdm', 'mir'), perturbs = c('rotvmir', 'rotvrdm', 'mirvrdm'), target='inline', erps = 'frn', freqs, roi) {
   
   #but we can save plot as svg file
@@ -7750,6 +8942,151 @@ plotGoOnsetPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('rot', 'rdm'
     if (target=='svg') {
       dev.off()
     }
+  }
+}
+
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs <- function(perturbs = c('smallrot', 'largerot'), target='inline', erps = 'lrp', type = 'b', freqs, roi) {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  #but we can save plot as svg file
+  if (target=='svg' & freqs == 'alpha') {
+    svglite(file=sprintf('doc/fig/Fig100H_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'beta') {
+    svglite(file=sprintf('doc/fig/Fig100H_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  } else if (target=='svg' & freqs == 'theta') {
+    svglite(file=sprintf('doc/fig/Fig100H_TFR_DiffWaves_EarlyLate_PermTest_%s_%s.svg', freqs, roi), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow=c(1,2), mar=c(4,4,2,0.1))
+  par(mar=c(4,4,2,0.1))
+  
+  #layout(matrix(c(1,2,3), nrow=1, ncol=3, byrow = TRUE), widths=c(2,2,2), heights=c(1,1))
+  layout(matrix(c(1,2), 1, 2, byrow = TRUE), widths=c(2,2), heights=c(1,1))
+  
+  for(ptype in perturbs){
+    if(ptype == 'smallrot'){
+      groups = c('smallrot_ppaxis', 'smallrot_ppquad')
+    } else if (ptype == 'largerot'){
+      groups = c('largerot_ppaxis', 'largerot_ppquad')
+    }
+    
+    # create plot
+    meanGroupReaches <- list() #empty list so that it plots the means last
+    #NA to create empty plot
+    # could maybe use plot.new() ?
+    plot(NA, NA, xlim = c(-1.1, 0.5), ylim = c(-yval - 10, yval +10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to go signal onset: %s", roi, freqs, ptype), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    
+    for (group in groups){
+      
+      if(group == 'smallrot_ppaxis'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'smallrot_ppquad'){
+        cond <- 'smallrot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      } else if (group == 'largerot_ppaxis'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_axis <- c('X0', 'X1', 'X4', 'X5', 'X8', 'X9', 'X12', 'X13', 
+                         'X16', 'X17', 'X20', 'X21', 'X24', 'X25', 'X28', 'X29', 'time')
+        subdat1 <- data[pp_rot_axis]
+      } else if (group == 'largerot_ppquad'){
+        cond <- 'largerot'
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_%s_%s_%s.csv', roi, freqs, cond, erps))
+        pp_rot_quad <- c('X2', 'X3', 'X6', 'X7', 'X10', 'X11', 'X14', 'X15', 
+                         'X18', 'X19', 'X22', 'X23', 'X26', 'X27', 'X30', 'X31', 'time')
+        subdat1 <- data[pp_rot_quad]
+      }
+      
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
+      
+      dat1 <- as.matrix(subdat1[,1:(dim(subdat1)[2]-1)])
+      
+      groupconfidence <- data.frame()
+      for (time in full_timepts){
+        cireaches <- dat1[which(subdat1$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(groupconfidence)) == 0){
+          groupconfidence <- citrial
+        } else {
+          groupconfidence <- rbind(groupconfidence, citrial)
+        }
+      }
+      
+      groupconfidence <- groupconfidence[201:501,]
+      
+      colourscheme <- getSIZEROTAXISColourScheme(targ = group)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[group]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[group]][['S']]
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    if(ptype == 'smallrot'){
+      #add legend
+      legend(-1,yval,legend=c('Small ROT: Movement along axis', 'Small ROT: Movement along quadrant'),
+             col=c(colourscheme[['smallrot_ppaxis']][['S']],colourscheme[['smallrot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } else if(ptype=='largerot'){
+      #add legend
+      legend(-1,yval,legend=c('Large ROT: Movement along axis', 'Large ROT: Movement along quadrant'),
+             col=c(colourscheme[['largerot_ppaxis']][['S']],colourscheme[['largerot_ppquad']][['S']]),
+             lty=1,bty='n',cex=1,lwd=2)
+    } 
+  }
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
   }
 }
 

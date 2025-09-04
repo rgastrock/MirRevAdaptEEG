@@ -357,6 +357,54 @@ getTrainingColourScheme <- function(errsize = c('aligned','early','late')){
   return(colourscheme)
 }
 
+getROTAXISColourScheme <- function(targloc = c('ealryrot_ppaxis','earlyrot_ppquad','laterot_ppaxis','laterot_ppquad')){
+  #create a list containing the colourscheme per group
+  for (targ in targloc){
+    colourscheme <- list()
+    
+    colourscheme[['earlyrot_ppaxis']] <- list('S'='#ff8200ff', # pure orange
+                                    'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['earlyrot_ppquad']] <- list('S'='#e51636ff', #vivid/york red
+                                   'T'='#e516362f')
+    
+    colourscheme[['laterot_ppaxis']] <- list('S'='#c400c4ff', #strong magenta
+                                     'T'='#c400c42f')
+
+    colourscheme[['laterot_ppquad']] <-   list('S'='#005de4ff', #pure blue
+                                    'T'='#005de42f')
+    
+    # colourscheme[['aligned']] <-   list('S'='#A9A9A9ff', #dark grey
+    #                                     'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
+getSIZEROTAXISColourScheme <- function(targloc = c('smallrot_ppaxis','smallrot_ppquad','largerot_ppaxis','largerot_ppquad')){
+  #create a list containing the colourscheme per group
+  for (targ in targloc){
+    colourscheme <- list()
+    
+    colourscheme[['smallrot_ppaxis']] <- list('S'='#ff8200ff', # pure orange
+                                              'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['smallrot_ppquad']] <- list('S'='#e51636ff', #vivid/york red
+                                              'T'='#e516362f')
+    
+    colourscheme[['largerot_ppaxis']] <- list('S'='#c400c4ff', #strong magenta
+                                             'T'='#c400c42f')
+    
+    colourscheme[['largerot_ppquad']] <-   list('S'='#005de4ff', #pure blue
+                                               'T'='#005de42f')
+    
+    # colourscheme[['aligned']] <-   list('S'='#A9A9A9ff', #dark grey
+    #                                     'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
 getErrSizeColourScheme <- function(errsize = c('aligned','sml','lrg')){
   #create a list containing the colourscheme per group
   for (err in errsize){

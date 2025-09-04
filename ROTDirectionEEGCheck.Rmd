@@ -1,0 +1,353 @@
+---
+title: "Effect of Consistent Rotation direction on EEG"
+author: "Raphael Q. Gastrock"
+date: "2025-09-04"
+output:
+  # pdf_document:
+  #   toc: true
+  #   toc_depth: '2'
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: true
+---
+
+First, we load script dependencies:
+
+```{r, warning=FALSE, message=FALSE}
+source('ana/shared.R')
+source('ana/permutationTtest.R')
+source('ana/expsched.R')
+```
+
+
+# Fixed rotation perturbation
+
+In this experiment, the rotation was always set to be 30 deg. in the counterclockwise direction. This means that correcting for the fixed rotation required that participants move 30 deg. in the clockwise direction. The kinematics produced for fixed rotation trials were thus dependent on the target location in a given trial. Target locations depended on which workspace axis the rotation was assigned for a given participant, as well as whether the targets were to the clockwise or counterclockwise direction of the workspace axis. The figure below shows expected hand movement directions to compensate for the rotation, relative to the target location (see solid lines, color coded according to corresponding targets).
+
+```{r, fig.width = 12, fig.height = 4}
+plotNewTabletConditions()
+```
+
+We see that for the fixed rotation, when targets are located counterclockwise relative to the axis, participants had to move along the opposite direction of the axis. But, when targets are located clockwise relative to the axis, participants still had to move clockwise relative to these targets. That is, they made movement within the quadrant where targets were located.
+
+Given that the kinematics for moving for the fixed rotation does not exactly match the kinematics for movement within the mirror reversed perturbation, we first assess whether the different movements for the different fixed rotation targets show any effects in our EEG measures, before we can compare these measures across perturbation types. Below, we compare how EEG measures may differ for the fixed rotation, when participants had to move along the axis or move along the quadrant. We compare these two movement types along our early vs. late and small vs. large conditions for our ERP and Time-Frequency analyses.
+
+# ERP analyses
+
+## Feedback processing
+
+### Early vs. Late
+
+First, we show the result we discuss in our manuscript:
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestEarlyLateDiffWaves(perturbs='rot')
+```
+
+Then, we show comparisons for Early and Late training between movements along the axis and movements along the quadrant.
+
+```{r, fig.width = 16, fig.height=6}
+plotCheckROTEarlyLateDiffWaves()
+```
+
+
+### Small vs. Large
+
+We show the result we discuss in our manuscript:
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestSmallLargeDiffWaves(perturbs='rot')
+```
+
+Then, we show comparisons for Small and Large errors between movements along the axis and movements along the quadrant.
+
+```{r, fig.width = 16, fig.height=6}
+plotCheckROTSmallLargeDiffWaves()
+```
+
+## Movement preparation
+
+### Early vs. Late
+
+#### Readiness Potential
+
+First, we show the result we discuss in our manuscript:
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestEarlyLateRPDiffWaves(perturbs='rot')
+```
+
+Then, we show comparisons for Early and Late training between movements along the axis and movements along the quadrant.
+
+```{r, fig.width = 16, fig.height=6}
+plotCheckROTEarlyLateDiffWavesRP()
+```
+
+#### Lateralized Readiness Potential
+
+First, we show the result we discuss in our manuscript:
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestEarlyLateLRPDiffWaves(perturbs='rot')
+```
+
+Then, we show comparisons for Early and Late training between movements along the axis and movements along the quadrant.
+
+```{r, fig.width = 16, fig.height=6}
+plotCheckROTEarlyLateDiffWavesLRP()
+```
+
+
+### Small vs. Large
+
+#### Readiness Potential
+
+We show the result we discuss in our manuscript:
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestSmallLargeRPDiffWaves(perturbs='rot')
+```
+
+Then, we show comparisons for Small and Large errors between movements along the axis and movements along the quadrant.
+
+```{r, fig.width = 16, fig.height=6}
+plotCheckROTSmallLargeDiffWavesRP()
+```
+
+
+#### Lateralized Readiness Potential
+
+We show the result we discuss in our manuscript:
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestSmallLargeLRPDiffWaves(perturbs='rot')
+```
+
+Then, we show comparisons for Small and Large errors between movements along the axis and movements along the quadrant.
+
+```{r, fig.width = 16, fig.height=6}
+plotCheckROTSmallLargeDiffWavesLRP()
+```
+
+
+# Time Frequency analyses
+
+## Feedback processing
+
+### Early vs. Late
+
+#### Beta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='beta', roi='medfro')
+plotCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='beta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='beta', roi='latcen')
+plotCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='beta', roi='latcen')
+```
+
+#### Alpha
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='medfro')
+plotCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='alpha', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='latcen')
+plotCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='alpha', roi='latcen')
+```
+
+#### Theta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='theta', roi='medfro')
+plotCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='theta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='theta', roi='latcen')
+plotCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='theta', roi='latcen')
+```
+
+### Small vs. Large
+
+#### Beta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='beta', roi='medfro')
+plotCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='beta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='beta', roi='latcen')
+plotCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='beta', roi='latcen')
+```
+
+#### Alpha
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='medfro')
+plotCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='alpha', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='latcen')
+plotCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='alpha', roi='latcen')
+```
+
+#### Theta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='theta', roi='medfro')
+plotCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='theta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='theta', roi='latcen')
+plotCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='theta', roi='latcen')
+```
+
+
+## Movement preparation
+
+### Early vs. Late
+
+#### Beta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='beta', roi='medfro')
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='beta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='beta', roi='latcen')
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='beta', roi='latcen')
+```
+
+#### Alpha
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='medfro')
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='alpha', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='latcen')
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='alpha', roi='latcen')
+```
+
+#### Theta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='theta', roi='medfro')
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='theta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotGoOnsetPermTestEarlyLateDiffWavesTFRs(perturbs='rot', freqs='theta', roi='latcen')
+plotGoOnsetCheckROTPermTestEarlyLateDiffWavesTFRs(freqs='theta', roi='latcen')
+```
+
+### Small vs. Large
+
+#### Beta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='beta', roi='medfro')
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='beta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='beta', roi='latcen')
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='beta', roi='latcen')
+```
+
+#### Alpha
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='medfro')
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='alpha', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='alpha', roi='latcen')
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='alpha', roi='latcen')
+```
+
+#### Theta
+
+##### Medial frontal area
+
+```{r, fig.width = 8, fig.height = 6}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='theta', roi='medfro')
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='theta', roi='medfro')
+```
+
+##### Lateral central area
+
+```{r, fig.width = 16, fig.height=6}
+plotGoOnsetPermTestSmallLargeDiffWavesTFRs(perturbs='rot', freqs='theta', roi='latcen')
+plotGoOnsetCheckROTPermTestSmallLargeDiffWavesTFRs(freqs='theta', roi='latcen')
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
