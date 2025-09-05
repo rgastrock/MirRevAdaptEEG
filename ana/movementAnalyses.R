@@ -2359,6 +2359,11 @@ plotBlockedPL <- function(target='inline'){
   axis(side=2, at=c(4, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5),las=2)
   
   #abline(h = c(400,700), col = 'black', lty = 2)
+  #diameter of stencil is 10.2 cm
+  #radius is 5.1 cm
+  #moved target closer to account for stylus hitting the stencil (measures as 0.52 cm) -> remove 0.52 cm from 5.1 cm = 4.58
+  #since we consider movement onset to offset only, this starts counting PL from 0.5 cm away from origin
+  #so 4.58 - 0.5 = 4.08 cm is start to target distance
   abline(v = c(4.5,12.5,27.5,35.5), h = c(4.08), col = 8, lty = 2)
   #abline(h = c(9), col = 8, lty = 2)
   
