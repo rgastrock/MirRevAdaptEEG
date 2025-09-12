@@ -803,6 +803,157 @@ plotWorkspaceLRPs <- function(groups = c('aln_right', 'aln_left', 'rot_right', '
   
 }
 
+#plot LRP across trial types----
+
+getSubtractedLRP <- function(groups = c('aln', 'rot', 'rdm', 'mir'), type = 'b', erps = 'lrp', directions = c('right', 'left')){
+
+  for(group in groups){
+    for(direction in directions){
+
+      C3data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s_C3.csv', group, direction, erps))
+      C4data <- read.csv(file=sprintf('data/Evoked_DF_%s_%s_%s_C4.csv', group, direction, erps))
+
+      rowidx <- C3data$X
+      timepts <- C3data$time
+
+      diffdata <- C3data - C4data
+      if(direction == 'right'){
+        rightdiff <- diffdata[,2:(dim(diffdata)[2]-1)]
+      } else if(direction == 'left'){
+        leftdiff <- diffdata[,2:(dim(diffdata)[2]-1)]
+      }
+    }
+
+    latdiff <- rightdiff - leftdiff
+    groupLRP <- data.frame(rowidx, latdiff, timepts)
+
+    write.csv(groupLRP, file=sprintf('data/Subtracted_LRP_DF_%s.csv', group), row.names = F)
+  }
+}
+
+getSubtractedLRPConfidenceInterval <- function(groups = c('aln', 'rot', 'rdm', 'mir'), type = 'b'){
+
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Subtracted_LRP_DF_%s.csv', group))
+    data <- data[,2:length(data)]
+
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+
+    confidence <- data.frame()
+
+
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+
+      write.csv(confidence, file=sprintf('data/Subtracted_LRP_CI_%s.csv', group), row.names = F)
+
+    }
+  }
+
+}
+
+plotSubtractedLRPs <- function(groups = c('aln', 'rot', 'rdm', 'mir'), target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig8_Subtracted_LRP.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #par(mfrow = c(4,2))
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(-1.1, 0.6), ylim = c(-16, 6),
+       xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+       main = "LRPs across trial types time-locked to go signal onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  # text(-1, 6, 'target onset', cex = 0.85)
+  # text(0, 6, 'go signal', cex = 0.85)
+  axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+  axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+  
+  
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/Subtracted_LRP_DF_%s.csv', group))
+    timepts <- data$time
+    timepts <- timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+    
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    groupconfidence <- read.csv(file=sprintf('data/Subtracted_LRP_CI_%s.csv', group))
+    groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+    
+    colourscheme <- getSubtractedLRPColourScheme(groups=group)
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[group]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    # plot mean reaches for each group
+    col <- colourscheme[[group]][['S']]
+    #lines(x = timepts, y = mid, col=col)
+    lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+  }
+  
+  lim <- par('usr')
+  col <- "#ededed"
+  col <- alpha(col, .5)
+  rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+  
+  ctr = 5
+  for(group in groups){
+    #add movement onset
+    if(group == 'aln'){
+      mo <- read.csv(file='data/MovementOnset_CI_aln_lrp.csv')
+    } else if (group == 'rot'){
+      mo <- read.csv(file='data/MovementOnset_CI_rot_lrp.csv')
+    } else if (group == 'rdm'){
+      mo <- read.csv(file='data/MovementOnset_CI_rdm_lrp.csv')
+    } else if (group == 'mir'){
+      mo <- read.csv(file='data/MovementOnset_CI_mir_lrp.csv')
+    }
+    colourscheme <- getSubtractedLRPColourScheme(groups = group)
+    col <- colourscheme[[group]][['T']]
+    lines(x = c(mo[,1], mo[,3]), y = c(ctr, ctr), col = col, lty = 1, lwd = 8)
+    col <- colourscheme[[group]][['S']]
+    points(x = mo[,2], y = ctr, pch = 20, cex = 1.5, col=col)
+    ctr = ctr - 0.5
+  }
+  
+  #add legend
+  legend(-1,-5,legend=c('Aligned', 'Fixed rotation', 'Random rotation', 'Mirror reversal'),
+         col=c(colourscheme[['aln']][['S']],colourscheme[['rot']][['S']],colourscheme[['rdm']][['S']],colourscheme[['mir']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+
 # plot LRP differences for right and left moves on VERTICAL axis ----
 getVerticalWorkspaceLRPConfidenceInterval <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdm_right', 'rdm_left', 'mir_right', 'mir_left'), type = 'b', erps = 'lrp', channels = c('C3','C4')){
   for(channel in channels){

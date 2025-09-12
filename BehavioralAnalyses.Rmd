@@ -39,6 +39,14 @@ getLCBlockedtTests()
 
 We compare the first, second, and last blocks (6 trials each) of training in the fixed rotation and mirror perturbations, and find no differences between the two. However, we do confirm that learning has occurred in the rotation perturbation when comparing the first and last block of training, where the amount of compensation is higher at the end of training. We do not find a difference between the first and last block of mirror training, but this is likely due to the high variability in block 1. However, when we compare the second and last blocks of mirror training, we find a difference, thereby confirming that learning has occurred by the end of training.
 
+# Statistics: Random Rotation trials
+
+```{r}
+getRDMBlockedtTests()
+```
+
+We confirm that participants do not learn to compensate for the random rotation. 
+
 # Washout trials: Reach aftereffects
 
 We also plot data from washout trials, to confirm expectations that reach aftereffects, or the persistent deviation in hand movements despite perturbation removal, are only observed for the fixed rotation and not the mirror reversal perturbation.

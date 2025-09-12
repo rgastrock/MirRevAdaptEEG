@@ -482,16 +482,16 @@ getSubtractedLRPColourScheme <- function(groups = c('aln', 'rot', 'rdm', 'mir'))
   for (group in groups){
     colourscheme <- list()
     
-    colourscheme[['rdm']] <- list('S'='#767676ff', # pure orange
-                                        'T'='#7676762f')    #2f gives a lighter shade of the color
+    colourscheme[['rdm']] <- list('S'='#ff8200ff', #orange
+                                  'T'='#ff82002f')    #2f gives a lighter shade of the color
     
-    colourscheme[['mir']] <- list('S'='#e51636ff', #vivid/york red
+    colourscheme[['rot']] <- list('S'='#e51636ff', #vivid/york red
                                   'T'='#e516362f')
     
     #colourscheme[['rdm']] <- list('S'='#c400c4ff', #strong magenta
       #                            'T'='#c400c42f')
     
-    colourscheme[['rot']] <-   list('S'='#005de4ff', #pure blue
+    colourscheme[['mir']] <-   list('S'='#005de4ff', #pure blue
                                     'T'='#005de42f')
     
     colourscheme[['aln']] <-   list('S'='#A9A9A9ff', #dark grey

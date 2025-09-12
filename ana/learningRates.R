@@ -5842,3 +5842,83 @@ getLCBlockedtTests <- function(maxppid = 31, location = 'feedback', targetno = 6
   print(ttestBF(MIRdat2$reachdev, MIRdatlast$reachdev, paired = TRUE))
   
 }
+
+getRDMBlockedtTests <- function(maxppid = 31, location = 'feedback', targetno = 6){
+  
+  RDM0dat <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = 'RDM0')
+  RDM0dat$ptype <- 'RDM0'
+  RDM1dat <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = 'RDM1')
+  RDM1dat$ptype <- 'RDM1'
+  LC4test <- rbind(RDM0dat, RDM1dat)
+  LC4test$ptype <- as.factor(LC4test$ptype)
+  LC4test$trial <- as.factor(LC4test$trial)
+  LC4test$participant <- as.factor(LC4test$participant)
+  
+  #compare first block
+  RDM0dat <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'RDM0'),]
+  RDM1dat <-LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'RDM1'),]
+  
+  cat('Random Early (first block) compared to Random Late (first block):\n')
+  print(t.test(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(RDM0dat$reachdev, RDM1dat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Random Early (first block) compared to Random Late (first block):\n')
+  print(ttestBF(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  
+  #compare second block
+  RDM0dat <- LC4test[which(LC4test$trial == 2 & LC4test$ptype == 'RDM0'),]
+  RDM1dat <-LC4test[which(LC4test$trial == 2 & LC4test$ptype == 'RDM1'),]
+  
+  cat('Random Early (second block) compared to Random Late (second block):\n')
+  print(t.test(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(RDM0dat$reachdev, RDM1dat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Random Early (second block) compared to Random Late (second block):\n')
+  print(ttestBF(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  
+  #compare last block
+  RDM0dat <- LC4test[which(LC4test$trial == 8 & LC4test$ptype == 'RDM0'),]
+  RDM1dat <-LC4test[which(LC4test$trial == 8 & LC4test$ptype == 'RDM1'),]
+  
+  cat('Random Early (last block) compared to Random Late (last block):\n')
+  print(t.test(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(RDM0dat$reachdev, RDM1dat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Random Early (last block) compared to Random Late (last block):\n')
+  print(ttestBF(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  
+  #compare random early first and last block
+  RDM0dat1 <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'RDM0'),]
+  RDM0datlast <-LC4test[which(LC4test$trial == 8 & LC4test$ptype == 'RDM0'),]
+  
+  cat('Random Early (first block) compared to Random Early (last block):\n')
+  print(t.test(RDM0dat1$reachdev, RDM0datlast$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(RDM0dat1$reachdev, RDM0datlast$reachdev, method = 'paired'))
+  cat('Bayesian t-test Random Early (first block) compared to Random Early (last block):\n')
+  print(ttestBF(RDM0dat1$reachdev, RDM0datlast$reachdev, paired = TRUE))
+  
+  #compare random late first and last block
+  RDM1dat1 <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'RDM1'),]
+  RDM1datlast <-LC4test[which(LC4test$trial == 8 & LC4test$ptype == 'RDM1'),]
+  
+  cat('Random Late (first block) compared to Random Late (last block):\n')
+  print(t.test(RDM1dat1$reachdev, RDM1datlast$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(RDM1dat1$reachdev, RDM1datlast$reachdev, method = 'paired'))
+  cat('Bayesian t-test Random Late (first block) compared to Random Late (last block):\n')
+  print(ttestBF(RDM1dat1$reachdev, RDM1datlast$reachdev, paired = TRUE))
+  
+  #compare first block of random early with last block of random late
+  RDM0dat <- LC4test[which(LC4test$trial == 1 & LC4test$ptype == 'RDM0'),]
+  RDM1dat <-LC4test[which(LC4test$trial == 8 & LC4test$ptype == 'RDM1'),]
+  
+  cat('Random Early (first block) compared to Random Late (last block):\n')
+  print(t.test(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  cat('Effect Size - Cohen d:\n')
+  print(cohensD(RDM0dat$reachdev, RDM1dat$reachdev, method = 'paired'))
+  cat('Bayesian t-test Random Early (first block) compared to Random Late (last block):\n')
+  print(ttestBF(RDM0dat$reachdev, RDM1dat$reachdev, paired = TRUE))
+  
+ 
+}
