@@ -267,6 +267,7 @@ Although we have all figures and statistical comparisons in this document, we su
 plotFeedbackERP()
 plotReadinessERP()
 plotLateralizedRP()
+plotSubtractedLRPs()
 ```
 
 

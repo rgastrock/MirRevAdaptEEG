@@ -1,0 +1,43 @@
+---
+title: "Summary table for EEG results"
+author: "Raphael Q. Gastrock"
+date: "2025-12-05"
+output: html_document
+---
+
+Install and load in dependencies.
+
+```{r}
+#install.packages('kableExtra')
+#install.packages('webshot2')
+
+library(kableExtra)
+library(webshot2)
+source('ana/expsched.R')
+```
+
+Generate the table.
+
+```{r}
+data <- plotSummaryTable()
+```
+
+Edit formatting and apperance.
+
+```{r}
+ table_1 <- data %>%
+    kbl(caption = "Table 1. Summary of EEG effects") %>%
+    kable_classic(lightable_options = 'striped', html_font = 'Arial', row_label_position = 'c', full_width = T, font_size = 14) %>%
+    pack_rows("movement preparation", 1, 5) %>%
+    pack_rows("feedback processing", 6, 9) %>%
+    column_spec(1, width = '1.75in') %>%
+    column_spec(3, width = '2in')
+  
+```
+
+Save to image.
+
+```{r}
+save_kable(table_1, "doc/fig/Tab1_Summary.png")
+```
+

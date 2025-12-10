@@ -501,6 +501,106 @@ plotNewTabletConditions <- function(conds = c(1,2,3,4), target='inline'){
   }
 }
 
+plotSummaryTimeline <- function(target='inline'){
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig0C_timeline.svg', width=8.5, height=4, pointsize=14, system_fonts=list(sans="Arial"))#width is 8.5, height is 4, pointsize is 14
+  }
+  
+  #might need to specify different X and Y for each trial
+  X <- c(0,3)
+  Y <- c(0.5, 1)
+
+  
+  plot(X, Y, type = 'n', axes = FALSE,
+       xlab = 'Time', ylab = '',
+       xlim = c(-1,4), ylim = c(0.45,0.75))#, cex.main=.65, cex.lab=.65)
+  abline(v = c(1,2), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+  axis(side=1, at=c(0,1,2,3))
+  
+  ##Movement preparation
+  #RP effect for ROT
+  col <- 'red'
+  RPtime <- seq(0.85,1,0.01)
+  lower <- c(rep(0.5, length(RPtime)))
+  upper <- c(rep(0.55, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  #Beta: medial frontal (small minus large)
+  col <- 'red'
+  RPtime <- seq(0.67,0.81,0.01)
+  lower <- c(rep(0.56, length(RPtime)))
+  upper <- c(rep(0.60, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  #Beta: lateral central (small minus large)
+  col <- 'red'
+  RPtime <- seq(0.06,0.37,0.01)
+  lower <- c(rep(0.61, length(RPtime)))
+  upper <- c(rep(0.65, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  #Alpha: lateral central (small minus large)
+  col <- 'red'
+  RPtime <- seq(0.03,0.32,0.01)
+  lower <- c(rep(0.66, length(RPtime)))
+  upper <- c(rep(0.70, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  
+  ##Feedback processing
+  #P3 effect for ROT and RDM
+  col <- 'red'
+  RPtime <- seq(2.05,2.54,0.01)
+  lower <- c(rep(0.5, length(RPtime)))
+  upper <- c(rep(0.55, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  #SLP effect for ROT and RDM
+  col <- 'red'
+  RPtime <- seq(2.21,2.92,0.01)
+  lower <- c(rep(0.56, length(RPtime)))
+  upper <- c(rep(0.60, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  #Beta: medial frontal (late minus early)
+  col <- 'red'
+  RPtime <- seq(2.20,2.47,0.01)
+  lower <- c(rep(0.61, length(RPtime)))
+  upper <- c(rep(0.65, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  #Beta: lateral central (small minus large)
+  col <- 'red'
+  RPtime <- seq(2.78,2.94,0.01)
+  lower <- c(rep(0.66, length(RPtime)))
+  upper <- c(rep(0.70, length(RPtime)))
+  polygon(x = c(RPtime, rev(RPtime)), y = c(lower, rev(upper)), border=NA, col=col)
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+}
+
+plotSummaryTable <- function(){
+  
+  prep_EEG1 <- c("RP", "movement preparation; increased negativity with expected sensory consequences", 'fixed rotation', 'increased positivity from early to late training')
+  prep_EEG2 <- c("LRP", "effector-specific preparation", 'all', 'preparation for intended movement direction')
+  prep_EEG3 <- c("Beta (lateral central)", "resynchonization with improved motor performance; linked to implicit learning", 'fixed rotation', 'resynchronization with small errors')
+  prep_EEG4 <- c("Beta (medial frontal)", "resynchonization with improved motor performance; linked to explicit learning", 'fixed rotation', 'resynchronization with small errors')
+  prep_EEG5 <- c("Alpha (lateral central)", "resynchonization with improved motor performance; task engagement", 'fixed rotation', 'resynchronization with small errors')
+  prep <- as.data.frame(rbind(prep_EEG1, prep_EEG2, prep_EEG3, prep_EEG4, prep_EEG5))
+  colnames(prep) <- c('EEG component', 'Expected functionality', 'Perturbation type', 'Observed effect')
+  
+  fb_EEG1 <- c("P3", "cognition and attention; scales with error size", 'fixed and random rotation', 'amplitude decreases from early to late training')
+  fb_EEG2 <- c("SLP", "negative association with explicit learning", 'all', 'sustained positivity with small errors')
+  fb_EEG3 <- c("Beta (lateral central)", "resynchonization with improved motor performance", 'random rotation', 'increased with large vs. small errors')
+  fb_EEG4 <- c("Beta (medial frontal)", "resynchonization with improved motor performance", 'random rotation', 'resynchronization from early to late learning')
+  fb <- as.data.frame(rbind(fb_EEG1, fb_EEG2, fb_EEG3, fb_EEG4))
+  colnames(fb) <- c('EEG component', 'Expected functionality', 'Perturbation type', 'Observed effect')
+  
+  data <- rbind(prep, fb)
+  rownames(data) <- NULL
+  
+  return(data)
+  
+}
 
 # #create online experiment axes
 # plotOnlineConditions <- function(conds = c(1,2,3,4), target='inline'){
