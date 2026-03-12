@@ -453,6 +453,30 @@ getLRPColourScheme <- function(channels = c('C3','C4')){
   return(colourscheme)
 }
 
+getMovementRTColourScheme <- function(directions = c('right','left')){
+  #create a list containing the colourscheme per group
+  for (direction in directions){
+    colourscheme <- list()
+    
+    # colourscheme[['smlrot']] <- list('S'='#ff8200ff', # pure orange
+    #                                  'T'='#ff82002f')    #2f gives a lighter shade of the color
+    
+    colourscheme[['right']] <- list('S'='#e51636ff', #vivid/york red
+                                 'T'='#e516362f')
+    
+    # colourscheme[['lrgrdm']] <- list('S'='#c400c4ff', #strong magenta
+    #                                  'T'='#c400c42f')
+    
+    colourscheme[['left']] <-   list('S'='#005de4ff', #pure blue
+                                   'T'='#005de42f')
+    
+    # colourscheme[['smlrdm']] <-   list('S'='#A9A9A9ff', #dark grey
+    #                                    'T'='#A9A9A92f')
+    
+  }
+  return(colourscheme)
+}
+
 getMoveDirectionColourScheme <- function(channels = c('C3','C4')){
   #create a list containing the colourscheme per group
   for (channel in channels){
@@ -713,6 +737,24 @@ getPTypeDiffWavesColourScheme <- function(groups = c('rot', 'mir', 'rdm')){
     
     colourscheme[['rdm']] <-   list('S'='#ff8200ff', #orange
                                     'T'='#ff82002f')
+    
+  }
+  return(colourscheme)
+}
+
+getRDMDiffWavesColourScheme <- function(groups = c('rdm1', 'rdm2')){
+  #create a list containing the colourscheme per group
+  for (group in groups){
+    colourscheme <- list()
+    
+    colourscheme[['rdm1']] <- list('S'='#e51636ff', #vivid/york red
+                                  'T'='#e516362f')
+    
+    colourscheme[['rdm2']] <-   list('S'='#005de4ff', #pure blue
+                                    'T'='#005de42f')
+    
+    # colourscheme[['rdm']] <-   list('S'='#ff8200ff', #orange
+    #                                 'T'='#ff82002f')
     
   }
   return(colourscheme)

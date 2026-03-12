@@ -1294,6 +1294,40 @@ getDiffWavesEarlyLateCI <- function(groups = c('earlyrot', 'laterot', 'earlyrdm'
   }
 }
 
+getDiffWavesRDMEarlyLateCI <- function(groups = c('early1rdm', 'late2rdm', 'early2rdm', 'late1rdm'), type = 'b', erps = 'frn'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_%s_%s.csv', group, erps))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/DiffWaves_EarlyLate_CI_%s_%s.csv', group, erps), row.names = F) 
+      
+    }
+  }
+}
+
 plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='inline', erps = 'frn') {
   
   for(ptype in perturbs){
@@ -1563,6 +1597,40 @@ plotEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'), target='in
 }
 
 getPTypeDiffWavesEarlyLateCI <- function(groups = c('rot_diff', 'rdm_diff', 'mir_diff'), type = 'b', erps = 'frn'){
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_EvL_%s_%s.csv', group, erps))
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    timepts <- data$time
+    data1 <- as.matrix(data[,1:(dim(data)[2]-1)])
+    
+    confidence <- data.frame()
+    
+    
+    for (time in timepts){
+      cireaches <- data1[which(data$time == time), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/DiffWaves_EarlyLate_EvL_CI_%s_%s.csv', group, erps), row.names = F) 
+      
+    }
+  }
+}
+
+getPTypeDiffWavesRDMEarlyLateCI <- function(groups = c('rdm1_diff', 'rdm2_diff'), type = 'b', erps = 'frn'){
   for (group in groups){
     data <- read.csv(file=sprintf('data/DiffWaves_DF_EvL_%s_%s.csv', group, erps))
     data <- data[,2:length(data)]

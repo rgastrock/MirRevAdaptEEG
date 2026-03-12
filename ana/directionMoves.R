@@ -1,5 +1,6 @@
 source('ana/shared.R')
 source('ana/learningRates.R')
+source('ana/movementAnalyses.R')
 
 #which side of the workspace did they move towards?
 
@@ -461,6 +462,231 @@ getRDMMovementWorkspaceDirection <- function(){
   rdmrot[is.na(rdmrot)] <- rdmmir[is.na(rdmrot)]
   
   write.csv(rdmrot, file='data/rdm_MovementWorkspace_direction.csv', row.names = F) 
+  
+}
+
+# CHECK RT DIFFERENCES IN MOVEMENT TO LEFT OR RIGHT SIDE----
+
+getRTRightandLeftMovements <- function(maxppid = 31, groups = c('aln', 'rot', 'rdmrot', 'rdmmir', 'mir')){
+  
+  for(group in groups){
+    dir_data <- read.csv(file=sprintf('data/%s_MovementWorkspace_direction.csv', group))
+    
+    if(group == 'aln'){
+      rt_data <- getAlignedGroupRTTrials()
+    } else if (group == 'rot'){
+      rt_data <- getROTGroupRTTrials()
+    } else if (group == 'mir'){
+      rt_data <- getMIRGroupRTTrials()
+    } else if (group == 'rdmrot'){
+      rt_data<- data.frame() #create place holder
+      participants <- seq(0,maxppid,1) #go through participant IDs
+      for(participant in participants){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          rt <- getRTTrials(id=participant, taskno = 9, task = 'random1')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          rt <- getRTTrials(id=participant, taskno = 3, task = 'random0')
+        }
+        
+        reaches <- rt$reaction_time #get rt column from data
+        trial <- c(1:length(reaches)) #sets up trial column
+        dat <- cbind(trial, reaches)
+        #rdat <- dat$reaches
+        
+        if (prod(dim(rt_data)) == 0){
+          rt_data <- dat
+        } else {
+          rt_data <- cbind(rt_data, reaches)
+        }
+      }
+    } else if (group == 'rdmmir'){
+      rt_data<- data.frame() #create place holder
+      participants <- seq(0,maxppid,1) #go through participant IDs
+      for(participant in participants){
+        if (participant%%2 == 1){
+          #mirror then rotation if odd id
+          rt <- getRTTrials(id=participant, taskno = 3, task = 'random0')
+        } else if (participant%%2 == 0){
+          #if pp id is even
+          #rotation first then mirror
+          rt <- getRTTrials(id=participant, taskno = 9, task = 'random1')
+        }
+        
+        reaches <- rt$reaction_time #get rt column from data
+        trial <- c(1:length(reaches)) #sets up trial column
+        dat <- cbind(trial, reaches)
+        #rdat <- dat$reaches
+        
+        if (prod(dim(rt_data)) == 0){
+          rt_data <- dat
+        } else {
+          rt_data <- cbind(rt_data, reaches)
+        }
+      }
+    } 
+    
+    #match direction with rt data per group
+    rt_data <- as.data.frame(rt_data)
+    trial <- c(1:nrow(rt_data))
+    
+    #right moves
+    subdat_right <- data.frame()
+    for(i in c(1:nrow(dir_data))){
+      dir_subdat <- as.character(dir_data[i,2:ncol(dir_data)])
+      rt_subdat <- as.numeric(rt_data[i,2:ncol(rt_data)])
+      subdat <- ifelse(dir_subdat == 'r', rt_subdat, NA)
+      
+      if (prod(dim(subdat_right)) == 0){
+        subdat_right <- subdat
+      } else {
+        subdat_right <- rbind(subdat_right, subdat)
+      }
+    }
+    
+    subdat_right <- cbind(trial, subdat_right)
+    
+    #left moves
+    subdat_left <- data.frame()
+    for(i in c(1:nrow(dir_data))){
+      dir_subdat <- as.character(dir_data[i,2:ncol(dir_data)])
+      rt_subdat <- as.numeric(rt_data[i,2:ncol(rt_data)])
+      subdat <- ifelse(dir_subdat == 'l', rt_subdat, NA)
+      
+      if (prod(dim(subdat_left)) == 0){
+        subdat_left <- subdat
+      } else {
+        subdat_left <- rbind(subdat_left, subdat)
+      }
+    }
+    subdat_left <- cbind(trial, subdat_left)
+    
+    
+    write.csv(subdat_right, file=sprintf('data/MovementWorkspace_RT_%s_right.csv', group), row.names = F) 
+    write.csv(subdat_left, file=sprintf('data/MovementWorkspace_RT_%s_left.csv', group), row.names = F) 
+  }
+}
+
+getRTRightandLeftMovementsCI <- function(groups = c('aln_right', 'aln_left', 'rot_right', 'rot_left', 'rdmrot_right', 'rdmrot_left', 'rdmmir_right', 'rdmmir_left', 'mir_right', 'mir_left'), type = 't'){
+  
+  for (group in groups){
+    data <- read.csv(file=sprintf('data/MovementWorkspace_RT_%s.csv', group))
+    trial <- data$trial
+    data <- data[,2:length(data)]
+    
+    data <- as.data.frame(data)
+    data1 <- as.matrix(data[,1:(dim(data)[2])])
+    
+    confidence <- data.frame()
+    
+    
+    for (t in trial){
+      cireaches <- data1[t, ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/MovementWorkspace_RT_%s_CI.csv', group), row.names = F) 
+      
+    }
+  }
+  
+}
+
+plotRTRightandLeftMovements <- function(groups = c('aln', 'rot', 'rdmrot', 'rdmmir', 'mir'), target='inline') {
+  
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig/Fig6C_Workspace_RT.svg', width=14, height=18, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  par(mfrow = c(3,2))
+  
+  for(group in groups){
+    if(group == 'aln'){
+      directions <- c('right', 'left')
+    } else if (group == 'rot'){
+      directions <- c('right', 'left')
+    } else if (group == 'rdmrot'){
+      directions <- c('right', 'left')
+    } else if (group == 'rdmmir'){
+      directions <- c('right', 'left')
+    } else if (group == 'mir'){
+      directions <- c('right', 'left')
+    } 
+    
+    if(group == 'aln' | group == 'rdmrot' | group == 'rdmmir'){
+      plot(NA, NA, xlim = c(0, 49), ylim = c(199, 800), 
+           xlab = "Trial", ylab = "Reaction time (ms)", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("RTs to right and left movements, %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      # abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      # text(-1, 6, 'target onset', cex = 0.85)
+      # text(0, 6, 'go signal', cex = 0.85)
+      axis(1, at = c(1, 10, 20, 30, 40, 48)) #tick marks for x axis
+      axis(2, at = c(200, 300, 400, 500, 600, 700, 800), las=2) #tick marks for y axis
+    } else if (group == 'rot' | group =='mir'){
+      plot(NA, NA, xlim = c(0, 91), ylim = c(199, 800), 
+           xlab = "Trial", ylab = "Reaction time (ms)", frame.plot = FALSE, #frame.plot takes away borders
+           main = sprintf("RTs to right and left movements, %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+      # abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+      # text(-1, 6, 'target onset', cex = 0.85)
+      # text(0, 6, 'go signal', cex = 0.85)
+      axis(1, at = c(1, 20, 40, 60, 80, 90)) #tick marks for x axis
+      axis(2, at = c(200, 300, 400, 500, 600, 700, 800), las=2) #tick marks for y axis
+    }
+    
+    for (direction in directions){
+      data <- read.csv(file=sprintf('data/MovementWorkspace_RT_%s_%s.csv', group, direction))
+      trial <- data$trial
+      
+      #read in files created by getGroupConfidenceInterval in filehandling.R
+      groupconfidence <- read.csv(file=sprintf('data/MovementWorkspace_RT_%s_%s_CI.csv', group, direction))
+      
+      colourscheme <- getMovementRTColourScheme(directions = direction)
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[direction]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(trial, rev(trial)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      # plot mean reaches for each group
+      col <- colourscheme[[direction]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = trial, y = mid, col = col, lty = 1, lwd = 2)
+      
+    }
+    
+    #add legend
+    legend(25,800,legend=c('right movements','left movements'),
+           col=c(colourscheme[['right']][['S']],colourscheme[['left']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+  }
+  
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
   
 }
 
