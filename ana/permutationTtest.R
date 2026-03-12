@@ -437,10 +437,10 @@ plotCheckRDMPermTestEarlyLateDiffWaves <- function(perturbs = c('rdm1', 'rdm2'),
     
     if(ptype == 'rdm1'){
       groups = c('early1rdm', 'late1rdm')
-      pname = '1st RDM block'
+      pname = '1st RDM set'
     } else if (ptype == 'rdm2'){
       groups = c('early2rdm', 'late2rdm')
-      pname = '2nd RDM block'
+      pname = '2nd RDM set'
     } 
     
     # create plot
@@ -1019,7 +1019,7 @@ plotCheckRDMPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rdm1', 'rdm2
   if(erps == 'frn'){
     plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-16, 10), 
          xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
-         main = "Late-Early difference in each RDM block: Feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+         main = "Late-Early difference in each RDM set: Feedback onset", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   }
   
   abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
@@ -1074,7 +1074,7 @@ plotCheckRDMPermTestPTypeEarlyLateDiffWaves <- function(groups = c('rdm1', 'rdm2
   }
   
   #add legend
-  legend(0.95,10,legend=c('RDM block 1', 'RDM block 2'),
+  legend(0.95,10,legend=c('RDM set 1', 'RDM set 2'),
          col=c(colourscheme[['rdm1']][['S']],colourscheme[['rdm2']][['S']]),
          lty=1,bty='n',cex=1,lwd=2)
   

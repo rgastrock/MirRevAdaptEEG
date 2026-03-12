@@ -1,30 +1,53 @@
 ---
-title: "RevisionsAnalyses"
+title: "Analyses for revisions"
 author: "Raphael Q. Gastrock"
 date: "2026-03-12"
-output: html_document
+output: 
+  pdf_document
+    
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+This document contains figures and statistics for the added analyses we conducted to address reviewer concerns.
+
+```{r, warning=FALSE, message=FALSE}
+source('ana/shared.R')
+source('ana/learningRates.R')
+source('ana/permutationTtest.R')
+source('ana/directionMoves.R')
 ```
 
-## R Markdown
+# Random rotation and ERP effects
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+A concern raised was that random rotations undermine the claimed learning specificity of ERP effects. That is, the random rotations show no learning behaviorally, but still produce early-late ERP differences, while the mirror condition shows weak/ absent effects. This is observed with our early and late comparisons when time-locking to the feedback onset (Fig. 5A-5C). This may suggest that the ERP effects reported are more about contextual factors (predictability, fatigue, etc.) rather than learning mechanisms. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+In the experiment, we have two sets of random rotation trials, one occurring before each rotation or mirror reversal training. Currently, we define early trials as the first two blocks (12 trials) in the first set, and late trials as the last 4 blocks (24 trials) in the second set. If fatigue or predictability is contributing as a confound to the effects observed, then we should see differences when comparing early and late trials within each set. Hence, we provide comparisons between early-late learning within each set, followed by a comparison between sets. 
 
-```{r cars}
-summary(cars)
+Set 1: early1 (first 12 trials) vs. late1 (last 24 trials)
+Set 2: early2 (first 12 trials) vs. late2 (last 24 trials)
+
+```{r}
+plotCheckRDMPermTestEarlyLateDiffWaves()
 ```
 
-## Including Plots
+Within the first set we observe an early-late difference (0.27 to 0.57 s, p = 0.01). Within the second set we also observe early-late differences (0.12 to 0.25 s, p = 0.02; and 0.32 to 0.54 s, p = 0.007). Thus, the ERP is less positive at during late trials in both sets. We then compare the differences between early and late trials between sets(late minus early compared between sets 1 and 2).
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+plotCheckRDMPermTestPTypeEarlyLateDiffWaves()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We do not observe any identified clusters from comparing the two sets. Thus, while the observed ERP becomes less positive from early to late trials, this relationship does not change across the two sets of random rotation trials in our experiment.
+
+# Reaction time (RT) effects on LRP
+
+The other concern is that given the substantial differences in RT across perturbation/ trial types, movement onset markers may not be sufficient to rule out contamination near the go signal onset. This would confound our interpretations if RTs differ between left and right movements across the workspace within each condition. First, the LRPs we report all occur between target onset and go signal onset, while participants start to move well after the go signal onset. Next, if there are no observed RT differences between left and right movements, then RTs are not acting as a confound in comparing left and right movements. We compare RTs across trials for all right and left movements within each condition (aligned, fixed rotation, random rotation before rotated block, random rotation before mirror block, and mirror reversal).
+
+```{r, fig.width = 12, fig.height = 12}
+plotRTRightandLeftMovements()
+```
+
+Note that not all movements were either to the right or left of the workspace, as these trials only contained movements to targets near the horizontal axis. We also mentioned that movements along the vertical axis did not produce as strong of an effect for the LRPs observed across conditions. Thus, these do not exactly match the trial by trial RTs we present in the behavioral data (Fig. 2). Overall, we observe no RT differences between left and right movements. The solid lines on the plots are means and shaded regions are 95% confidence intervals. Since the means overlap the shaded regions of the other direction, these suggest no differences between the two curves.
+
+
+
+
+
