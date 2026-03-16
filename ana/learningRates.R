@@ -5680,13 +5680,13 @@ plotCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', targetno=
     svglite(file='doc/fig/Fig29_ROTMIRBlockedIndLearningCurve.svg', width=11.5, height=10.5, pointsize=16, system_fonts=list(sans="Arial"))
   }
   
-  plot(NA, NA, xlim = c(1,15), ylim = c(-200,250), 
+  plot(NA, NA, xlim = c(1,15), ylim = c(-300,500), 
        xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = 100, col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   abline(h = 0, col = 8, lty = 2)
   axis(1, at=c(1, 5, 10, 15))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
-  axis(2, at = c(-200, -100, 0, 100, 200), las=2) #tick marks for y axis
+  axis(2, at = c(-300, -200, -100, 0, 100, 200, 300, 400, 500), las=2) #tick marks for y axis
   
   for(perturb in perturbtypes){
     data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
@@ -5759,13 +5759,13 @@ plotRDMCollapsedBlockedIndLC <- function(maxppid=31, location='feedback', target
     svglite(file='doc/fig/Fig30_RDMBlockedIndLearningCurve.svg', width=11.5, height=10.5, pointsize=16, system_fonts=list(sans="Arial"))
   }
   
-  plot(NA, NA, xlim = c(1,9), ylim = c(-200,250), 
+  plot(NA, NA, xlim = c(1,9), ylim = c(-300,500), 
        xlab = "Block", ylab = "Amount of compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = 100, col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   abline(h = 0, col = 8, lty = 2)
   axis(1, at=c(1, 3, 5, 8))#, labels=c('Exclusive', 'Inclusive')) #tick marks for x axis
-  axis(2, at = c(-200, -100, 0, 100, 200), las=2) #tick marks for y axis
+  axis(2, at = c(-300, -200, -100, 0, 100, 200, 300, 400, 500), las=2) #tick marks for y axis
   
   for(perturb in perturbtypes){
     data <- getBlockedIndividualLearningCurves(maxppid = maxppid, location = location, targetno = targetno, perturb = perturb)
