@@ -789,3 +789,18 @@ getPermTestColourScheme <- function(){
   
   return(colourscheme)
 }
+
+getSexColourScheme <- function(groups = c('MALES', 'FEMALES')){
+  
+  for(group in groups){
+    colourscheme <- list()
+    #create a list containing the colourscheme per group
+    colourscheme[['MALES']] <- list('S'=alpha('#005de4ff', 1), #blue
+                                    'T'='#005de42f')
+    
+    #create a list containing the colourscheme per group
+    colourscheme[['FEMALES']] <- list('S'=alpha('#e51636ff', 1), #vivid/york red
+                                      'T'='#e516362f')
+  }
+  return(colourscheme)
+}
