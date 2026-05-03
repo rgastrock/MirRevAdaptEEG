@@ -9708,6 +9708,148 @@ plotSexFRNPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir
   }
 }
 
+# SEX DIFFERENCES: Perturb type, FRN, EarlyLate-----
+getSexPTypeFRNEarlyLate <- function(groups = c('rot', 'rdm', 'mir'), erps = 'frn'){
+  for(group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_EvL_%s_diff_%s.csv', group, erps))
+    sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+    
+    males <- sexdata$id[which(sexdata$sex == 'm')]
+    females <- sexdata$id[which(sexdata$sex == 'f')]
+    
+    mdat <- data[,c('time', males)]
+    fdat <- data[,c('time', females)]
+    
+    write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_FRN_EarlyLate_MALES_%s.csv', group), row.names = F) 
+    write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_FRN_EarlyLate_FEMALES_%s.csv', group), row.names = F) 
+  }
+}
+
+getSexPTypeFRNEarlyLateCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), type = 'b'){
+  for(sex in sexes){
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_FRN_EarlyLate_%s_%s.csv', sex, group))
+      timepts <- data$time
+      # data <- data[,2:length(data)]
+      
+      data <- as.data.frame(data)
+      
+      data1 <- as.matrix(data[,2:(dim(data)[2])])
+      
+      confidence <- data.frame()
+      
+      
+      for (time in timepts){
+        cireaches <- data1[which(data$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+      }
+      write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_FRN_EarlyLate_%s_%s_CI.csv', sex, group), row.names = F) 
+    }
+  }
+}
+
+plotSexPTypeFRNPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), target='inline', erps = 'frn') {
+  
+  for (group in groups){
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig001_PType_FRN_EARLYLATE_%s.svg', group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-6, 16), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Early vs Late\n feedback onset: %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
+    
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_FRN_EarlyLate_%s_%s.csv', sex, group))
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_FRN_EarlyLate_%s_%s_CI.csv', sex, group))
+      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # colourscheme <- getPermTestColourScheme()
+    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+    # subdat <- permdat[which(permdat$condition == ptype),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['T']]
+    #     } else {
+    #       col <- colourscheme[['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     lower <- c(rep(-5, length(permtime)))
+    #     upper <- c(rep(-4, length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    #add legend
+    legend(1,15,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+  
+}
+
 # SEX DIFFERENCES: FRN, SmallLarge-----
 getSexFRNSmallLarge <- function(perturbs = c('rot', 'rdm', 'mir'), erps = 'frn'){
   for(ptype in perturbs){
@@ -9876,6 +10018,148 @@ plotSexFRNPermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mi
       }
     }
   }
+}
+
+# SEX DIFFERENCES: Perturb type, FRN, SmallLarge-----
+getSexPTypeFRNSmallLarge <- function(groups = c('rot', 'rdm', 'mir'), erps = 'frn'){
+  for(group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_SvL_%s_diff_%s.csv', group, erps))
+    sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+    
+    males <- sexdata$id[which(sexdata$sex == 'm')]
+    females <- sexdata$id[which(sexdata$sex == 'f')]
+    
+    mdat <- data[,c('time', males)]
+    fdat <- data[,c('time', females)]
+    
+    write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_FRN_SmallLarge_MALES_%s.csv', group), row.names = F) 
+    write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_FRN_SmallLarge_FEMALES_%s.csv', group), row.names = F) 
+  }
+}
+
+getSexPTypeFRNSmallLargeCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), type = 'b'){
+  for(sex in sexes){
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_FRN_SmallLarge_%s_%s.csv', sex, group))
+      timepts <- data$time
+      # data <- data[,2:length(data)]
+      
+      data <- as.data.frame(data)
+      
+      data1 <- as.matrix(data[,2:(dim(data)[2])])
+      
+      confidence <- data.frame()
+      
+      
+      for (time in timepts){
+        cireaches <- data1[which(data$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+      }
+      write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_FRN_SmallLarge_%s_%s_CI.csv', sex, group), row.names = F) 
+    }
+  }
+}
+
+plotSexPTypeFRNPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), target='inline', erps = 'frn') {
+  
+  for (group in groups){
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig001_PType_FRN_SMALLLARGE_%s.svg', group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    plot(NA, NA, xlim = c(-0.35, 1.6), ylim = c(-6, 16), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Large vs Small\n feedback onset: %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    axis(2, at = c(-5, 0, 5, 10, 15), las=2) #tick marks for y axis
+    
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_FRN_SmallLarge_%s_%s.csv', sex, group))
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601] #remove .5 seconds before and after -1.5 and 1.5
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_FRN_SmallLarge_%s_%s_CI.csv', sex, group))
+      groupconfidence <- groupconfidence[351:601,] #grab timepts we need
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # colourscheme <- getPermTestColourScheme()
+    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+    # subdat <- permdat[which(permdat$condition == ptype),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['T']]
+    #     } else {
+    #       col <- colourscheme[['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     lower <- c(rep(-5, length(permtime)))
+    #     upper <- c(rep(-4, length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    #add legend
+    legend(1,15,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+  
 }
 
 # SEX DIFFERENCES: RP, EarlyLate-----
@@ -10047,6 +10331,148 @@ plotSexRPPermTestEarlyLateDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir'
   }
 }
 
+# SEX DIFFERENCES: Perturb type, RP, EarlyLate-----
+getSexPTypeRPEarlyLate <- function(groups = c('rot', 'rdm', 'mir'), erps = 'rp'){
+  for(group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_EvL_%s_diff_%s.csv', group, erps))
+    sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+    
+    males <- sexdata$id[which(sexdata$sex == 'm')]
+    females <- sexdata$id[which(sexdata$sex == 'f')]
+    
+    mdat <- data[,c('time', males)]
+    fdat <- data[,c('time', females)]
+    
+    write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_RP_EarlyLate_MALES_%s.csv', group), row.names = F) 
+    write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_RP_EarlyLate_FEMALES_%s.csv', group), row.names = F) 
+  }
+}
+
+getSexPTypeRPEarlyLateCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), type = 'b'){
+  for(sex in sexes){
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_RP_EarlyLate_%s_%s.csv', sex, group))
+      timepts <- data$time
+      # data <- data[,2:length(data)]
+      
+      data <- as.data.frame(data)
+      
+      data1 <- as.matrix(data[,2:(dim(data)[2])])
+      
+      confidence <- data.frame()
+      
+      
+      for (time in timepts){
+        cireaches <- data1[which(data$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+      }
+      write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_RP_EarlyLate_%s_%s_CI.csv', sex, group), row.names = F) 
+    }
+  }
+}
+
+plotSexPTypeRPPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), target='inline', erps = 'rp') {
+  
+  for (group in groups){
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig002_PType_RP_EARLYLATE_%s.svg', group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Early vs Late\n go signal onset: %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_RP_EarlyLate_%s_%s.csv', sex, group))
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_RP_EarlyLate_%s_%s_CI.csv', sex, group))
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # colourscheme <- getPermTestColourScheme()
+    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+    # subdat <- permdat[which(permdat$condition == ptype),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['T']]
+    #     } else {
+    #       col <- colourscheme[['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     lower <- c(rep(-5, length(permtime)))
+    #     upper <- c(rep(-4, length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    #add legend
+    legend(0.45,9.5,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+  
+}
+
 # SEX DIFFERENCES: RP, SmallLarge-----
 getSexRPSmallLarge <- function(perturbs = c('rot', 'rdm', 'mir'), erps = 'rp'){
   for(ptype in perturbs){
@@ -10214,6 +10640,148 @@ plotSexRPPermTestSmallLargeDiffWaves <- function(perturbs = c('rot', 'rdm', 'mir
       }
     }
   }
+}
+
+# SEX DIFFERENCES: Perturb type, RP, SmallLarge-----
+getSexPTypeRPSmallLarge <- function(groups = c('rot', 'rdm', 'mir'), erps = 'rp'){
+  for(group in groups){
+    data <- read.csv(file=sprintf('data/DiffWaves_DF_SvL_%s_diff_%s.csv', group, erps))
+    sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+    
+    males <- sexdata$id[which(sexdata$sex == 'm')]
+    females <- sexdata$id[which(sexdata$sex == 'f')]
+    
+    mdat <- data[,c('time', males)]
+    fdat <- data[,c('time', females)]
+    
+    write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_RP_SmallLarge_MALES_%s.csv', group), row.names = F) 
+    write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_RP_SmallLarge_FEMALES_%s.csv', group), row.names = F) 
+  }
+}
+
+getSexPTypeRPSmallLargeCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), type = 'b'){
+  for(sex in sexes){
+    for (group in groups){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_RP_SmallLarge_%s_%s.csv', sex, group))
+      timepts <- data$time
+      # data <- data[,2:length(data)]
+      
+      data <- as.data.frame(data)
+      
+      data1 <- as.matrix(data[,2:(dim(data)[2])])
+      
+      confidence <- data.frame()
+      
+      
+      for (time in timepts){
+        cireaches <- data1[which(data$time == time), ]
+        
+        if (type == "t"){
+          cireaches <- cireaches[!is.na(cireaches)]
+          citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+        } else if(type == "b"){
+          citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+        }
+        
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+      }
+      write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_RP_SmallLarge_%s_%s_CI.csv', sex, group), row.names = F) 
+    }
+  }
+}
+
+plotSexPTypeRPPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), target='inline', erps = 'rp') {
+  
+  for (group in groups){
+    #but we can save plot as svg file
+    if (target=='svg') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig002_PType_RP_SMALLLARGE_%s.svg', group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-16, 10), 
+         xlab = "Time (s)", ylab = "µV", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Large vs Small\n go signal onset: %s", group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    axis(2, at = c(-15, -10, -5, 0, 5), las=2) #tick marks for y axis
+    
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_RP_SmallLarge_%s_%s.csv', sex, group))
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501] #remove .5 seconds before and after -1.5 and 1.5
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_RP_SmallLarge_%s_%s_CI.csv', sex, group))
+      groupconfidence <- groupconfidence[201:501,] #grab timepts we need
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # colourscheme <- getPermTestColourScheme()
+    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
+    # subdat <- permdat[which(permdat$condition == ptype),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['T']]
+    #     } else {
+    #       col <- colourscheme[['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     lower <- c(rep(-5, length(permtime)))
+    #     upper <- c(rep(-4, length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    #add legend
+    legend(0.45,9.5,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+  
 }
 
 # SEX DIFFERENCES: TFR Feedback, EarlyLate-----
@@ -10415,6 +10983,185 @@ plotSexTFRFRNEarlyLateAll <- function(frequencies = c('beta', 'alpha', 'theta'),
   for(freqs in frequencies){
     for(roi in rois){
       plotSexTFRFRNPermTestEarlyLateDiffWaves(freqs = freqs, roi = roi, target=target)
+    }
+  }
+  
+}
+
+# SEX DIFFERENCES: TFR PType Feedback, EarlyLate-----
+getSexPTypeTFRFRNEarlyLate <- function(groups = c('rot', 'rdm', 'mir'), freqs = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), erps = 'frn'){
+  for(group in groups){
+    for(freq in freqs){
+      for(roi in rois){
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_%s_%s_%s.csv', roi, freq, group, erps))
+        sexdata <- read.csv(file='qualtrics/pp_demog_idtfr.csv')
+        
+        males <- sexdata$id[which(sexdata$sex == 'm')]
+        females <- sexdata$id[which(sexdata$sex == 'f')]
+        
+        mdat <- data[,c('time', males)]
+        fdat <- data[,c('time', females)]
+        
+        write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_EarlyLate_MALES_%s_%s.csv', freq, group, roi), row.names = F) 
+        write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_EarlyLate_FEMALES_%s_%s.csv', freq, group, roi), row.names = F) 
+      }
+    }
+  }
+}
+
+getSexPTypeTFRFRNEarlyLateCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), rois = c('medfro', 'latcen'), freqs = c('beta', 'alpha', 'theta'), type = 'b'){
+  for(freq in freqs){
+    for(sex in sexes){
+      for(roi in rois){
+        for (group in groups){
+          data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_EarlyLate_%s_%s_%s.csv', freq, sex, group, roi))
+          timepts <- data$time
+          # data <- data[,2:length(data)]
+          
+          data <- as.data.frame(data)
+          
+          data1 <- as.matrix(data[,2:(dim(data)[2])])
+          
+          confidence <- data.frame()
+          
+          
+          for (time in timepts){
+            cireaches <- data1[which(data$time == time), ]
+            
+            if (type == "t"){
+              cireaches <- cireaches[!is.na(cireaches)]
+              citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+            } else if(type == "b"){
+              citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+            }
+            
+            if (prod(dim(confidence)) == 0){
+              confidence <- citrial
+            } else {
+              confidence <- rbind(confidence, citrial)
+            }
+          }
+          write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_EarlyLate_%s_%s_%s_CI.csv', freq, sex, group, roi), row.names = F) 
+        }
+      }
+    }
+  }
+}
+
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), freqs, roi, target='inline', erps = 'frn') {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  for (group in groups){
+    
+    #but we can save plot as svg file
+    if (target=='svg' & freqs == 'alpha') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig003A_PType_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'beta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig003B_PType_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'theta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig003C_PType_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    
+    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-yval - 10, yval +10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to feedback onset: %s", roi, freqs, group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_EarlyLate_%s_%s_%s.csv', freqs, sex, group, roi))
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_EarlyLate_%s_%s_%s_CI.csv', freqs, sex, group, roi))
+      groupconfidence <- groupconfidence[351:601,]
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
+    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
+    # subdat <- permdat[which(permdat$condition == cond),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['late']][['T']]
+    #     } else {
+    #       col <- colourscheme[['late']][['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     mult <- 0.05
+    #     lower <- c(rep(-yval, length(permtime)))
+    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    legend(0.8,yval,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
+
+plotSexPTypeTFRFRNEarlyLateAll <- function(frequencies = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), target='svg'){
+  
+  for(freqs in frequencies){
+    for(roi in rois){
+      plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = freqs, roi = roi, target=target)
     }
   }
   
@@ -10624,6 +11371,185 @@ plotSexTFRFRNSmallLargeAll <- function(frequencies = c('beta', 'alpha', 'theta')
   
 }
 
+# SEX DIFFERENCES: TFR PType Feedback, SmallLarge-----
+getSexPTypeTFRFRNSmallLarge <- function(groups = c('rot', 'rdm', 'mir'), freqs = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), erps = 'frn'){
+  for(group in groups){
+    for(freq in freqs){
+      for(roi in rois){
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_%s_%s_%s.csv', roi, freq, group, erps))
+        sexdata <- read.csv(file='qualtrics/pp_demog_idtfr.csv')
+        
+        males <- sexdata$id[which(sexdata$sex == 'm')]
+        females <- sexdata$id[which(sexdata$sex == 'f')]
+        
+        mdat <- data[,c('time', males)]
+        fdat <- data[,c('time', females)]
+        
+        write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_SmallLarge_MALES_%s_%s.csv', freq, group, roi), row.names = F) 
+        write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_SmallLarge_FEMALES_%s_%s.csv', freq, group, roi), row.names = F) 
+      }
+    }
+  }
+}
+
+getSexPTypeTFRFRNSmallLargeCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), rois = c('medfro', 'latcen'), freqs = c('beta', 'alpha', 'theta'), type = 'b'){
+  for(freq in freqs){
+    for(sex in sexes){
+      for(roi in rois){
+        for (group in groups){
+          data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_SmallLarge_%s_%s_%s.csv', freq, sex, group, roi))
+          timepts <- data$time
+          # data <- data[,2:length(data)]
+          
+          data <- as.data.frame(data)
+          
+          data1 <- as.matrix(data[,2:(dim(data)[2])])
+          
+          confidence <- data.frame()
+          
+          
+          for (time in timepts){
+            cireaches <- data1[which(data$time == time), ]
+            
+            if (type == "t"){
+              cireaches <- cireaches[!is.na(cireaches)]
+              citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+            } else if(type == "b"){
+              citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+            }
+            
+            if (prod(dim(confidence)) == 0){
+              confidence <- citrial
+            } else {
+              confidence <- rbind(confidence, citrial)
+            }
+          }
+          write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_SmallLarge_%s_%s_%s_CI.csv', freq, sex, group, roi), row.names = F) 
+        }
+      }
+    }
+  }
+}
+
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), freqs, roi, target='inline', erps = 'frn') {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  for (group in groups){
+    
+    #but we can save plot as svg file
+    if (target=='svg' & freqs == 'alpha') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig004A_PType_TFR_DiffWaves_SmallLarge_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'beta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig004B_PType_TFR_DiffWaves_SmallLarge_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'theta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig004C_PType_TFR_DiffWaves_SmallLarge_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    
+    plot(NA, NA, xlim = c(-0.35, 1.1), ylim = c(-yval - 10, yval +10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to feedback onset: %s", roi, freqs, group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-0.25, 0, 0.25, 0.5, 1)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_SmallLarge_%s_%s_%s.csv', freqs, sex, group, roi))
+      full_timepts <- data$time
+      timepts <- full_timepts[351:601]
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sFRN_SmallLarge_%s_%s_%s_CI.csv', freqs, sex, group, roi))
+      groupconfidence <- groupconfidence[351:601,]
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
+    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
+    # subdat <- permdat[which(permdat$condition == cond),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['late']][['T']]
+    #     } else {
+    #       col <- colourscheme[['late']][['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     mult <- 0.05
+    #     lower <- c(rep(-yval, length(permtime)))
+    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    legend(0.8,yval,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
+
+plotSexPTypeTFRFRNSmallLargeAll <- function(frequencies = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), target='svg'){
+  
+  for(freqs in frequencies){
+    for(roi in rois){
+      plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = freqs, roi = roi, target=target)
+    }
+  }
+  
+}
+
 # SEX DIFFERENCES: TFR GO Onset, EarlyLate-----
 getSexTFRRPEarlyLate <- function(perturbs = c('rot', 'rdm', 'mir'), freqs = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), erps = 'lrp'){
   for(ptype in perturbs){
@@ -10828,6 +11754,185 @@ plotSexTFRRPEarlyLateAll <- function(frequencies = c('beta', 'alpha', 'theta'), 
   
 }
 
+# SEX DIFFERENCES: TFR PType GO Onset, EarlyLate-----
+getSexPTypeTFRRPEarlyLate <- function(groups = c('rot', 'rdm', 'mir'), freqs = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), erps = 'lrp'){
+  for(group in groups){
+    for(freq in freqs){
+      for(roi in rois){
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_EvL_%s_%s_%s.csv', roi, freq, group, erps))
+        sexdata <- read.csv(file='qualtrics/pp_demog_idtfr.csv')
+        
+        males <- sexdata$id[which(sexdata$sex == 'm')]
+        females <- sexdata$id[which(sexdata$sex == 'f')]
+        
+        mdat <- data[,c('time', males)]
+        fdat <- data[,c('time', females)]
+        
+        write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_%sRP_EarlyLate_MALES_%s_%s.csv', freq, group, roi), row.names = F) 
+        write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_%sRP_EarlyLate_FEMALES_%s_%s.csv', freq, group, roi), row.names = F) 
+      }
+    }
+  }
+}
+
+getSexPTypeTFRRPEarlyLateCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), rois = c('medfro', 'latcen'), freqs = c('beta', 'alpha', 'theta'), type = 'b'){
+  for(freq in freqs){
+    for(sex in sexes){
+      for(roi in rois){
+        for (group in groups){
+          data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sRP_EarlyLate_%s_%s_%s.csv', freq, sex, group, roi))
+          timepts <- data$time
+          # data <- data[,2:length(data)]
+          
+          data <- as.data.frame(data)
+          
+          data1 <- as.matrix(data[,2:(dim(data)[2])])
+          
+          confidence <- data.frame()
+          
+          
+          for (time in timepts){
+            cireaches <- data1[which(data$time == time), ]
+            
+            if (type == "t"){
+              cireaches <- cireaches[!is.na(cireaches)]
+              citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+            } else if(type == "b"){
+              citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+            }
+            
+            if (prod(dim(confidence)) == 0){
+              confidence <- citrial
+            } else {
+              confidence <- rbind(confidence, citrial)
+            }
+          }
+          write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_%sRP_EarlyLate_%s_%s_%s_CI.csv', freq, sex, group, roi), row.names = F) 
+        }
+      }
+    }
+  }
+}
+
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), freqs, roi, target='inline', erps = 'lrp') {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  for (group in groups){
+    
+    #but we can save plot as svg file
+    if (target=='svg' & freqs == 'alpha') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig005A_PTypeRP_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'beta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig005B_PTypeRP_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'theta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig005C_PTypeRP_TFR_DiffWaves_EarlyLate_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-yval - 10, yval + 10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to go signal onset: %s", roi, freqs, group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sRP_EarlyLate_%s_%s_%s.csv', freqs, sex, group, roi))
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sRP_EarlyLate_%s_%s_%s_CI.csv', freqs, sex, group, roi))
+      groupconfidence <- groupconfidence[201:501,]
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col)#xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
+    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
+    # subdat <- permdat[which(permdat$condition == cond),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['late']][['T']]
+    #     } else {
+    #       col <- colourscheme[['late']][['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     mult <- 0.05
+    #     lower <- c(rep(-yval, length(permtime)))
+    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    legend(0.8,yval,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
+
+plotSexPTypeTFRRPEarlyLateAll <- function(frequencies = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), target='svg'){
+  
+  for(freqs in frequencies){
+    for(roi in rois){
+      plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = freqs, roi = roi, target=target)
+    }
+  }
+  
+}
+
 # SEX DIFFERENCES: TFR GO Onset, SmallLarge-----
 getSexTFRRPSmallLarge <- function(perturbs = c('rot', 'rdm', 'mir'), freqs = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), erps = 'lrp'){
   for(ptype in perturbs){
@@ -11027,6 +12132,185 @@ plotSexTFRRPSmallLargeAll <- function(frequencies = c('beta', 'alpha', 'theta'),
   for(freqs in frequencies){
     for(roi in rois){
       plotSexTFRRPPermTestSmallLargeDiffWaves(freqs = freqs, roi = roi, target=target)
+    }
+  }
+  
+}
+
+# SEX DIFFERENCES: TFR PType GO Onset, SmallLarge-----
+getSexPTypeTFRRPSmallLarge <- function(groups = c('rot', 'rdm', 'mir'), freqs = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), erps = 'lrp'){
+  for(group in groups){
+    for(freq in freqs){
+      for(roi in rois){
+        data <- read.csv(file=sprintf('data/TFR_%s_DiffWaves_SvL_%s_%s_%s.csv', roi, freq, group, erps))
+        sexdata <- read.csv(file='qualtrics/pp_demog_idtfr.csv')
+        
+        males <- sexdata$id[which(sexdata$sex == 'm')]
+        females <- sexdata$id[which(sexdata$sex == 'f')]
+        
+        mdat <- data[,c('time', males)]
+        fdat <- data[,c('time', females)]
+        
+        write.csv(mdat, file=sprintf('data/sex_diff/SexDiff_PType_%sRP_SmallLarge_MALES_%s_%s.csv', freq, group, roi), row.names = F) 
+        write.csv(fdat, file=sprintf('data/sex_diff/SexDiff_PType_%sRP_SmallLarge_FEMALES_%s_%s.csv', freq, group, roi), row.names = F) 
+      }
+    }
+  }
+}
+
+getSexPTypeTFRRPSmallLargeCI <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), rois = c('medfro', 'latcen'), freqs = c('beta', 'alpha', 'theta'), type = 'b'){
+  for(freq in freqs){
+    for(sex in sexes){
+      for(roi in rois){
+        for (group in groups){
+          data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sRP_SmallLarge_%s_%s_%s.csv', freq, sex, group, roi))
+          timepts <- data$time
+          # data <- data[,2:length(data)]
+          
+          data <- as.data.frame(data)
+          
+          data1 <- as.matrix(data[,2:(dim(data)[2])])
+          
+          confidence <- data.frame()
+          
+          
+          for (time in timepts){
+            cireaches <- data1[which(data$time == time), ]
+            
+            if (type == "t"){
+              cireaches <- cireaches[!is.na(cireaches)]
+              citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+            } else if(type == "b"){
+              citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+            }
+            
+            if (prod(dim(confidence)) == 0){
+              confidence <- citrial
+            } else {
+              confidence <- rbind(confidence, citrial)
+            }
+          }
+          write.csv(confidence, file=sprintf('data/sex_diff/SexDiff_PType_%sRP_SmallLarge_%s_%s_%s_CI.csv', freq, sex, group, roi), row.names = F) 
+        }
+      }
+    }
+  }
+}
+
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 'mir'), sexes = c('MALES', 'FEMALES'), freqs, roi, target='inline', erps = 'lrp') {
+  
+  if (freqs == 'alpha'){
+    yval <- 200
+  } else if (freqs == 'beta'){
+    yval <- 100
+  } else if (freqs == 'theta'){
+    yval <- 300
+  }
+  
+  for (group in groups){
+    
+    #but we can save plot as svg file
+    if (target=='svg' & freqs == 'alpha') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig006A_PTypeRP_TFR_DiffWaves_SmallLarge_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'beta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig006B_PTypeRP_TFR_DiffWaves_SmallLarge_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    } else if (target=='svg' & freqs == 'theta') {
+      svglite(file=sprintf('doc/fig_sexdiff/Fig006C_PTypeRP_TFR_DiffWaves_SmallLarge_PermTest_%s_%s_%s.svg', freqs, roi, group), width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+    }
+    
+    plot(NA, NA, xlim = c(-1.1, 1.20), ylim = c(-yval - 10, yval + 10), 
+         xlab = "Time (s)", ylab = "Power (µV²)", frame.plot = FALSE, #frame.plot takes away borders
+         main = sprintf("Mean %s %s time-locked to go signal onset: %s", roi, freqs, group), xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+    
+    
+    abline(h = c(0), v = c(-1, 0), col = 8, lty = 2) #creates horizontal dashed lines through y =  0
+    axis(1, at = c(-1, -0.5, -0.25, 0, 0.25, 0.5)) #tick marks for x axis
+    if (freqs == 'alpha'){
+      axis(2, at = c(-200, -150, -100, -50, 0, 50, 100, 150, 200), las=2) #tick marks for y axis
+    } else if (freqs == 'beta'){
+      axis(2, at = c(-100, -50, 0, 50, 100), las=2) #tick marks for y axis
+    } else if (freqs == 'theta'){
+      axis(2, at = c(-300, -250, -200, -150, -100, -50, 0, 50, 100, 150, 200, 250, 300), las=2) #tick marks for y axis
+    }
+    
+    for(sex in sexes){
+      data <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sRP_SmallLarge_%s_%s_%s.csv', freqs, sex, group, roi))
+      full_timepts <- data$time
+      timepts <- full_timepts[201:501]
+      
+      groupconfidence <- read.csv(file=sprintf('data/sex_diff/SexDiff_PType_%sRP_SmallLarge_%s_%s_%s_CI.csv', freqs, sex, group, roi))
+      groupconfidence <- groupconfidence[201:501,]
+      
+      colourscheme <- getSexColourScheme()
+      #take only first, last and middle columns of file
+      lower <- groupconfidence[,1]
+      upper <- groupconfidence[,3]
+      mid <- groupconfidence[,2]
+      
+      col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+      
+      #upper and lower bounds create a polygon
+      #polygon creates it from low left to low right, then up right to up left -> use rev
+      #x is just trial nnumber, y depends on values of bounds
+      polygon(x = c(timepts, rev(timepts)), y = c(lower, rev(upper)), border=NA, col=col)
+      
+      col <- colourscheme[[sex]][['S']]
+      #lines(x = timepts, y = mid, col=col)
+      lines(x = timepts, y = mid, col = col, lty = 1, lwd = 2)
+    }
+    
+    lim <- par('usr')
+    col <- "#ededed"
+    col <- alpha(col, .5)
+    rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col)#xleft, ybottom, x right, ytop; light grey hex code
+    
+    # #add in permutation clusters and any significant results
+    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
+    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
+    # subdat <- permdat[which(permdat$condition == cond),]
+    # for(i in c(1:nrow(subdat))){
+    #   start <- subdat$clust_idx_start[i] + 1
+    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+    #   
+    #   if(is.na(start) & is.na(end)){
+    #     next
+    #   } else {
+    #     #redefine timepts
+    #     timepts <- full_timepts[401:601]
+    #     permtime <- timepts[start:end]
+    #     
+    #     p_clust <- subdat$p_values[i]
+    #     if(p_clust >= 0.05){
+    #       col <- colourscheme[['late']][['T']]
+    #     } else {
+    #       col <- colourscheme[['late']][['S']]
+    #     }
+    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+    #     mult <- 0.05
+    #     lower <- c(rep(-yval, length(permtime)))
+    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
+    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+    #   }
+    # }
+    
+    
+    legend(0.8,yval,legend=c('males', 'females'),
+           col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+           lty=1,bty='n',cex=1,lwd=2)
+    
+    
+    #close everything if you saved plot as svg
+    if (target=='svg') {
+      dev.off()
+    }
+  }
+}
+
+plotSexPTypeTFRRPSmallLargeAll <- function(frequencies = c('beta', 'alpha', 'theta'), rois = c('medfro', 'latcen'), target='svg'){
+  
+  for(freqs in frequencies){
+    for(roi in rois){
+      plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = freqs, roi = roi, target=target)
     }
   }
   

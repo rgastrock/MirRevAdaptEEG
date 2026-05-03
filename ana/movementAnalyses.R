@@ -889,6 +889,224 @@ plotBlockedRT <- function(target='inline'){
   
 }
 
+#Reaction time SEX DIFFERENCES----
+getSexGroupRTs <- function() {
+  aln <- getRTAligned()
+  colnames(aln) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rdm0 <- getRTRDM0()
+  colnames(rdm0) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rot <- getRTRot()
+  colnames(rot) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                         'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                         'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                         'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rdm1 <- getRTRDM1()
+  colnames(rdm1) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  mir <- getRTMir()
+  colnames(mir) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                         'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                         'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                         'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  data <- rbind(aln, rdm0, rot, rdm1, mir)
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/RT_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/RT_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexRTConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/RT_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- c(1:nrow(data))
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[trial, ]
+      if(all(is.na(cireaches))){
+        citrial <- c(a = NA_real_, b = NA_real_, c = NA_real_)
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+        next
+      }
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/RT_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexRTs <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig101_RT.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,325), ylim = c(199,801), 
+       xlab = "Trial", ylab = "Reaction time (ms)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Reaction times across trial types", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(v = c(48, 96, 186, 234, 324), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 49, 97, 187, 235, 324)) #tick marks for x axis
+  axis(2, at = c(200, 300, 400, 500, 600, 700, 800)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/RT_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:324), rev(c(1:324))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    col <- colourscheme[[sex]][['S']]
+    lines(mid,col=col,lty=1)
+    
+    
+  }
+  
+  # add legend
+  legend(48,800,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+# Reaction time SEX differences: STATS----
+getSexBlockedRT <- function(sexes = c('MALES', 'FEMALES'), blockdefs) {
+  for(s in sexes){
+    dat <- read.csv(file=sprintf('data/sex_diff/RT_%s.csv', s))
+    dat <- dat[,-1] #remove trial rows
+    participants <- colnames(dat)
+    N <- length(participants)
+    
+    participant <- c()
+    set <- c()
+    dv <- c()
+    sex <- c()
+    
+    for (ppno in c(1:N)) {
+      
+      pp <- participants[ppno]
+      
+      for (blockno in c(1:length(blockdefs))) {
+        #for each participant, and every 9 trials, get the mean
+        blockdef <- blockdefs[[blockno]]
+        blockstart <- blockdef[1]
+        blockend <- blockstart + blockdef[2] - 1
+        samples <- dat[blockstart:blockend,ppno]
+        samples <- mean(samples, na.rm=TRUE)
+        
+        participant <- c(participant, pp)
+        set <- c(set, names(blockdefs)[blockno])
+        dv <- c(dv, samples)
+        sex <- c(sex, s)
+      }
+    }
+    if(s == 'MALES'){
+      LCaov_males <- data.frame(participant, set, dv, sex)
+    } else if (s == 'FEMALES'){
+      LCaov_females <- data.frame(participant, set, dv, sex)
+    }
+  }
+  #combine datasets
+  LCaov <- rbind(LCaov_males, LCaov_females)
+  #need to make some columns as factors for ANOVA
+  #LCaov$participant <- as.factor(LCaov$participant)
+  LCaov$set <- factor(LCaov$set, levels = c('al_1', 'al_2', 'al_3',
+                                            'rdm0_1', 'rdm0_2', 'rdm0_3',
+                                            'rot_1', 'rot_2', 'rot_3',
+                                            'rdm1_1', 'rdm1_2', 'rdm1_3',
+                                            'mir_1', 'mir_2', 'mir_3'))
+  LCaov$sex <- as.factor(LCaov$sex)
+  
+  return(LCaov)
+  
+}
+
+sexRTBayesANOVA <- function() {
+  
+  blockdefs <- list('al_1' = c(1,12), 'al_2' = c(13,12), 'al_3' = c(37,12),
+                    'rdm0_1' = c(49,6), 'rdm0_2' = c(55,6), 'rdm0_3' = c(91,6),
+                    'rot_1' = c(97,6), 'rot_2' = c(103,6), 'rot_3' = c(181,6),
+                    'rdm1_1' = c(187,6), 'rdm1_2' = c(193,6), 'rdm1_3' = c(229,6),
+                    'mir_1' = c(235,6), 'mir_2' = c(241,6), 'mir_3' = c(319,6))
+  LC_part1 <- getSexBlockedRT(blockdefs=blockdefs)
+  LC_part1 <- na.omit(LC_part1) #omit NA values
+  
+  LC_part1$participant <- as.factor(LC_part1$participant)
+  
+  
+  cat('Reaction times, males versus females:\n')
+  bfLC<- anovaBF(dv ~ set + sex + participant, data = LC_part1, whichRandom = 'participant') #include data from participants, but note that this is a random factor
+  #compare interaction contribution, over the contribution of both main effects
+  #bfinteraction <- bfLC[4]/bfLC[3]
+  
+  #bfinclude to compare model with interactions against all other models
+  bfinteraction <- bayesfactor_inclusion(bfLC)
+  
+  print(bfLC)
+  print(bfinteraction)
+  
+}
+
 # Movement time analysis ----
 getMTTrials <- function(id, task, taskno){
   #allows for this function to work with each file
@@ -1769,6 +1987,224 @@ plotBlockedMT <- function(target='inline'){
   
 }
 
+#Movement time SEX DIFFERENCES----
+getSexGroupMTs <- function() {
+  aln <- getMTAligned()
+  colnames(aln) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rdm0 <- getMTRDM0()
+  colnames(rdm0) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rot <- getMTRot()
+  colnames(rot) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rdm1 <- getMTRDM1()
+  colnames(rdm1) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  mir <- getMTMir()
+  colnames(mir) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  data <- rbind(aln, rdm0, rot, rdm1, mir)
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/MT_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/MT_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexMTConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/MT_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- c(1:nrow(data))
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[trial, ]
+      if(all(is.na(cireaches))){
+        citrial <- c(a = NA_real_, b = NA_real_, c = NA_real_)
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+        next
+      }
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/MT_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexMTs <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig102_MT.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,325), ylim = c(0,201), 
+       xlab = "Trial", ylab = "Movement time (ms)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Movement times across trial types", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(v = c(48, 96, 186, 234, 324), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 49, 97, 187, 235, 324)) #tick marks for x axis
+  axis(2, at = c(0, 50, 100, 150, 200)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/MT_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:324), rev(c(1:324))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    col <- colourscheme[[sex]][['S']]
+    lines(mid,col=col,lty=1)
+    
+    
+  }
+  
+  # add legend
+  legend(48,60,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+# Movement time SEX differences: STATS----
+getSexBlockedMT <- function(sexes = c('MALES', 'FEMALES'), blockdefs) {
+  for(s in sexes){
+    dat <- read.csv(file=sprintf('data/sex_diff/MT_%s.csv', s))
+    dat <- dat[,-1] #remove trial rows
+    participants <- colnames(dat)
+    N <- length(participants)
+    
+    participant <- c()
+    set <- c()
+    dv <- c()
+    sex <- c()
+    
+    for (ppno in c(1:N)) {
+      
+      pp <- participants[ppno]
+      
+      for (blockno in c(1:length(blockdefs))) {
+        #for each participant, and every 9 trials, get the mean
+        blockdef <- blockdefs[[blockno]]
+        blockstart <- blockdef[1]
+        blockend <- blockstart + blockdef[2] - 1
+        samples <- dat[blockstart:blockend,ppno]
+        samples <- mean(samples, na.rm=TRUE)
+        
+        participant <- c(participant, pp)
+        set <- c(set, names(blockdefs)[blockno])
+        dv <- c(dv, samples)
+        sex <- c(sex, s)
+      }
+    }
+    if(s == 'MALES'){
+      LCaov_males <- data.frame(participant, set, dv, sex)
+    } else if (s == 'FEMALES'){
+      LCaov_females <- data.frame(participant, set, dv, sex)
+    }
+  }
+  #combine datasets
+  LCaov <- rbind(LCaov_males, LCaov_females)
+  #need to make some columns as factors for ANOVA
+  #LCaov$participant <- as.factor(LCaov$participant)
+  LCaov$set <- factor(LCaov$set, levels = c('al_1', 'al_2', 'al_3',
+                                            'rdm0_1', 'rdm0_2', 'rdm0_3',
+                                            'rot_1', 'rot_2', 'rot_3',
+                                            'rdm1_1', 'rdm1_2', 'rdm1_3',
+                                            'mir_1', 'mir_2', 'mir_3'))
+  LCaov$sex <- as.factor(LCaov$sex)
+  
+  return(LCaov)
+  
+}
+
+sexMTBayesANOVA <- function() {
+  
+  blockdefs <- list('al_1' = c(1,12), 'al_2' = c(13,12), 'al_3' = c(37,12),
+                    'rdm0_1' = c(49,6), 'rdm0_2' = c(55,6), 'rdm0_3' = c(91,6),
+                    'rot_1' = c(97,6), 'rot_2' = c(103,6), 'rot_3' = c(181,6),
+                    'rdm1_1' = c(187,6), 'rdm1_2' = c(193,6), 'rdm1_3' = c(229,6),
+                    'mir_1' = c(235,6), 'mir_2' = c(241,6), 'mir_3' = c(319,6))
+  LC_part1 <- getSexBlockedMT(blockdefs=blockdefs)
+  LC_part1 <- na.omit(LC_part1) #omit NA values
+  
+  LC_part1$participant <- as.factor(LC_part1$participant)
+  
+  
+  cat('Movement times, males versus females:\n')
+  bfLC<- anovaBF(dv ~ set + sex + participant, data = LC_part1, whichRandom = 'participant') #include data from participants, but note that this is a random factor
+  #compare interaction contribution, over the contribution of both main effects
+  #bfinteraction <- bfLC[4]/bfLC[3]
+  
+  #bfinclude to compare model with interactions against all other models
+  bfinteraction <- bayesfactor_inclusion(bfLC)
+  
+  print(bfLC)
+  print(bfinteraction)
+  
+}
+
 #Path Length analysis----
 #Every sample has (x,y) coordinate.
 # First sample will have distance from origin as sqrt(x^2 + y^2) - called absolute vector
@@ -2390,6 +2826,224 @@ plotBlockedPL <- function(target='inline'){
   if (target=='svg') {
     dev.off()
   }
+  
+}
+
+#Path length SEX DIFFERENCES----
+getSexGroupPLs <- function() {
+  aln <- as.data.frame(getAlignedGroupPathLength())
+  colnames(aln) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rdm0 <- as.data.frame(getRDM0GroupPathLength())
+  colnames(rdm0) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rot <- as.data.frame(getROTGroupPathLength())
+  colnames(rot) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  rdm1 <- as.data.frame(getRDM1GroupPathLength())
+  colnames(rdm1) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  mir <- as.data.frame(getMIRGroupPathLength())
+  colnames(mir) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                     'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                     'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                     'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  data <- rbind(aln, rdm0, rot, rdm1, mir)
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/PL_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/PL_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexPLConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/PL_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- c(1:nrow(data))
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[trial, ]
+      if(all(is.na(cireaches))){
+        citrial <- c(a = NA_real_, b = NA_real_, c = NA_real_)
+        if (prod(dim(confidence)) == 0){
+          confidence <- citrial
+        } else {
+          confidence <- rbind(confidence, citrial)
+        }
+        next
+      }
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/PL_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexPLs <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig103_PL.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,325), ylim = c(4, 8), 
+       xlab = "Trial", ylab = "Path length (cm)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Path length across trial types", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(v = c(48, 96, 186, 234, 324), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 49, 97, 187, 235, 324)) #tick marks for x axis
+  axis(2, at = c(4.00, 4.50, 5.00, 5.50, 6.00, 6.50, 7.00, 7.50, 8.00)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/PL_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:324), rev(c(1:324))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    col <- colourscheme[[sex]][['S']]
+    lines(mid,col=col,lty=1)
+    
+    
+  }
+  
+  # add legend
+  legend(1,5.5,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+# Path length SEX differences: STATS----
+getSexBlockedPL <- function(sexes = c('MALES', 'FEMALES'), blockdefs) {
+  for(s in sexes){
+    dat <- read.csv(file=sprintf('data/sex_diff/PL_%s.csv', s))
+    dat <- dat[,-1] #remove trial rows
+    participants <- colnames(dat)
+    N <- length(participants)
+    
+    participant <- c()
+    set <- c()
+    dv <- c()
+    sex <- c()
+    
+    for (ppno in c(1:N)) {
+      
+      pp <- participants[ppno]
+      
+      for (blockno in c(1:length(blockdefs))) {
+        #for each participant, and every 9 trials, get the mean
+        blockdef <- blockdefs[[blockno]]
+        blockstart <- blockdef[1]
+        blockend <- blockstart + blockdef[2] - 1
+        samples <- dat[blockstart:blockend,ppno]
+        samples <- mean(samples, na.rm=TRUE)
+        
+        participant <- c(participant, pp)
+        set <- c(set, names(blockdefs)[blockno])
+        dv <- c(dv, samples)
+        sex <- c(sex, s)
+      }
+    }
+    if(s == 'MALES'){
+      LCaov_males <- data.frame(participant, set, dv, sex)
+    } else if (s == 'FEMALES'){
+      LCaov_females <- data.frame(participant, set, dv, sex)
+    }
+  }
+  #combine datasets
+  LCaov <- rbind(LCaov_males, LCaov_females)
+  #need to make some columns as factors for ANOVA
+  #LCaov$participant <- as.factor(LCaov$participant)
+  LCaov$set <- factor(LCaov$set, levels = c('al_1', 'al_2', 'al_3',
+                                            'rdm0_1', 'rdm0_2', 'rdm0_3',
+                                            'rot_1', 'rot_2', 'rot_3',
+                                            'rdm1_1', 'rdm1_2', 'rdm1_3',
+                                            'mir_1', 'mir_2', 'mir_3'))
+  LCaov$sex <- as.factor(LCaov$sex)
+  
+  return(LCaov)
+  
+}
+
+sexPLBayesANOVA <- function() {
+  
+  blockdefs <- list('al_1' = c(1,12), 'al_2' = c(13,12), 'al_3' = c(37,12),
+                    'rdm0_1' = c(49,6), 'rdm0_2' = c(55,6), 'rdm0_3' = c(91,6),
+                    'rot_1' = c(97,6), 'rot_2' = c(103,6), 'rot_3' = c(181,6),
+                    'rdm1_1' = c(187,6), 'rdm1_2' = c(193,6), 'rdm1_3' = c(229,6),
+                    'mir_1' = c(235,6), 'mir_2' = c(241,6), 'mir_3' = c(319,6))
+  LC_part1 <- getSexBlockedPL(blockdefs=blockdefs)
+  LC_part1 <- na.omit(LC_part1) #omit NA values
+  
+  LC_part1$participant <- as.factor(LC_part1$participant)
+  
+  
+  cat('Path lengths, males versus females:\n')
+  bfLC<- anovaBF(dv ~ set + sex + participant, data = LC_part1, whichRandom = 'participant') #include data from participants, but note that this is a random factor
+  #compare interaction contribution, over the contribution of both main effects
+  #bfinteraction <- bfLC[4]/bfLC[3]
+  
+  #bfinclude to compare model with interactions against all other models
+  bfinteraction <- bayesfactor_inclusion(bfLC)
+  
+  print(bfLC)
+  print(bfinteraction)
   
 }
 

@@ -5990,3 +5990,458 @@ getRDMBlockedtTests <- function(maxppid = 31, location = 'feedback', targetno = 
   
  
 }
+
+# Learning Curves: Sex Differences-----
+
+getSexROTGroupLearningCurves <- function(maxppid = 31, location = 'feedback') {
+  
+  data <- as.data.frame(getPercCompROTGroupLearningCurves(maxppid = maxppid, location = location))
+  colnames(data) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/LC_ROT_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/LC_ROT_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexROTGroupConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/LC_ROT_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[which(data$trial == trial), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/LC_rot_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexROTLearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig100_ROT_LC.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
+       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Rotation learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
+  axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/LC_ROT_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:90), rev(c(1:90))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    meanGroupReaches[[sex]] <- mid #use mean to fill in empty list for each group
+  }
+  
+  
+  for (sex in sexes) {
+    # plot mean reaches for each group
+    col <- colourscheme[[sex]][['S']]
+    lines(meanGroupReaches[[sex]],col=col,lty=1)
+  }
+  
+  # add legend
+  legend(60,-80,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+getSexMIRGroupLearningCurves <- function(maxppid = 31, location = 'feedback') {
+  
+  data <- as.data.frame(getPercCompMIRGroupLCALL(maxppid = maxppid, location = location))
+  colnames(data) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/LC_MIR_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/LC_MIR_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexMIRGroupConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/LC_MIR_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[which(data$trial == trial), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/LC_mir_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexMIRLearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig100_MIR_LC.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
+       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Mirror learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
+  axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/LC_mir_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:90), rev(c(1:90))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    meanGroupReaches[[sex]] <- mid #use mean to fill in empty list for each group
+  }
+  
+  
+  for (sex in sexes) {
+    # plot mean reaches for each group
+    col <- colourscheme[[sex]][['S']]
+    lines(meanGroupReaches[[sex]],col=col,lty=1)
+  }
+  
+  # add legend
+  legend(60,-80,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+getSexRDM1GroupLearningCurves <- function(maxppid = 31, location = 'feedback') {
+  
+  data <- as.data.frame(getPercCompBlock1RDMGroupLCALL(maxppid = maxppid, location = location))
+  colnames(data) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/LC_RDM1_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/LC_RDM1_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexRDM1GroupConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/LC_RDM1_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[which(data$trial == trial), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/LC_rdm1_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexRDM1LearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig100_RDM1_LC.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,49), ylim = c(-200,200), 
+       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Random rotation set 1 learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 15, 30, 48)) #tick marks for x axis
+  axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/LC_rdm1_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    meanGroupReaches[[sex]] <- mid #use mean to fill in empty list for each group
+  }
+  
+  
+  for (sex in sexes) {
+    # plot mean reaches for each group
+    col <- colourscheme[[sex]][['S']]
+    lines(meanGroupReaches[[sex]],col=col,lty=1)
+  }
+  
+  # add legend
+  legend(30,-80,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
+getSexRDM2GroupLearningCurves <- function(maxppid = 31, location = 'feedback') {
+  
+  data <- as.data.frame(getPercCompBlock2RDMGroupLCALL(maxppid = maxppid, location = location))
+  colnames(data) <- c('trial', 'pp000', 'pp001', 'pp002', 'pp003', 'pp004', 'pp005', 'pp006', 'pp007',
+                      'pp008', 'pp009', 'pp010', 'pp011', 'pp012', 'pp013', 'pp014', 'pp015',
+                      'pp016', 'pp017', 'pp018', 'pp019', 'pp020', 'pp021', 'pp022', 'pp023',
+                      'pp024', 'pp025', 'pp026', 'pp027', 'pp028', 'pp029', 'pp030', 'pp031')
+  
+  sexdata <- read.csv(file='qualtrics/pp_demog.csv')
+  
+  males <- sexdata$id[which(sexdata$sex == 'm')]
+  females <- sexdata$id[which(sexdata$sex == 'f')]
+  
+  mdat <- data[,c('trial', males)]
+  fdat <- data[,c('trial', females)]
+  
+  write.csv(mdat, file='data/sex_diff/LC_RDM2_MALES.csv', row.names = F) 
+  write.csv(fdat, file='data/sex_diff/LC_RDM2_FEMALES.csv', row.names = F) 
+  
+}
+
+getSexRDM2GroupConfidenceInterval <- function(sexes = c('MALES', 'FEMALES'), type = 'b'){
+  
+  for(sex in sexes){
+    data <- read.csv(file=sprintf('data/sex_diff/LC_RDM2_%s.csv', sex))
+    
+    data <- as.data.frame(data)
+    trialno <- data$trial
+    data1 <- as.matrix(data[,2:dim(data)[2]])
+    
+    confidence <- data.frame()
+    
+    
+    for (trial in trialno){
+      cireaches <- data1[which(data$trial == trial), ]
+      
+      if (type == "t"){
+        cireaches <- cireaches[!is.na(cireaches)]
+        citrial <- t.interval(data = cireaches, variance = var(cireaches), conf.level = 0.95)
+      } else if(type == "b"){
+        citrial <- getBSConfidenceInterval(data = cireaches, resamples = 1000)
+      }
+      
+      if (prod(dim(confidence)) == 0){
+        confidence <- citrial
+      } else {
+        confidence <- rbind(confidence, citrial)
+      }
+      
+      write.csv(confidence, file=sprintf('data/sex_diff/LC_rdm2_%s_CI.csv', sex), row.names = F) 
+      
+      
+    }
+  }
+}
+
+plotSexRDM2LearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inline') {
+  
+  #but we can save plot as svg file
+  if (target=='svg') {
+    svglite(file='doc/fig_sexdiff/Fig100_RDM2_LC.svg', width=12, height=7, pointsize=14, system_fonts=list(sans="Arial"))
+  }
+  # create plot
+  meanGroupReaches <- list() #empty list so that it plots the means last
+  
+  #NA to create empty plot
+  # could maybe use plot.new() ?
+  plot(NA, NA, xlim = c(0,49), ylim = c(-200,200), 
+       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       main = "Random rotation set 2 learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
+  abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
+  axis(1, at = c(1, 15, 30, 48)) #tick marks for x axis
+  axis(2, at = c(-200, -100, 0, 100, 200)) #tick marks for y axis
+  
+  for(sex in sexes){
+    #read in files created by getGroupConfidenceInterval in filehandling.R
+    groupconfidence <- read.csv(file=sprintf('data/sex_diff/LC_rdm2_%s_CI.csv', sex))
+    
+    colourscheme <- getSexColourScheme()
+    #take only first, last and middle columns of file
+    lower <- groupconfidence[,1]
+    upper <- groupconfidence[,3]
+    mid <- groupconfidence[,2]
+    
+    col <- colourscheme[[sex]][['T']] #use colour scheme according to group
+    
+    #upper and lower bounds create a polygon
+    #polygon creates it from low left to low right, then up right to up left -> use rev
+    #x is just trial nnumber, y depends on values of bounds
+    polygon(x = c(c(1:48), rev(c(1:48))), y = c(lower, rev(upper)), border=NA, col=col)
+    
+    meanGroupReaches[[sex]] <- mid #use mean to fill in empty list for each group
+  }
+  
+  
+  for (sex in sexes) {
+    # plot mean reaches for each group
+    col <- colourscheme[[sex]][['S']]
+    lines(meanGroupReaches[[sex]],col=col,lty=1)
+  }
+  
+  # add legend
+  legend(30,-80,legend=c('males','females'),
+         col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
+         lty=1,bty='n',cex=1,lwd=2)
+  
+  #close everything if you saved plot as svg
+  if (target=='svg') {
+    dev.off()
+  }
+  
+}
+
