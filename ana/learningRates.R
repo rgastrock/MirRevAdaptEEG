@@ -6061,7 +6061,7 @@ plotSexROTLearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inli
   #NA to create empty plot
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
-       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       xlab = "Trial", ylab = "Amount of Compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "Rotation learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
@@ -6174,7 +6174,7 @@ plotSexMIRLearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inli
   #NA to create empty plot
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(0,91), ylim = c(-200,200), 
-       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       xlab = "Trial", ylab = "Amount of Compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "Mirror learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(1, 30, 60, 90)) #tick marks for x axis
@@ -6287,7 +6287,7 @@ plotSexRDM1LearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inl
   #NA to create empty plot
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(0,49), ylim = c(-200,200), 
-       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       xlab = "Trial", ylab = "Amount of Compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "Random rotation set 1 learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(1, 15, 30, 48)) #tick marks for x axis
@@ -6400,7 +6400,7 @@ plotSexRDM2LearningCurves <- function(sexes = c('MALES', 'FEMALES'), target='inl
   #NA to create empty plot
   # could maybe use plot.new() ?
   plot(NA, NA, xlim = c(0,49), ylim = c(-200,200), 
-       xlab = "Trial", ylab = "Amount of Compensation (°)", frame.plot = FALSE, #frame.plot takes away borders
+       xlab = "Trial", ylab = "Amount of Compensation (%)", frame.plot = FALSE, #frame.plot takes away borders
        main = "Random rotation set 2 learning over time", xaxt = 'n', yaxt = 'n') #xaxt and yaxt to allow to specify tick marks
   abline(h = c(-100,0, 100), col = 8, lty = 2) #creates horizontal dashed lines through y =  0 and 30
   axis(1, at = c(1, 15, 30, 48)) #tick marks for x axis

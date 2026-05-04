@@ -9808,35 +9808,44 @@ plotSexPTypeFRNPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', '
     col <- alpha(col, .5)
     rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # colourscheme <- getPermTestColourScheme()
-    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
-    # subdat <- permdat[which(permdat$condition == ptype),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['T']]
-    #     } else {
-    #       col <- colourscheme[['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     lower <- c(rep(-5, length(permtime)))
-    #     upper <- c(rep(-4, length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/Permutation_test_EvL_PerturbTypeComp_SexDIFF_%s.csv', erps))
     
+    if(group == 'rot'){
+      ptype <- 'rot_mvf'
+    } else if (group == 'rdm'){
+      ptype <- 'rdm_mvf'
+    } else if (group == 'mir'){
+      ptype <- 'mir_mvf'
+    }
     
+    subdat <- permdat[which(permdat$condition == ptype),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
+        permtime <- timepts[start:end]
+
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(10, length(permtime)))
+        upper <- c(rep(11, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     #add legend
     legend(1,15,legend=c('males', 'females'),
            col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
@@ -10120,35 +10129,44 @@ plotSexPTypeFRNPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', 
     col <- alpha(col, .5)
     rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # colourscheme <- getPermTestColourScheme()
-    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
-    # subdat <- permdat[which(permdat$condition == ptype),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['T']]
-    #     } else {
-    #       col <- colourscheme[['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     lower <- c(rep(-5, length(permtime)))
-    #     upper <- c(rep(-4, length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/Permutation_test_SvL_PerturbTypeComp_SexDIFF_%s.csv', erps))
     
+    if(group == 'rot'){
+      ptype <- 'rot_mvf'
+    } else if (group == 'rdm'){
+      ptype <- 'rdm_mvf'
+    } else if (group == 'mir'){
+      ptype <- 'mir_mvf'
+    }
     
+    subdat <- permdat[which(permdat$condition == ptype),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
+        permtime <- timepts[start:end]
+
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(10, length(permtime)))
+        upper <- c(rep(11, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     #add legend
     legend(1,15,legend=c('males', 'females'),
            col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
@@ -10431,35 +10449,44 @@ plotSexPTypeRPPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm', 'm
     col <- alpha(col, .5)
     rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # colourscheme <- getPermTestColourScheme()
-    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
-    # subdat <- permdat[which(permdat$condition == ptype),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['T']]
-    #     } else {
-    #       col <- colourscheme[['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     lower <- c(rep(-5, length(permtime)))
-    #     upper <- c(rep(-4, length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/Permutation_test_EvL_PerturbTypeComp_SexDIFF_%s.csv', erps))
     
+    if(group == 'rot'){
+      ptype <- 'rot_mvf'
+    } else if (group == 'rdm'){
+      ptype <- 'rdm_mvf'
+    } else if (group == 'mir'){
+      ptype <- 'mir_mvf'
+    }
     
+    subdat <- permdat[which(permdat$condition == ptype),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[201:501]
+        permtime <- timepts[start:end]
+
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-5, length(permtime)))
+        upper <- c(rep(-4, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     #add legend
     legend(0.45,9.5,legend=c('males', 'females'),
            col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
@@ -10742,35 +10769,44 @@ plotSexPTypeRPPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm', '
     col <- alpha(col, .5)
     rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # colourscheme <- getPermTestColourScheme()
-    # permdat <- read.csv(file=sprintf('data/Permutation_test_EarlyvsLate_%s.csv', erps))
-    # subdat <- permdat[which(permdat$condition == ptype),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['T']]
-    #     } else {
-    #       col <- colourscheme[['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     lower <- c(rep(-5, length(permtime)))
-    #     upper <- c(rep(-4, length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/Permutation_test_SvL_PerturbTypeComp_SexDIFF_%s.csv', erps))
     
+    if(group == 'rot'){
+      ptype <- 'rot_mvf'
+    } else if (group == 'rdm'){
+      ptype <- 'rdm_mvf'
+    } else if (group == 'mir'){
+      ptype <- 'mir_mvf'
+    }
     
+    subdat <- permdat[which(permdat$condition == ptype),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[201:501]
+        permtime <- timepts[start:end]
+
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-15, length(permtime))), col = col, lty = 1, lwd = 8)
+        lower <- c(rep(-5, length(permtime)))
+        upper <- c(rep(-4, length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     #add legend
     legend(0.45,9.5,legend=c('males', 'females'),
            col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
@@ -11115,36 +11151,37 @@ plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm'
     col <- alpha(col, .5)
     rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
-    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
-    # subdat <- permdat[which(permdat$condition == cond),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['late']][['T']]
-    #     } else {
-    #       col <- colourscheme[['late']][['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     mult <- 0.05
-    #     lower <- c(rep(-yval, length(permtime)))
-    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/TFR_Permutation_test_EvL_PerturbTypeComp_SexDIFF_%s_%s.csv', erps, roi))
+    cond <- sprintf('%s_%s_%s_mvf', freqs, roi, group)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
+        permtime <- timepts[start:end]
+
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
     
-    
+    colourscheme <- getSexColourScheme()
     legend(0.8,yval,legend=c('males', 'females'),
            col=c(colourscheme[['MALES']][['S']],colourscheme[['FEMALES']][['S']]),
            lty=1,bty='n',cex=1,lwd=2)
@@ -11498,34 +11535,37 @@ plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm
     col <- alpha(col, .5)
     rect(-0.25, lim[3]-1, 0, lim[4]+1, border = col, col = col) #xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
-    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
-    # subdat <- permdat[which(permdat$condition == cond),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['late']][['T']]
-    #     } else {
-    #       col <- colourscheme[['late']][['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     mult <- 0.05
-    #     lower <- c(rep(-yval, length(permtime)))
-    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/TFR_Permutation_test_SvL_PerturbTypeComp_SexDIFF_%s_%s.csv', erps, roi))
+    cond <- sprintf('%s_%s_%s_mvf', freqs, roi, group)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[401:601]
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     
     
     legend(0.8,yval,legend=c('males', 'females'),
@@ -11881,34 +11921,37 @@ plotSexPTypeTFRRPPermTestEarlyLateDiffWaves <- function(groups = c('rot', 'rdm',
     col <- alpha(col, .5)
     rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col)#xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
-    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
-    # subdat <- permdat[which(permdat$condition == cond),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['late']][['T']]
-    #     } else {
-    #       col <- colourscheme[['late']][['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     mult <- 0.05
-    #     lower <- c(rep(-yval, length(permtime)))
-    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/TFR_Permutation_test_EvL_PerturbTypeComp_SexDIFF_%s_%s.csv', erps, roi))
+    cond <- sprintf('%s_%s_%s_mvf', freqs, roi, group)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[201:501]
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     
     
     legend(0.8,yval,legend=c('males', 'females'),
@@ -12264,34 +12307,37 @@ plotSexPTypeTFRRPPermTestSmallLargeDiffWaves <- function(groups = c('rot', 'rdm'
     col <- alpha(col, .5)
     rect(0, lim[3]-1, 0.5, lim[4]+1, border = col, col = col)#xleft, ybottom, x right, ytop; light grey hex code
     
-    # #add in permutation clusters and any significant results
-    # permdat <- read.csv(file=sprintf('data/TFR_Permutation_test_EarlyvsLate_%s_%s.csv', erps, roi))
-    # cond <- sprintf('%s_%s_%s', freqs, roi, ptype)
-    # subdat <- permdat[which(permdat$condition == cond),]
-    # for(i in c(1:nrow(subdat))){
-    #   start <- subdat$clust_idx_start[i] + 1
-    #   end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
-    #   
-    #   if(is.na(start) & is.na(end)){
-    #     next
-    #   } else {
-    #     #redefine timepts
-    #     timepts <- full_timepts[401:601]
-    #     permtime <- timepts[start:end]
-    #     
-    #     p_clust <- subdat$p_values[i]
-    #     if(p_clust >= 0.05){
-    #       col <- colourscheme[['late']][['T']]
-    #     } else {
-    #       col <- colourscheme[['late']][['S']]
-    #     }
-    #     #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
-    #     mult <- 0.05
-    #     lower <- c(rep(-yval, length(permtime)))
-    #     upper <- c(rep(-yval + (yval*mult), length(permtime)))
-    #     polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
-    #   }
-    # }
+    #add in permutation clusters and any significant results
+    colourscheme <- getPermTestColourScheme()
+    permdat <- read.csv(file=sprintf('data/sex_diff/TFR_Permutation_test_SvL_PerturbTypeComp_SexDIFF_%s_%s.csv', erps, roi))
+    cond <- sprintf('%s_%s_%s_mvf', freqs, roi, group)
+    subdat <- permdat[which(permdat$condition == cond),]
+    for(i in c(1:nrow(subdat))){
+      start <- subdat$clust_idx_start[i] + 1
+      end <- subdat$clust_idx_end[i] #nothing to add or subtract: due to python indexing and should not include last digit in python sequence
+      
+      if(is.na(start) & is.na(end)){
+        next
+      } else {
+        #redefine timepts
+        timepts <- full_timepts[201:501]
+        permtime <- timepts[start:end]
+        
+        p_clust <- subdat$p_values[i]
+        if(p_clust >= 0.05){
+          col <- colourscheme[['T']]
+        } else {
+          col <- colourscheme[['S']]
+        }
+        #lines(x = c(permtime), y = c(rep(-yval, length(permtime))), col = col, lty = 1, lwd = 8)
+        mult <- 0.05
+        lower <- c(rep(-yval, length(permtime)))
+        upper <- c(rep(-yval + (yval*mult), length(permtime)))
+        polygon(x = c(permtime, rev(permtime)), y = c(lower, rev(upper)), border=NA, col=col)
+      }
+    }
+    
+    colourscheme <- getSexColourScheme()
     
     
     legend(0.8,yval,legend=c('males', 'females'),

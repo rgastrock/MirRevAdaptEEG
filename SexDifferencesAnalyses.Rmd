@@ -1,0 +1,249 @@
+---
+title: "Sex Differences"
+author: "Raphael Q. Gastrock"
+date: "2026-05-04"
+output: 
+  html_document:
+    toc: true
+    toc_depth: '5'
+    toc_float: true
+---
+
+This document contains analyses for comparing males and females across our behavioral and EEG results.
+
+```{r, warning=FALSE, message=FALSE}
+source('ana/shared.R')
+source('ana/learningRates.R')
+source('ana/permutationTtest.R')
+source('ana/movementAnalyses.R')
+```
+
+# Behavioral analyses
+
+First we confirm the absence of any sex effects across all our behavioral measures, similar to our earlier study (Gastrock et al., 2024).
+
+## Learning (Compensation)
+
+We compare the amount of compensation throughout all trials of training in each perturbation type. We do not perform exhaustive statistical tests for these comparisons. Instead, we present means and 95% confidence intervals for us to get a qualitative sense of any differences between the two sexes.
+
+### Fixed rotation
+
+```{r}
+plotSexROTLearningCurves()
+```
+
+For the most part, especially during earlier and later training, means in one sex overlap the confidence interval range of the other sex, suggesting no overall differences in compensation.
+
+### Mirror reversal
+
+```{r}
+plotSexMIRLearningCurves()
+```
+
+No overall differences, but we do note higher variability across participants.
+
+### Random rotation: Sets 1 and 2
+
+```{r}
+plotSexRDM1LearningCurves()
+plotSexRDM2LearningCurves()
+```
+
+No overall differences between males and females. We also observe no learning for this perturbation type.
+
+## Movement measures
+
+We then compare males and females along different movement variables (reaction time, movement time, path length), during different trial types (aligned, random rotation prior each perturbation training, perturbation training),
+
+Trial types proceed in the following manner for plots below: aligned > random rotation set 1 > fixed rotation > random rotation set 2 > mirror reversal
+
+### Reaction times
+
+```{r}
+plotSexRTs()
+sexRTBayesANOVA()
+```
+
+We find no evidence for an effect of sex.
+
+### Movement times
+
+```{r}
+plotSexMTs()
+sexMTBayesANOVA()
+```
+
+We find no evidence for an effect of sex.
+
+### Path length
+
+```{r}
+plotSexPLs()
+sexPLBayesANOVA()
+```
+
+We find no evidence for an effect of sex.
+
+## General Conclusions
+
+Overall, we do not find evidence for differences between males and females for our different behavioral measures.
+
+# EEG Analyses
+
+Given that we implemented our EEG analyses in steps (1: each condition's difference with aligned, 2: early vs late and small versus large, 3: across perturbation types), comparing males and females across all these steps will produce a comprehensive set of results. Therefore, for the results below, we will only focus sex comparisons within each perturbation type, after subtracting Late minus Early and Small minus Large conditions. As in our main results, we compare EEG signals between males and females using cluster-based permutation t tests. Identified clusters will be highlighter as light purple bars in the plots below, but significant clusters will be in solid purple bars.
+
+## Temporal domain
+
+### Movement preparation
+
+#### Early-late difference
+
+```{r}
+plotSexPTypeRPPermTestEarlyLateDiffWaves()
+```
+
+No significant clusters identified.
+
+#### Small-large difference
+
+```{r}
+plotSexPTypeRPPermTestSmallLargeDiffWaves()
+```
+
+We find a significant cluster for the random rotation condition (-0.69 to -0.54 sec), where the signal is more negative for females than males. This suggests that RPs were more negative for large errors compared to small errors in females, which was not the case for males. However, we note that despite this difference in RPs, we do not find overall differences in behavior between males and females.
+
+### Feedback processing
+
+#### Early-late difference
+
+```{r}
+plotSexPTypeFRNPermTestEarlyLateDiffWaves()
+```
+
+No significant clusters identified.
+
+#### Small-large difference
+
+```{r}
+plotSexPTypeFRNPermTestSmallLargeDiffWaves()
+```
+
+No significant clusters identified.
+
+## Frequency domain
+
+We repeat the same analyses as in the temporal domain, but also compare across our predetermined ROIs and across beta, alpha, and theta frequency bands.
+
+### Movement preparation
+
+#### Early-late difference
+
+##### medial frontal region
+
+```{r}
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = 'beta', roi = 'medfro')
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = 'alpha', roi = 'medfro')
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = 'theta', roi = 'medfro')
+```
+
+No significant clusters identified.
+
+##### lateral central region
+
+```{r}
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = 'beta', roi = 'latcen')
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = 'alpha', roi = 'latcen')
+plotSexPTypeTFRRPPermTestEarlyLateDiffWaves(freqs = 'theta', roi = 'latcen')
+```
+
+No significant clusters identified.
+
+#### Small-large difference
+
+##### medial frontal region
+
+```{r}
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = 'beta', roi = 'medfro')
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = 'alpha', roi = 'medfro')
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = 'theta', roi = 'medfro')
+```
+
+We find a difference between males and females during fixed rotation training in the medial frontal regions for the theta frequency band (-0.83 to -0.35 sec). This suggests that females had more negative-going theta activity for large errors than small errors, while the opposite pattern is observed in males. This may suggest different patterns of neural activity during movement preparation between the sexes.
+
+##### lateral central region
+
+```{r}
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = 'beta', roi = 'latcen')
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = 'alpha', roi = 'latcen')
+plotSexPTypeTFRRPPermTestSmallLargeDiffWaves(freqs = 'theta', roi = 'latcen')
+```
+
+No significant clusters identified.
+
+### Feedback processing
+
+#### Early-late difference
+
+##### medial frontal region
+
+```{r}
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = 'beta', roi = 'medfro')
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = 'alpha', roi = 'medfro')
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = 'theta', roi = 'medfro')
+```
+
+We find a difference between males and females during mirror reversal training in the medial frontal regions for the beta frequency band (0.24 to 0.48 sec). This suggests that females had more negative-going beta activity during early compared to late training, while the opposite pattern is observed in males. This may suggest different patterns of neural activity during feedback processing between the sexes.
+
+##### lateral central region
+
+```{r}
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = 'beta', roi = 'latcen')
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = 'alpha', roi = 'latcen')
+plotSexPTypeTFRFRNPermTestEarlyLateDiffWaves(freqs = 'theta', roi = 'latcen')
+```
+
+No significant clusters identified.
+
+#### Small-large difference
+
+##### medial frontal region
+
+```{r}
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = 'beta', roi = 'medfro')
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = 'alpha', roi = 'medfro')
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = 'theta', roi = 'medfro')
+```
+
+No significant clusters identified.
+
+##### lateral central region
+
+```{r}
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = 'beta', roi = 'latcen')
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = 'alpha', roi = 'latcen')
+plotSexPTypeTFRFRNPermTestSmallLargeDiffWaves(freqs = 'theta', roi = 'latcen')
+```
+
+No significant clusters identified.
+
+## General conclusions
+
+We identify some differences between males and females in our different perturbation types, during both pre- (for fixed and random rotations) and post- (for mirror reversal) movement, along both temporal and frequency domains. While these may suggest differences in processing errors or preparing for movements between males and females, we highlight that we do not observe differences between the two sexes when comparing our behavioral measures. Thus, although the underlying neural mechanisms may differ between males and females, these ultimately lead to similar performance in our tasks.
+
+However, future studies should investigate sex differences further, using an equal sample size and focusing on specific effects rather than the exploratory approach we have in this study.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
